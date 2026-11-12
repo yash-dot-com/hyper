@@ -116,8 +116,8 @@ function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={
 function InkStickerSheet() {
   return <div className="ink-sticker-sheet">{(["disc","arrow","spark","bow","vase","cube"] as const).map(shape=><HalftoneSticker key={shape} shape={shape}/>)}</div>;
 }
-function FusionSample() {
-  return <InkFusion className="fusion-sample" role="img" aria-label="Interactive ink dot pattern" tabIndex={0}/>;
+function FusionSample({fullSize=false}: {fullSize?:boolean} = {}) {
+  return <InkFusion className="fusion-sample" style={{width:fullSize?320:168,maxWidth:"100%",aspectRatio:"16 / 15",background:"#c9cec3"}} role="img" aria-label="Interactive ink dot pattern" tabIndex={0}/>;
 }
 const collection = [
   {title:"Ink Fusion",description:"Hover or focus the print to let neighboring dots pool into branching shapes. Move away to release them.",slug:"ink-fusion",component:"InkFusion",icon:Layers2,preview:FusionSample},
