@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { Showcase } from "@/components/showcase";
 
+import { highlight } from "@/lib/highlight";
 
 export default async function Home() {
   "use cache";
@@ -47,5 +48,5 @@ export default async function Home() {
     readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"),
   ]);
   const sources = [kaleidoscope, breathing, chroma, drift, cutInk, spectrum, magnetic, afterglow, dottedButterfly, butterfly, meadow, paper, momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
-  return <Showcase composition={composition} sources={sources} />;
+  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 28 || i === 30 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
 }

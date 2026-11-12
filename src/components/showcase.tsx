@@ -41,7 +41,7 @@ import { PixelCharacter } from "./experiments/PixelCharacter";
 import { PixelControls, defaultPixel, pixelPrompt } from "./pixel-settings";
 import { DemoVideo } from "./demo-video";
 import { RippleDemo, ripplePrompt, type RippleDemoMode } from "@/components/ripple-demo";
-import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockFilename, CodeBlockActions } from "./ai-elements/code-block";
+import type { Token } from "@/lib/highlight";
 
 const MotionButton = motion.create(Button);
 const buttonGestures = {
@@ -235,7 +235,7 @@ function subscribe(listener: () => void) {
 const snapshot = () => window.location.hash === "#agent-portrait" ? "kawaii-face-kit" : window.location.hash === "#frosted-tile-button" ? "frosted-tile-footer" : window.location.hash.slice(1);
 const home = () => "";
 
-function Detail({ index, source, composition }: { composition: string; index: number; source: string; }) {
+function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
@@ -441,17 +441,16 @@ function Detail({ index, source, composition }: { composition: string; index: nu
     {isKawaii && <KawaiiControls value={face} change={setFace}/>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
     {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href={`/skills/${item.slug}.zip`} download>Download skill and {isGradientSkill ? "components" : "SVG examples"} ↓</a></div>}
-    <CodeBlock className="editor" role="region" aria-label="Component source" code={source} language={isSkill?"markdown":"tsx"} showLineNumbers>
-      <CodeBlockHeader className="source-heading"><CodeBlockTitle><Code2/><CodeBlockFilename>{item.component}.{isSkill?"md":"tsx"}</CodeBlockFilename></CodeBlockTitle>
-        <CodeBlockActions><motion.button {...buttonGestures} onClick={()=>copy("code")}>{feedback==="code"?<Check/>:<Copy/>}{feedback==="code"?"Copied":isSkill?"Copy skill":"Copy code"}</motion.button></CodeBlockActions>
-      </CodeBlockHeader>
-    </CodeBlock>
+    <section className="editor" aria-label="Component source">
+      <header><span><Code2/>{item.component}.{isSkill ? "md" : "tsx"}</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : isSkill ? "Copy skill" : "Copy code"}</motion.button></header>
+      <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
+    </section>
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}
     <span className="sr-only" role="status">{feedback && feedback + " copied"}</span>
   </>;
 }
 
-export function Showcase({ sources, composition }: { composition: string; sources: string[] }) {
+export function Showcase({ sources, highlighted, composition }: { composition: string; sources: string[]; highlighted: Token[][][] }) {
   const slug = useSyncExternalStore(subscribe, snapshot, home);
   const index = collection.findIndex(item => item.slug === slug);
   const [open, setOpen] = useState(false);
@@ -476,7 +475,7 @@ export function Showcase({ sources, composition }: { composition: string; source
           <div className="mini" inert aria-hidden="true"><item.preview/></div>
           <a href={'#' + item.slug}>{item.title}<ArrowUpRight/></a>
         </article>)}</div>
-      </> : <Detail composition={composition} index={index} source={sources[index]}/>}
+      </> : <Detail composition={composition} index={index} source={sources[index]} lines={highlighted[index]}/>}
     </main>
     </div>
   </MotionConfig>;
