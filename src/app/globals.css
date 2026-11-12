@@ -317,3 +317,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 
 
 .stage.art-breathing-bands,.art-breathing-bands .mini{background:#fff9ee;grid-template-columns:minmax(0,1fr)}.stage.art-breathing-bands{height:auto}
+.stage.art-digital-kaleidoscope,.art-digital-kaleidoscope .mini{background:#fffef9;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.demo-modes.band-palettes{flex-wrap:wrap;gap:10px;margin:18px 0 22px}
+.band-palettes button{height:auto;min-height:44px;padding:9px 18px}
