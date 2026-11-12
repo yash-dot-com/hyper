@@ -16,10 +16,11 @@ const buttonGestures = {
   whileTap: { y: 0, scale: 0.97 },
 };
 
-function KineticVideo() {
+function KineticVideo({ fullSize = false }: { fullSize?: boolean }) {
+  const base = fullSize ? "/kinetic-paragraph/preview-hd" : "/kinetic-paragraph/preview";
   return (
     <video autoPlay muted loop playsInline width={720} height={720}
-      src="/kinetic-paragraph/preview.mp4" poster="/kinetic-paragraph/poster.webp"
+      src={base + ".mp4"} poster={fullSize ? base + ".webp" : "/kinetic-paragraph/poster.webp"}
       aria-label="Kinetic paragraph animation" />
   );
 }
@@ -86,8 +87,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isRipple ? <RippleDemo mode={mode}/> : isVideo ? (
-        <KineticVideo/>
+      {isRipple ? <RippleDemo mode={mode} fullSize/> : isVideo ? (
+        <KineticVideo fullSize/>
       ) : <>
       <div className="piece" key={version}><Preview playing={playing}/></div>
       <div className="playback">
