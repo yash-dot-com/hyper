@@ -23,6 +23,7 @@ export function BreathingBandsFooter({children,palette="citrus"}:{children?:Reac
       elapsed.current+=reduced.matches?0:Math.min(.08,(now-last)/1000);
       last=now;
       const c=ctx!;
+      c.setTransform(1,0,0,node.height/110,0,0);
       const phase=elapsed.current*Math.PI/4;
       const breath=(1-Math.cos(phase))/2;
       c.fillStyle=colors[0];c.fillRect(0,0,960,110);
@@ -48,7 +49,7 @@ export function BreathingBandsFooter({children,palette="citrus"}:{children?:Reac
     return ()=>{cancelAnimationFrame(frame);observer.disconnect();document.removeEventListener("visibilitychange",sync);reduced.removeEventListener("change",sync)};
   },[palette]);
   return <footer style={{width:"100%",background:"#fff9ee",color:"#252318"}}>
-    <canvas ref={ref} width="960" height="110" aria-hidden="true" style={{display:"block",width:"100%",height:"auto"}}/>
+    <canvas ref={ref} width="960" height="280" aria-hidden="true" style={{display:"block",width:"100%",height:"auto",minHeight:"130px"}}/>
     {children&&<div style={{padding:"1rem 4%"}}>{children}</div>}
   </footer>;
 }
