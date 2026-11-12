@@ -2,24 +2,34 @@
 
 import { useEffect, useRef, type ReactNode, type CSSProperties } from "react";
 
-const warm=[[245,235,25],[251,176,82],[238,44,176],[198,58,194],[239,116,21]];
-const cool=[[245,235,25],[71,213,192],[36,151,198],[59,57,154],[76,34,131]];
+type InkSet=readonly [string,string,string,string,string];
+export const driftPalettes:Record<"warm"|"cool",InkSet>={
+  warm:["#f5eb19","#fbb052","#ee2cb0","#c63ac2","#ef7415"],
+  cool:["#f5eb19","#47d5c0","#2497c6","#3b399a","#4c2283"],
+};
+function rgb(hex:string){
+  const value=parseInt(hex.slice(1),16);
+  return [value>>16,(value>>8)&255,value&255];
+}
 const widths=[5,42,34,64,46,22,14,13,24,12,8,15,20,12,31,27,33,61,24,24,32,24,49,19,26];
 
-export function PrismDrift({children,className,style,speed=1}:{
-  children?:ReactNode;className?:string;style?:CSSProperties;speed?:number;
+export function PrismDrift({children,className,style,speed=1,palettes=driftPalettes}:{
+  children?:ReactNode;className?:string;style?:CSSProperties;speed?:number;palettes?:typeof driftPalettes;
 }){
   const canvas=useRef<HTMLCanvasElement>(null);
+  const time=useRef(0);
   useEffect(()=>{
     const node=canvas.current!,c=node.getContext("2d");
     if(!c)return;
     const reduced=matchMedia("(prefers-reduced-motion: reduce)");
     const total=widths.reduce((a,b)=>a+b,0);
-    let visible=false,frame=0,elapsed=0,last=0;
+    const warm=palettes.warm.map(rgb),cool=palettes.cool.map(rgb);
+    let visible=false,frame=0,last=0;
     function draw(now:number){
       const ctx=c!;
-      if(last && !reduced.matches)elapsed+=Math.min(.1,(now-last)/1000)*speed;
+      if(last && !reduced.matches)time.current+=Math.min(.1,(now-last)/1000)*speed;
       last=now;
+      const elapsed=time.current;
       const t=elapsed*2*Math.PI/20;
       // Ease between the two ink sets twice per loop, holding each at full strength.
       const mix=Math.max(0,Math.min(1,(-Math.cos(t)-.05)*2.1+.5));
@@ -43,8 +53,8 @@ export function PrismDrift({children,className,style,speed=1}:{
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduced.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{observer.disconnect();cancelAnimationFrame(frame);reduced.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[speed]);
-  return <div className={className} style={{position:"relative",isolation:"isolate",overflow:"hidden",background:"linear-gradient(120deg,#ef7415,#ed2cb0,#f5eb19)",...style}}>
+  },[speed,palettes]);
+  return <div className={className} style={{position:"relative",isolation:"isolate",overflow:"hidden",background:`linear-gradient(120deg,${palettes.warm.join(",")})`,...style}}>
     <canvas ref={canvas} aria-hidden="true" width={960} height={480} style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:-1}}/>
     {children}
   </div>;
