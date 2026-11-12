@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { ProceduralTree, type TreeSettings } from "./experiments/ProceduralTree";
+import { ProceduralTree, treeDesigns, type TreeDesign, type TreeSettings } from "./experiments/ProceduralTree";
 import { LuminousSurface, lightFinishes, type LightFinish } from "./experiments/LuminousSurface";
 import { MetalEmblem, emblemMarks, type EmblemMark } from "./experiments/MetalEmblem";
 import { GlassBubble } from "./experiments/GlassBubble";
@@ -138,6 +138,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
   const isTree = item.slug === "procedural-tree";
+  const [design,setDesign]=useState<TreeDesign>("Original");
   const [tree,setTree] = useState<TreeSettings>({width:460,height:380,depth:3,seed:19});
   useEffect(()=>{if(isTree)setTree(t=>({...t,seed:Math.floor(Math.random()*1000)}));},[isTree]);
   const [growth,regrow] = useState(0);
@@ -169,7 +170,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
 
   async function copy(kind: "code" | "prompt") {
     const text = kind === "code" ? source : isTree ? [
-      `Use the named ProceduralTree export in a React project. Render <ProceduralTree width={${tree.width}} height={${tree.height}} depth={${tree.depth}} seed={${tree.seed}} />. Keep seeded geometry, parent-before-child animation and reduced-motion behavior. In Next.js import from a client boundary.`,
+      `Use the named ProceduralTree export in a React project. Render <ProceduralTree design="${design}" width={${tree.width}} height={${tree.height}} depth={${tree.depth}} seed={${tree.seed}} />. Keep seeded geometry, parent-before-child animation and reduced-motion behavior. In Next.js import from a client boundary.`,
       "```tsx", source, "```",
     ].join("\n\n") : isLight ? [
       `Use the named LuminousSurface React export in a client boundary. Wrap your content with <LuminousSurface finish="${light}">…</LuminousSurface>. Preserve the frosted rim, pointer lighting, focus feedback, and reduced-motion fallback.`, "```tsx", source, "```",
@@ -227,9 +228,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isTree ? <ProceduralTree key={growth} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {isTree && <div className="pixel-controls">
+      <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>
       {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
       <Button variant="outline" onClick={()=>setTree(t=>({...t,seed:(t.seed+1+Math.floor(Math.random()*999))%1000}))}>New tree</Button>
       <Button variant="outline" onClick={()=>regrow(n=>n+1)}>Replay growth</Button>
