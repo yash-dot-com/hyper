@@ -240,8 +240,9 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .directory-select-trigger:focus-visible {outline:2px solid var(--foreground);outline-offset:2px}
 .directory-select-trigger[data-popup-open] svg {transform:rotate(180deg)}
 .directory-select-position {z-index:20}
-.directory-select-popup {width:var(--anchor-width);min-width:max-content;max-height:min(18rem,var(--available-height));overflow:auto;overscroll-behavior:contain;padding:4px;border:1px solid #484845;border-radius:11px;background:#20201f;color:#efeee9;box-shadow:0 8px 24px #0005}
-.directory-select-option {padding:5px 8px;border-radius:6px;cursor:pointer;outline:none}
+.directory-select-popup {display:flex;flex-direction:column;width:var(--anchor-width);min-width:max-content;max-height:min(18rem,var(--available-height));overflow:hidden;padding:8px 5px;border:1px solid #484845;border-radius:11px;background:#20201f;color:#efeee9;box-shadow:0 8px 24px #0005}
+.directory-select-list {min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.directory-select-option {min-height:32px;padding:6px 9px;border-radius:6px;cursor:pointer;outline:none}
 .directory-select-option[data-selected] {font-weight:600}
 .directory-select-option[data-highlighted] {background:#393937;color:#fff}
 .pixel-controls fieldset div { display:flex; flex-wrap:wrap; gap:3px; margin-top:8px; }
@@ -251,7 +252,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 
 .stage.art-kawaii-face-kit,.art-kawaii-face-kit .mini { background:#f5e3e7; }
 .face-sheet {display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px;margin-top:20px}
-.face-sheet button {display:grid;justify-items:center;padding:6px 2px 9px;background:#212020;border:1px solid var(--edge);border-radius:10px;font-size:11px;text-transform:capitalize}
+.face-sheet button {display:grid;justify-items:center;padding:8px 2px;background:#212020;border:1px solid var(--edge);border-radius:10px;font-size:11px;text-transform:capitalize}
 .face-sheet button:hover {background:#30292c}
 .face-sheet button[aria-pressed=true] {border-color:#edaac0;background:#352a30}
 

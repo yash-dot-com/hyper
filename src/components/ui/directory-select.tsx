@@ -18,7 +18,7 @@ export function DirectorySelect<T extends string>({label,value,options,onChange,
     <Select.Portal>
       <Select.Positioner className="directory-select-position" sideOffset={5} align="start" alignItemWithTrigger={false}>
         <Select.Popup className="directory-select-popup">
-          <Select.List>{items.map(item=><Select.Item className="directory-select-option" key={item.value} value={item.value}>
+          <Select.List className="directory-select-list">{items.map(item=><Select.Item className="directory-select-option" key={item.value} value={item.value}>
             <Select.ItemText>{item.label}</Select.ItemText>
             <Select.ItemIndicator><Check size={14}/></Select.ItemIndicator>
           </Select.Item>)}</Select.List>
