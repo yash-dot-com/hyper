@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { EmbossedBadge, badgeFinishes, type BadgeFinish } from "./experiments/EmbossedBadge";
 import { MotionBadge, badgeKinds, type BadgeKind } from "./experiments/MotionBadge";
 import { FolderSticker } from "./experiments/GradientObjects";
 import { GradientFolder, folderColors, type FolderColor } from "./experiments/GradientFolder";
@@ -73,7 +74,15 @@ function BadgeSheet({choose}:{choose?:(kind:BadgeKind)=>void}) {
     {badgeKinds.map(kind=><MotionBadge key={kind} kind={kind} onClick={choose?()=>choose(kind):undefined}/>)}
   </div>;
 }
+function EmbossedSheet({choose}:{choose?:(finish:BadgeFinish)=>void}) {
+  return <div style={{display:"grid",justifyItems:"center",gap:14}}>
+    {badgeFinishes.map((finish,i)=><div key={finish} style={{transform:`rotate(${[4,-6,-2][i]}deg)`}}>
+      <EmbossedBadge finish={finish} onClick={choose?()=>choose(finish):undefined}/>
+    </div>)}
+  </div>;
+}
 const collection = [
+  {title:"Embossed Badges", description:"Three softly beveled labels with engraved marks. Select a finish to copy its usage.", slug:"embossed-badges", component:"EmbossedBadge", icon:Layers2, preview:EmbossedSheet},
   {title:"Motion Badges", description:"Six pastel badges with a gesture for each icon. Select a badge to use it in your prompt.", slug:"motion-badges", component:"MotionBadge", icon:Layers2, preview:BadgeSheet},
   {title:"Gradient Stickers", description:"Four folder stickers for projects, receipts, scripts, and documents. Hover to peek inside, or tap to pin one open.", slug:"gradient-objects", component:"SKILL", icon:Layers2, preview:GradientObjectsDemo},
   {title:"Gradient Folder", description:"Hover to fan the pages, or click to pin the folder open.", slug:"gradient-folder", component:"GradientFolder", icon:Layers2, preview:() => <GradientFolder size={195}/>},
@@ -98,6 +107,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
+  const isEmbossed = item.slug === "embossed-badges";
+  const [finish,setFinish] = useState<BadgeFinish>("branding");
   const isBadge = item.slug === "motion-badges";
   const [badge,setBadge] = useState<BadgeKind>("Digital");
   const isGradientSkill = item.slug === "gradient-objects";
@@ -117,7 +128,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isBadge ? [
+    const text = kind === "code" ? source : isEmbossed ? [
+      `Use the complete EmbossedBadge React component with motion/react. Render <EmbossedBadge finish="${finish}" />. Preserve its matching face, bevel, engraved text and icon treatments. Use label for custom copy and onClick for an interactive badge.`, "```tsx", source, "```",
+    ].join("\n\n") : isBadge ? [
       `Integrate the named MotionBadge React export below using motion/react. Render <MotionBadge kind="${badge}" />. Pass label to customize the text or onClick for an actionable badge. Preserve reduced-motion support.`,
       "```tsx", source, "```",
     ].join("\n\n") : isFolder ? [
@@ -160,8 +173,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
     {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
     {isFolder && <div className="demo-modes" style={{marginTop:14}} role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
