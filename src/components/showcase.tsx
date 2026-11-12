@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
+import { ArrowUpRight, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DigitalKaleidoscope, scopePresets } from "./experiments/DigitalKaleidoscope";
@@ -49,17 +49,17 @@ const buttonGestures = {
   whileTap: { y: 0, scale: 0.97 },
 };
 
-function CopyPromptButton({copied,onCopy}:{copied:boolean;onCopy:()=>void}){
+function CopyAction({label,copied,onCopy}:{label:string;copied:boolean;onCopy:()=>void}){
   const reduced=useReducedMotion();
   return <span style={{display:"flex",justifyContent:"flex-end",width:142,flexShrink:0}}>
-    <MotionButton className="prompt-action" aria-label="Copy prompt" onClick={onCopy}
+    <MotionButton className="prompt-action" aria-label={label} onClick={onCopy}
       style={{position:"relative",overflow:"hidden",height:44,padding:0}}
       initial={false} animate={{width:copied&&!reduced?44:142}}
       transition={{duration:reduced?0:.24,ease:[.32,0,.16,1]}}>
       <motion.span aria-hidden="true" initial={false} animate={{opacity:copied?0:1}}
         transition={{duration:reduced?0:.1,delay:copied||reduced?0:.12}}
         style={{display:"inline-flex",alignItems:"center",gap:8,whiteSpace:"nowrap"}}>
-        <Copy/>Copy prompt
+        <Copy/>{label}
       </motion.span>
       <svg aria-hidden="true" viewBox="0 0 24 24" style={{position:"absolute",width:22,height:22,color:"#7ce4a0"}}>
         <motion.path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -382,7 +382,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   return <>
     <header className="detail-head">
       <h1>{item.title}</h1>
-      <CopyPromptButton copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
+      <CopyAction label="Copy prompt" copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
     </header>
     <p className="component-description">{item.description}</p>
     {item.slug === "halftone-butterfly" && <div className="demo-modes">
@@ -462,7 +462,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
     {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href={`/skills/${item.slug}.zip`} download>Download skill and {isGradientSkill ? "components" : "SVG examples"} ↓</a></div>}
     <section className="editor" aria-label="Component source">
-      <header><span><Code2/>{item.component}.{isSkill ? "md" : "tsx"}</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : isSkill ? "Copy skill" : "Copy code"}</motion.button></header>
+      <header>
+        <span className="source-filename"><Code2/><span>{item.component}.{isSkill ? "md" : "tsx"}</span></span>
+        <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
+      </header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
     </section>
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}
