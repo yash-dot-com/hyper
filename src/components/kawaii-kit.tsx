@@ -1,3 +1,4 @@
+import { DirectorySelect } from "./ui/directory-select";
 import { KawaiiFace, kawaiiExpressions, type KawaiiExpression, type EyeStyle, type MouthStyle } from "./experiments/KawaiiFace";
 
 export const initialFace = { expression: "happy" as KawaiiExpression, eyes: "" as EyeStyle|"", mouth: "" as MouthStyle|"", blush: "#f19bb1" };
@@ -9,8 +10,8 @@ const mouthStyles = Array.from(new Set(names.map(name => kawaiiExpressions[name]
 export function KawaiiControls({value,change}:{value:FaceSettings;change:(value:FaceSettings)=>void}) {
   return <>
     <div className="pixel-controls">
-      <label>Eyes<select value={value.eyes} onChange={e=>change({...value,eyes:e.target.value as FaceSettings["eyes"]})}><option value="">Expression default</option>{eyeStyles.map(s=><option key={s}>{s}</option>)}</select></label>
-      <label>Mouth<select value={value.mouth} onChange={e=>change({...value,mouth:e.target.value as FaceSettings["mouth"]})}><option value="">Expression default</option>{mouthStyles.map(s=><option key={s}>{s}</option>)}</select></label>
+      <DirectorySelect label="Eyes" value={value.eyes} options={["",...eyeStyles]} defaultLabel="Expression default" onChange={eyes=>change({...value,eyes})}/>
+      <DirectorySelect label="Mouth" value={value.mouth} options={["",...mouthStyles]} defaultLabel="Expression default" onChange={mouth=>change({...value,mouth})}/>
       <label>Blush<input type="color" value={value.blush} onChange={e=>change({...value,blush:e.target.value})}/></label>
     </div>
     <div role="group" aria-label="Expression presets" className="face-sheet">{names.map(name=>

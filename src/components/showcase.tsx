@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig, useReducedMotion } from "motion/react";
+import { DirectorySelect } from "./ui/directory-select";
 import { Button } from "@/components/ui/button";
 import { DigitalKaleidoscope, scopePresets } from "./experiments/DigitalKaleidoscope";
 import { BreathingBandsFooter, type BandPalette } from "./experiments/BreathingBandsFooter";
@@ -442,7 +443,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isCascade && <div className="demo-modes"><Button variant="outline" onClick={()=>setPaused(p=>!p)}>{paused?"Resume":"Pause"}</Button><Button variant="outline" onClick={()=>{setPaused(false);setDeal(n=>n+1)}}>Replay cascade</Button></div>}
     {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
-      <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>
+      <DirectorySelect label="Design" value={design} options={treeDesigns} onChange={setDesign}/>
       {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
       <div className="control-pair">
       <Button variant="outline" onClick={()=>setTree(t=>({...t,seed:(t.seed+1+Math.floor(Math.random()*999))%1000}))}>New tree</Button>
@@ -450,7 +451,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       </div>
     </div>}
     {isLight && <p role="status" style={{marginTop:12}}>Selected finish: {light}</p>}
-    {isChrome && <div className="pixel-controls"><label>Mark<select value={mark} onChange={e=>setMark(e.target.value as EmblemMark)}>{emblemMarks.map(name=><option key={name}>{name}</option>)}</select></label></div>}
+    {isChrome && <div className="pixel-controls"><DirectorySelect label="Mark" value={mark} options={emblemMarks} onChange={setMark}/></div>}
     {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
     {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
     {isFolder && <div className="demo-modes" role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
