@@ -45,7 +45,15 @@ function KawaiiThumbnail() { return <KawaiiFace size={180} expression="pleased"/
 
 function StickerThumbnail() { return <VoxelSticker size={186}/>; }
 
+function SkillExamples() {
+  return <figure className="skill-examples" aria-label="Axonometric icon examples">
+    <img src="/skills/axonometric-icons/examples/turntable.svg" alt="Isometric turntable"/>
+    <PocketSampler size="100%"/>
+    <img src="/skills/axonometric-icons/examples/camera.svg" alt="Dimetric film camera"/>
+  </figure>;
+}
 const collection = [
+  {title:"Axonometric Icons", description:"A reusable skill for drawing isometric and dimetric SVG objects. Copy the instructions into your agent, then describe the object you want.", slug:"axonometric-icons", component:"SKILL", icon:Layers2, preview:SkillExamples},
   {title:"Pocket Sampler", description:"A miniature drum machine with twelve pads, twin faders, and a waveform display. Change the projection to adjust the viewing angle.", slug:"pocket-sampler", component:"PocketSampler", icon:Layers2, preview:() => <PocketSampler size={178}/>},
   {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},
   { title: "Kawaii Face Kit", description: "A blushing face for a conversation. Pick an expression, then mix the eyes, mouth, and cheek color.", slug: "kawaii-face-kit", component: "KawaiiFace", icon: Grid2X2, preview: KawaiiThumbnail },
@@ -65,6 +73,7 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isSkill = item.slug === "axonometric-icons";
   const isSampler = item.slug === "pocket-sampler";
   const [projection,setProjection] = useState<Projection>("isometric");
   const isVoxel = item.slug === "voxel-stickers";
@@ -82,7 +91,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isSampler ? [
+    const text = kind === "code" ? source : isSkill ? "Create an isometric or dimetric SVG icon using the skill below. If I have not named the object yet, ask which object to draw.\n\n" + source : isSampler ? [
       `Use the supplied PocketSampler React SVG component. Save as PocketSampler.tsx, import its named export, and render <PocketSampler projection="${projection}" size={240} />. Preserve its projected faces and scoped SVG definitions.`,
       "```tsx", source, "```",
     ].join("\n\n") : isVoxel ? [
@@ -122,7 +131,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isSampler ? <PocketSampler projection={projection} size="min(80%, 380px)"/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isSkill ? <SkillExamples/> : isSampler ? <PocketSampler projection={projection} size="min(80%, 380px)"/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {isSampler && <div className="demo-modes" role="group" aria-label="Projection">{(["isometric","dimetric"] as const).map(mode=><Button key={mode} variant="outline" aria-pressed={projection===mode} onClick={()=>setProjection(mode)}>{mode==="isometric"?"Isometric":"Dimetric"}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
@@ -130,8 +139,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     )}</div>}
     {isKawaii && <KawaiiControls value={face} change={setFace}/>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
+    {isSkill && <a className="skill-download" href="/skills/axonometric-icons.zip" download>Download skill and SVG examples ↓</a>}
     <section className="editor" aria-label="Component source">
-      <header><span><Code2/>{item.component}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
+      <header><span><Code2/>{item.component}.{isSkill ? "md" : "tsx"}</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : isSkill ? "Copy skill" : "Copy code"}</motion.button></header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
     </section>
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}

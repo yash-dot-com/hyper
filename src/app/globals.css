@@ -222,3 +222,8 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .face-sheet button[aria-pressed=true] {border-color:#edaac0;background:#352a30}
 
 .stage.art-voxel-stickers,.art-voxel-stickers .mini { background: #eeeae3; }
+
+.skill-examples {width:94%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:2%;margin:auto}
+.skill-examples img {width:100%;height:auto}
+.art-axonometric-icons .mini,.stage.art-axonometric-icons {background:#eeeae3}
+.skill-download {display:inline-block;margin-top:14px;text-decoration:underline;text-underline-offset:3px}
