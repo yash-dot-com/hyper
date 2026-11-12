@@ -142,8 +142,6 @@ button,a {cursor:pointer} :focus-visible {outline:2px solid #e4cb94;outline-offs
   .rail nav a:not([aria-current="page"]):hover {background:#252524;color:#efefea}
 }
 .rail nav a[aria-current="page"] {background:#353532;color:#fff}
-.rail nav a::after {content:"";margin-inline-start:auto;width:6px;height:6px;flex:none;border-radius:50%;background:transparent}
-.rail nav a[aria-current="page"]::after {background:currentColor}
 .rail nav a:focus-visible {outline-offset:-2px}
 .rail svg,.source-heading svg {width:16px;height:16px;stroke-width:1.65}
 .rail h2 {color:#90908a;font-size:12px;font-weight:500;margin:34px 12px 9px}
