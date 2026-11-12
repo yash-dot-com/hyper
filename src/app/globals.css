@@ -238,3 +238,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .art-jelly-avatar .mini,.stage.art-jelly-avatar {background:#fffdfd}
 
 .stage.art-glass-bubbles,.art-glass-bubbles .mini {background:radial-gradient(ellipse at 82% 110%,#132237,#101319 68%)}
+
+.art-procedural-tree .mini,.stage.art-procedural-tree {background:#101311;grid-template:minmax(0,1fr)/minmax(0,1fr)}
