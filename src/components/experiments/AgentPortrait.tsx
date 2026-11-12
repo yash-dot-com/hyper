@@ -9,7 +9,7 @@ const outlines = {
   open: "M-23 4C-24-12-16-29-3-30C12-32 22-14 23 2C24 18 17 28 1 29C-13 30-22 22-23 4Z",
   round: "M-24 1C-24-16-15-28 0-28C16-28 25-14 25 2C25 19 15 29 0 29C-16 29-24 17-24 1Z",
   half: "M-23-7C-12-8 12-8 23-9C24-4 24 0 23 5C21 20 11 27-3 26C-17 25-23 14-23-7Z",
-  focus: "M-23-15C-8-10 9-5 23-3C24 2 23 8 22 11C17 23 8 27-5 25C-19 23-25 10-23-15Z",
+  focus: "M-23 1C-23-12-15-20-1-20C13-20 22-13 23 0C24 16 16 26 1 27C-14 28-23 18-23 1Z",
   soft: "M-23 2C-21-10-12-18 0-19C14-19 22-8 23 6C13 3 5 4-2 7C-11 10-18 16-22 20C-24 15-24 8-23 2Z",
 };
 type Eye = keyof typeof outlines;
@@ -18,9 +18,9 @@ const faces: Record<AgentState, Expression> = {
   idle: {eyes:["open","open"], tilt:0, gaze:[1,2], pupil:12, mouth:"M73 99q7 4 14-1", rhythm:"drift"},
   listening: {eyes:["round","open"], tilt:-4, gaze:[-4,1], pupil:15, mouth:"M75 99q6 7 12-1", brows:"M48 34q6-5 12-4", rhythm:"nod"},
   thinking: {eyes:["half","open"], tilt:-7, gaze:[6,-7], pupil:13, mouth:"M78 100q4-4 9-2", brows:"M92 29q7-6 13-3", rhythm:"ponder"},
-  reading: {eyes:["half","half"], tilt:3, gaze:[0,5], pupil:11, mouth:"M76 98q6 2 12 0", rhythm:"scan"},
+  reading: {eyes:["focus","focus"], tilt:3, gaze:[0,5], pupil:11, mouth:"M76 98q6 2 12 0", rhythm:"scan"},
   planning: {eyes:["open","round"], tilt:-3, gaze:[5,-5], pupil:10, mouth:"M72 98q9 8 18-3", rhythm:"plot"},
-  working: {eyes:["focus","focus"], tilt:0, gaze:[1,4], pupil:12, mouth:"M74 99q8-2 16 0", rhythm:"tap"},
+  working: {eyes:["focus","focus"], tilt:1, gaze:[1,7], pupil:13, mouth:"M74 98q7 6 14 0", rhythm:"tap"},
   checking: {eyes:["half","round"], tilt:7, gaze:[-5,1], pupil:9, mouth:"M76 99q5-3 11-2", brows:"M93 29q8-7 16-2", rhythm:"inspect"},
   waiting: {eyes:["half","half"], tilt:-4, gaze:[-6,6], pupil:13, mouth:"M74 101q7-1 14-2", rhythm:"sigh"},
   blocked: {eyes:["round","open"], tilt:4, gaze:[0,2], pupil:6, mouth:"M74 102q6-9 15-3", brows:"M42 37q8 1 15-6M98 30q6 7 14 6", rhythm:"flinch"},
@@ -33,7 +33,7 @@ export function AgentPortrait({ state = "idle", size = 240 }: {
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const f = faces[state];
   const ink = "#20211d";
-  return <svg className="agent-eyes" viewBox="0 0 160 130" role="img" aria-label={`Agent: ${state}`}
+  return <svg className="agent-eyes" viewBox="0 -15 160 160" role="img" aria-label={`Agent: ${state}`}
     style={{width:size,maxWidth:"100%",height:"auto",display:"block"} as CSSProperties}>
     <style>{`
       .agent-eyes .ae-pose {transform-origin:80px 86px;transition:transform .36s cubic-bezier(.2,.8,.2,1)}
@@ -62,11 +62,12 @@ export function AgentPortrait({ state = "idle", size = 240 }: {
       @keyframes ae-bounce {12%{transform:scale(1.04,.95)}24%{transform:translateY(-5px)}38%{transform:scale(1.02,.98)}49%,100%{transform:none}}
       @media(prefers-reduced-motion:reduce){.agent-eyes * {animation:none!important;transition:none!important}}
     `}</style>
+    <rect x="3" y="-12" width="154" height="154" rx="29" fill="#f6dca3" stroke={ink} strokeWidth="3"/>
     <g className="ae-pose" style={{transform:`rotate(${f.tilt}deg)`}}>
       <g className={`ae-body ${f.rhythm}`}>
         {f.eyes.map((shape,i) => {
           const d = outlines[shape], clip = id + "-eye-" + i;
-          const mirror = i === 1 && (shape === "focus" || shape === "soft");
+          const mirror = i === 1 && shape === "soft";
           return <g key={i} transform={`translate(${i ? 105 : 55} ${i ? 63 : 65})`}>
             <g className="ae-blink">
               <defs><clipPath id={clip}><path d={d} transform={mirror ? "scale(-1 1)" : undefined}/></clipPath></defs>
