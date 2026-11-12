@@ -32,15 +32,15 @@ If the mechanism is unfamiliar, ask for a reference before drafting. If images c
 List fixed parts, moving parts, attachment points, rest position and mechanical stop. Paint the recess first, moving parts next, foreground retainers last. Position the midpoint of the gesture manually and check whether it could exist in the physical object.
 
 - **Folder:** back and bottom seam stay still. Only the front lip spreads a few pixels and drops. Use matching SVG path commands in both poses. Raise the papers at slightly different times; keep the label on the anchored lower pocket.
-- **Rocker:** the base stays still. One end rises as the other sinks. Change the projected outline and the visible sidewall around the central pivot. The end markings move with the cap. A lamp can indicate the latched state.
-- **Slide latch:** the knob and bolt travel together on a single axis. Guide sleeves and keeper remain fixed and cover the moving shaft. In the locked pose the bolt tip enters the keeper. In the released pose it clears it.
-- **Drawer:** translate the front and handle as one piece. Expose more of the tray and its contents as the drawer approaches the viewer. The cabinet opening remains dark behind it.
+- **Favorite heart:** give the lobes a warm pink highlight and the lower edge a deeper berry fold. Lift on hover and compress on press.
+- **Messages:** keep the tail legible at small sizes. Three pale dots lift in sequence over a mint-to-teal face.
+- **Notifications:** shade the bell from pale gold to amber and copper. Swing from its crown, leaving room around the silhouette.
 
 ## Implement and verify
 
-Use a native button for a two-state action, aria-pressed for its state, and an accessible name describing the action. A hover preview can reveal a folder; a latch changes state on deliberate activation. Support keyboard and touch. Do not shrink the hit target with the graphic.
+Use a native button for a two-state action, aria-pressed for its state, and an accessible name describing the action. Use standalone SVGs for stickers, or put them inside an existing action button or navigation link. Support keyboard and touch. Do not shrink the hit target with the graphic.
 
-In React, scope SVG paint-server IDs with useId(). Use motion/react for the few transforms or path morphs that communicate the mechanism. Use gentle damping for paper, firmer stops for metal. A drawer carries mass and should settle more slowly than a switch. Respect reduced motion by applying the final state immediately without stagger. Keep every state intelligible without animation.
+In React, scope SVG paint-server IDs with useId(). Use motion/react for the few transforms or path morphs that communicate the mechanism. Use gentle damping for paper, firmer stops for metal. Keep icon gestures small enough to remain readable in a toolbar. Respect reduced motion by applying the final state immediately without stagger. Keep every state intelligible without animation.
 
 Inspect the four examples in the included TSX files. Test rest, halfway and final poses at both thumbnail and detail sizes. Check keyboard activation, touch, focus and multiple instances using different IDs. Deliver the complete source and a usage example including dependencies.
 
