@@ -27,28 +27,21 @@ export function AfterglowFooter({word="Afterglow", colors={}, heading="Made for 
     <svg viewBox="0 0 1000 450" style={{display:"block",width:"100%",fontFamily:"inherit"}} role="img" aria-label={[heading,word].filter(Boolean).join(" ")}>
       <defs>
         <text ref={lettering} id={id+"word"} textAnchor="middle" fontWeight="700" fontSize="205" letterSpacing="-.045em">{word}</text>
-        {[1.25,5].map(blur=><filter key={blur} id={id+"blur"+blur} x="-100%" y="-100%" width="300%" height="300%" filterUnits="userSpaceOnUse">
+        {[1.6,3.5,7,12].map(blur=><filter key={blur} id={id+"blur"+blur} x="-25%" y="-85%" width="150%" height="270%">
           <feGaussianBlur stdDeviation={blur}/>
         </filter>)}
         <linearGradient id={id+"face"} x1="0" y1="0" x2=".2" y2="1">
           <stop stopColor={palette.core}/><stop offset=".55" stopColor={palette.core}/>
           <stop offset="1" stopColor={palette.rim}/>
         </linearGradient>
-        <filter id={id+"bevel"} x="-10%" y="-30%" width="120%" height="160%">
-          <feGaussianBlur in="SourceAlpha" stdDeviation="2.8"/>
-          <feOffset dx=".8" dy="1.6"/>
-          <feComposite in="SourceAlpha" operator="out"/>
-          <feComponentTransfer result="edge"><feFuncA type="linear" slope=".55"/></feComponentTransfer>
-          <feFlood floodColor="#281290"/>
-          <feComposite in2="edge" operator="in"/>
-        </filter>
       </defs>
       <text x="77" y="115" fill="white" fontSize="53" fontWeight="620" letterSpacing="-.055em">{heading}</text>
       <g transform={`translate(500 446) scale(${scale})`}>
-        <use {...useWord} fill={palette.halo} stroke={palette.halo} strokeWidth="19" filter={`url(#${id}blur5)`}/>
-        <use {...useWord} fill={palette.rim} stroke={palette.rim} strokeWidth="8" filter={`url(#${id}blur1.25)`}/>
-        <use {...useWord} fill={`url(#${id}face)`}/>
-        <use {...useWord} filter={`url(#${id}bevel)`}/>
+        <use {...useWord} fill={palette.halo} stroke={palette.halo} strokeWidth="40" opacity=".83" filter={`url(#${id}blur12)`}/>
+        <use {...useWord} fill={palette.halo} stroke={palette.halo} strokeWidth="24" filter={`url(#${id}blur7)`}/>
+        <use {...useWord} fill={palette.rim} stroke={palette.rim} strokeWidth="16" filter={`url(#${id}blur3.5)`}/>
+        <use {...useWord} fill={`url(#${id}face)`} stroke={palette.core} strokeWidth="2" filter={`url(#${id}blur1.6)`}/>
+        <use {...useWord} fill={palette.core} opacity=".62" filter={`url(#${id}blur7)`}/>
       </g>
       <path d="M70 0V450M695 0V450M0 54H1000M0 156H1000" fill="none" stroke="white" opacity=".48" strokeWidth=".8"/>
       <rect x="68" y="52" width="4" height="4" fill="white"/>
