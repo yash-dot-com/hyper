@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Home, Layers2, Menu, Orbit as OrbitIcon, Pause, Play, RotateCcw, Sparkles, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,9 @@ function Detail({ index, source, lines }: { index: number; source: string; lines
   const [version, restart] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [manual, setManual] = useState("");
+  const promptTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(promptTimer.current), []);
+
   async function copy(kind: "code" | "prompt") {
     const text = kind === "code" ? source : [
       `Integrate the ${item.title} React component into my project using the complete TSX source below.`,
@@ -44,7 +47,11 @@ function Detail({ index, source, lines }: { index: number; source: string; lines
     ].join("\n\n");
     try {
       await navigator.clipboard.writeText(text);
+      window.clearTimeout(promptTimer.current);
       setFeedback(kind);
+      if (kind === "prompt") {
+        promptTimer.current = window.setTimeout(() => setFeedback(""), 3500);
+      }
       setManual("");
     } catch {
       setFeedback("");
