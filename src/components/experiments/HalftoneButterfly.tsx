@@ -4,16 +4,18 @@ import { useEffect, useRef } from "react";
 
 // A single wing in local coordinates, with the thorax at the origin.
 const outline = "M2 -7 C18 -35 53 -65 83 -76 C106 -86 103 -57 99 -40 C96 -21 87 -5 75 0 Q63 6 47 5 C68 12 83 33 71 46 Q67 53 60 51 Q55 63 46 57 Q36 66 28 55 C12 50 6 27 2 12 Z";
-const inks = [[26,60,246],[15,136,255],[83,223,255],[255,205,213],[255,94,87],[255,123,49],[255,235,119],[255,178,185],[78,187,255]];
+// RGB equivalents of the voice blob’s resting CMYK-inspired ink stops.
+const inks = [[0,196,250],[250,0,133],[250,225,0],[250,0,133],[22,25,44],[0,196,250]];
 
 export function HalftoneButterfly() {
   const canvas=useRef<HTMLCanvasElement>(null);
   useEffect(()=>{
     const node=canvas.current!,ctx=node.getContext("2d");
     if(!ctx)return;
+    ctx.resetTransform();
     const wing=new Path2D(outline);
     // Batch dots by pigment phase so each frame needs only a few fill calls.
-    type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number};
+    type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number;freedom:number};
     const bands=Array.from({length:64},(): Dot[]=>[]);
     for(let row=0;row<61;row++){
       const y=-80+row*2.5;
@@ -28,7 +30,15 @@ export function HalftoneButterfly() {
         const span=Math.min(1,distance/118);
         const lag=1.45*span+.65*(y+80)/140;
         const drift=row*2.31+col*3.81;
-        band.push({x,y,radius,span,lag,drift});
+        // Measure clearance once. Edge dots ride the membrane while interior
+        // dots retain their small independent currents.
+        let clearance=0;
+        for(const inset of [2,4,6,8]){
+          if(!Array.from({length:8},(_,k)=>k*Math.PI/4).every(a=>
+            ctx.isPointInPath(wing,x+inset*Math.cos(a),y+inset*Math.sin(a))))break;
+          clearance=inset;
+        }
+        band.push({x,y,radius,span,lag,drift,freedom:Math.max(0,(clearance-2)/6)});
       }
     }
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
@@ -51,8 +61,8 @@ export function HalftoneButterfly() {
           // independent drift breaks up the rows without losing the silhouette.
           const wave=beat-dot.lag;
           const flow=Math.sin(t*1.6+dot.y*.064+dot.x*.032);
-          const dx=dot.span*(2.9*flow+.95*Math.sin(t*2.1+dot.drift));
-          const dy=dot.span*(2.2*Math.cos(t*1.45+dot.x*.058)+.85*Math.cos(t*1.8+dot.drift));
+          const dx=dot.freedom*dot.span*(2.9*flow+.95*Math.sin(t*2.1+dot.drift));
+          const dy=dot.freedom*dot.span*(2.2*Math.cos(t*1.45+dot.x*.058)+.85*Math.cos(t*1.8+dot.drift));
           for(const side of [-1,1]){
             const localBeat=wave+side*.10;
             const fold=.78+.21*Math.cos(localBeat);
@@ -64,10 +74,10 @@ export function HalftoneButterfly() {
         }
         c.fill();
       }
-      c.strokeStyle="#8ab8ef";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
+      c.strokeStyle="#00c4fa";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
       c.moveTo(1,-9);c.quadraticCurveTo(8,-25,16,-30);c.stroke();
       for(let j=0;j<8;j++){
-        c.fillStyle=j<3?"#adeaff":"#5489d9";c.beginPath();c.ellipse(0,-9+j*3,2.4-j*.18,1.5,0,0,Math.PI*2);c.fill();
+        c.fillStyle=j<3?"#fae100":"#00c4fa";c.beginPath();c.ellipse(0,-9+j*3,2.4-j*.18,1.5,0,0,Math.PI*2);c.fill();
       }
       if(visible&&!document.hidden&&!reduce.matches)frame=requestAnimationFrame(paint);
     }
@@ -76,5 +86,5 @@ export function HalftoneButterfly() {
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
   },[]);
-  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of shifting blue, coral and lemon halftone dots" style={{display:"block",width:"min(100%, 560px)",maxHeight:"100%",objectFit:"contain",background:"#09090d"}}/>;
+  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of shifting cyan, magenta and yellow halftone dots" style={{display:"block",width:"min(100%, 560px)",maxHeight:"100%",objectFit:"contain",background:"#09090d"}}/>;
 }
