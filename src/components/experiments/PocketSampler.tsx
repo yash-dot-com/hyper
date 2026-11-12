@@ -5,8 +5,11 @@ export function PocketSampler({ projection = "isometric", size = 240 }: { projec
   const id = useId();
   // A camera on the horizontal diagonal gives equal X/Y foreshortening.
   // At elevation asin(1/sqrt(3)), the vertical axis has that same scale.
-  const elevation = projection === "isometric" ? Math.asin(1/Math.sqrt(3)) : Math.PI/9;
-  const u = Math.SQRT1_2, v = u*Math.sin(elevation), h = Math.cos(elevation);
+  // Fixed sin/cos pairs keep serialized SVG coordinates identical during hydration.
+  const [sine,h] = projection === "isometric"
+    ? [0.57735026919, 0.816496580928]
+    : [0.342020143326, 0.939692620786];
+  const u = Math.SQRT1_2, v = u*sine;
   const top = `matrix(${u} ${v} ${-u} ${v} 101 24)`;
   const foot = 12*h;
   const point = (x: number, y: number, z = 0) => [101 + u*(x-y), 24 + v*(x+y) - h*z];
@@ -47,7 +50,7 @@ export function PocketSampler({ projection = "isometric", size = 240 }: { projec
       {[[4,4],[142,4],[4,110],[142,110]].map(([x,y])=><g key={x+"-"+y}><circle cx={x} cy={y} r="1.7" fill="#928b79"/><path d={`M${x-1} ${y+1}l2-2`} stroke="#514f46" strokeWidth=".6"/></g>)}
     </g>
     {[100,124].map((x,i) => {
-      const [cx,cy]=point(x,24), radius=9, ry=radius*Math.sin(elevation), lift=10*h;
+      const [cx,cy]=point(x,24), radius=9, ry=radius*sine, lift=10*h;
       return <g key={x} transform={`translate(${cx} ${cy})`}>
         <ellipse cy="1" rx="10.4" ry={ry+1} fill="#786d59" opacity=".48"/>
         <path d={`M-${radius} 0a${radius} ${ry} 0 0 0 ${2*radius} 0v-${lift}h-${2*radius}z`} fill="#343b38"/>
