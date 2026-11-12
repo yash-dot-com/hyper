@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { PocketSampler, type Projection } from "./experiments/PocketSampler";
 import { VoxelSticker, stickerNames, type StickerName } from "./experiments/VoxelSticker";
 import { KawaiiFace } from "./experiments/KawaiiFace";
 import { KawaiiControls, initialFace, kawaiiPrompt } from "./kawaii-kit";
@@ -45,6 +46,7 @@ function KawaiiThumbnail() { return <KawaiiFace size={180} expression="pleased"/
 function StickerThumbnail() { return <VoxelSticker size={186}/>; }
 
 const collection = [
+  {title:"Pocket Sampler", description:"A miniature drum machine with twelve pads, twin faders, and a waveform display. Change the projection to adjust the viewing angle.", slug:"pocket-sampler", component:"PocketSampler", icon:Layers2, preview:() => <PocketSampler size={178}/>},
   {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},
   { title: "Kawaii Face Kit", description: "A blushing face for a conversation. Pick an expression, then mix the eyes, mouth, and cheek color.", slug: "kawaii-face-kit", component: "KawaiiFace", icon: Grid2X2, preview: KawaiiThumbnail },
   { title: "Pixel Character", description: "A little portrait built from colored squares. It glances to one side, tilts its head, and bobs back into place.", slug: "pixel-character", component: "PixelCharacter", icon: Grid2X2, preview: PixelThumbnail },
@@ -63,6 +65,8 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isSampler = item.slug === "pocket-sampler";
+  const [projection,setProjection] = useState<Projection>("isometric");
   const isVoxel = item.slug === "voxel-stickers";
   const [sticker,setSticker] = useState<StickerName>("Globe");
   const isKawaii = item.slug === "kawaii-face-kit";
@@ -78,7 +82,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isVoxel ? [
+    const text = kind === "code" ? source : isSampler ? [
+      `Use the supplied PocketSampler React SVG component. Save as PocketSampler.tsx, import its named export, and render <PocketSampler projection="${projection}" size={240} />. Preserve its projected faces and scoped SVG definitions.`,
+      "```tsx", source, "```",
+    ].join("\n\n") : isVoxel ? [
       "Use the named React export VoxelSticker from the complete source below. Preserve its transparent background, block geometry, and shading. It needs React only.",
       `Save as VoxelSticker.tsx, import { VoxelSticker } from "./VoxelSticker", and render <VoxelSticker name="${sticker}" size={240} />.`,
       "```tsx", source, "```",
@@ -115,8 +122,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isSampler ? <PocketSampler projection={projection} size="min(80%, 380px)"/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isSampler && <div className="demo-modes" role="group" aria-label="Projection">{(["isometric","dimetric"] as const).map(mode=><Button key={mode} variant="outline" aria-pressed={projection===mode} onClick={()=>setProjection(mode)}>{mode==="isometric"?"Isometric":"Dimetric"}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
       <button key={name} aria-label={name} aria-pressed={name===sticker} onClick={()=>setSticker(name)}><span aria-hidden="true"><VoxelSticker name={name} size={56}/></span>{name}</button>
     )}</div>}
