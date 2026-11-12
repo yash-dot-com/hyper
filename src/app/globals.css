@@ -267,3 +267,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 }
 .ink-sticker-sheet > svg {height:100%;min-width:0;min-height:0}
 .art-parallax-ink-stickers .mini .ink-sticker-sheet {max-width:310px;padding:12px;gap:6px}
+.stage.art-ink-fusion,.art-ink-fusion .mini {background:#c9cec3;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.fusion-sample {width:min(82%,320px);aspect-ratio:16/15}
+.mini .fusion-sample {width:min(65%,168px)}
