@@ -89,7 +89,7 @@ function GlassConversation({compact=false}:{compact?:boolean}) {
   useEffect(() => { setLargeIndex(Math.floor(Math.random() * (compact ? 2 : 3))); }, [compact]);
   return <div style={{width:"86%",maxWidth:compact?290:440,display:"flex",flexDirection:"column",gap:compact?9:14,fontSize:compact?14:18}}>
     {(compact ? ["What are we making?", "A little light in glass."] : ["What are we making?", "A little light in glass.", "Let’s try it."]).map((message,i) =>
-      <GlassBubble key={message} side={i%2 ? "outgoing" : "incoming"} size={i===largeIndex ? "large" : "regular"}>{message}</GlassBubble>
+      <GlassBubble key={message} side={i%2 ? "outgoing" : "incoming"} >{message}{i===largeIndex && [" I was thinking of something that catches the afternoon light.", " See how the blue deepens near the middle?", " I’ll send you a preview once it’s ready."][i]}</GlassBubble>
     )}
   </div>;
 }
