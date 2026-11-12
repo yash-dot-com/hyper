@@ -461,7 +461,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isKawaii && <KawaiiControls value={face} change={setFace}/>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
     {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href={`/skills/${item.slug}.zip`} download>Download skill and {isGradientSkill ? "components" : "SVG examples"} ↓</a></div>}
-    <section aria-labelledby="source-title">
+    <section className="source-section" aria-labelledby="source-title">
       <div className="source-heading">
         <h2 id="source-title">{isSkill?"Skill":"Code"}</h2>
         <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
