@@ -52,7 +52,7 @@ export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0, shapeSeed=0 }:
 function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternSeed:number;shapeSeed:number;index:number}) {
   const companion=index%2===1;
   const canvas=useRef<HTMLCanvasElement>(null);
-  const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,destination:companion?2:0,
+  const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,pace:[.32,.40,.29,.36][index],
     route:index===2?[[.13,.25,-30],[.2,.16,-22],[.83,.62,12],[.7,.87,26]]:index===3?[[.94,.83,11],[.85,.89,-18],[.3,.52,-41],[.18,.24,19]]:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
   useEffect(()=>{
     const node=canvas.current!,ctx=node.getContext("2d");
@@ -123,9 +123,8 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
     let visible=false, frame=0, last=0;
     // Overlapping spline spans preserve velocity through each new destination.
-    // Pairs of destinations at each side produce broad passes and sweeping turns.
     const route=flight.current.route;
-    let {t,destination,travel,heading,bank,pitch,wingPhase}=flight.current;
+    let {t,pace,travel,heading,bank,pitch,wingPhase}=flight.current;
     function paint(now:number){
       const dt=reduce.matches?0:Math.max(0,Math.min(.05,(now-last)/1000));
       t+=dt;
@@ -140,14 +139,19 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
       const unit=Math.min(width/260,height/180);
       const margin=52*unit;
       const glide=Math.min(1,Math.max(0,.55+.8*Math.sin(t*.85+.55*Math.sin(t*.41))));
-      travel+=dt*(.35+.045*Math.sin(t*.51)-.035*glide);
+      travel+=dt*(pace+.045*Math.sin(t*.51)-.035*glide);
       if(travel>=1){
         travel-=1;
-        const left=destination%4<2;
-        const high=(destination+1)%4<2;
-        destination++;
-        route.shift();route.push([left?Math.random()*.15:.85+Math.random()*.15,
-          high?Math.random()*.24:.76+Math.random()*.24,-58+Math.random()*102]);
+        const previous=route[2],tip=route[3];
+        const bearing=Math.atan2(tip[1]-previous[1],tip[0]-previous[0]);
+        const turn=bearing+(Math.random()-.5)*Math.PI*1.45;
+        const stride=.42+Math.random()*.46;
+        // Reflect waypoints at the bounds so individual paths curve back into view.
+        const reflect=(n:number)=>1-Math.abs(1-Math.abs(n));
+        route.shift();
+        route.push([reflect(tip[0]+stride*Math.cos(turn)),
+          reflect(tip[1]+stride*Math.sin(turn)),-58+Math.random()*102]);
+        pace=.25+Math.random()*.2;
       }
       const u=travel,v=1-u;
       const weights=[v**3,3*u**3-6*u*u+4,-3*u**3+3*u*u+3*u+1,u**3];
@@ -216,7 +220,7 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
     function sync(){cancelAnimationFrame(frame);last=performance.now();if(visible&&!document.hidden)paint(last)}
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
-    return ()=>{Object.assign(flight.current,{t,destination,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
+    return ()=>{Object.assign(flight.current,{t,pace,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
   },[seed,patternSeed,shapeSeed,companion,index]);
   return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
