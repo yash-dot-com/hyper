@@ -170,10 +170,11 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
       }
       c.stroke();
       c.scale(cb,cp);
-      c.strokeStyle="#00c4fa";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
+      c.strokeStyle="#000";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
       c.moveTo(1,-9);c.quadraticCurveTo(8,-25,16,-30);c.stroke();
+      c.fillStyle="#000";
       for(let j=0;j<8;j++){
-        c.fillStyle=j<3?"#fae100":"#00c4fa";c.beginPath();c.ellipse(0,-9+j*3,2.4-j*.18,1.5,0,0,Math.PI*2);c.fill();
+        c.beginPath();c.ellipse(0,-9+j*3,2.4-j*.18,1.5,0,0,Math.PI*2);c.fill();
       }
       if(visible&&!document.hidden&&!reduce.matches)frame=requestAnimationFrame(paint);
     }
