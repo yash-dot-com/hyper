@@ -275,3 +275,4 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .stage.art-paper-noticeboard,.art-paper-noticeboard .mini {background:#faf8f4;grid-template-columns:minmax(0,1fr);padding:clamp(12px,3vw,40px)}
 .stage.art-paper-noticeboard {height:auto;min-height:310px}
 .art-paper-noticeboard .mini .paper-board {max-width:250px}
+.stage.art-meadow-footer,.art-meadow-footer .mini {background:#87b5df;grid-template-columns:minmax(0,1fr)}.stage.art-meadow-footer{height:auto}.art-meadow-footer .mini .meadow-footer{height:100%}
