@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
 
 // A single wing in local coordinates, with the thorax at the origin.
 const outline = "M2 -7 C18 -35 53 -65 83 -76 C106 -86 103 -57 99 -40 C96 -21 87 -5 75 0 Q63 6 47 5 C68 12 83 33 71 46 Q67 53 60 51 Q55 63 46 57 Q36 66 28 55 C12 50 6 27 2 12 Z";
@@ -42,17 +42,14 @@ function pigment(hue:number,saturation:number,light:number) {
   });
 }
 
-type Center={x:number;y:number};
-
 export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0, shapeSeed=0 }: {hue?:number;seed?:number;patternSeed?:number;shapeSeed?:number} = {}) {
-  const flock=useRef<Center[]>([{x:.25,y:.75},{x:.75,y:.25},{x:.25,y:.25},{x:.75,y:.75}]);
   return <div role="img" aria-label="Four flying butterflies with distinct color-shifting halftone wings"
     style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
-    {[0,1,2,3].map(index=><ButterflyLayer key={index} flock={flock} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
+    {[0,1,2,3].map(index=><ButterflyLayer key={index} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
   </div>;
 }
 
-function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:RefObject<Center[]>;seed:number;patternSeed:number;shapeSeed:number;index:number}) {
+function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternSeed:number;shapeSeed:number;index:number}) {
   const companion=index%2===1;
   const canvas=useRef<HTMLCanvasElement>(null);
   const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,pace:[.32,.40,.29,.36][index],
@@ -140,7 +137,14 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:RefObjec
       }
       c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,width,height);
       const unit=Math.min(width/260,height/180);
-      const margin=52*unit;
+      // Give each spline its own flight space. Stagger the horizontal divides
+      // so the two pairs roam at different heights without influencing one another.
+      const right=index%2===1, lower=index===0 || index===3;
+      const splitX=width*.5,splitY=height*(right?.55:.45);
+      const scale=Math.min(.34*unit,Math.min(splitX,height*.45)/480);
+      const inset=scale*160+unit;
+      const spanX=splitX-2*inset;
+      const spanY=(lower?height-splitY:splitY)-2*inset;
       const glide=Math.min(1,Math.max(0,.55+.8*Math.sin(t*.85+.55*Math.sin(t*.41))));
       travel+=dt*(pace+.045*Math.sin(t*.51)-.035*glide);
       if(travel>=1){
@@ -160,7 +164,7 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:RefObjec
       const weights=[v**3,3*u**3-6*u*u+4,-3*u**3+3*u*u+3*u+1,u**3];
       const tangent=[-3*v*v,9*u*u-12*u,-9*u*u+6*u+3,3*u*u];
       const sum=(axis:number,coeff:number[])=>route.reduce((n,p,i)=>n+p[axis]*coeff[i]/6,0);
-      const target=Math.atan2(sum(1,tangent)*(height-2*margin),sum(0,tangent)*(width-2*margin))+Math.PI/2;
+      const target=Math.atan2(sum(1,tangent)*spanY,sum(0,tangent)*spanX)+Math.PI/2;
       const turn=Math.atan2(Math.sin(target-heading),Math.cos(target-heading));
       heading+=turn*(1-Math.exp(-dt*7));
       bank+=(Math.max(-.45,Math.min(.45,turn))-bank)*(1-Math.exp(-dt*4));
@@ -170,29 +174,8 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:RefObjec
       const climb=Math.atan2(sum(2,tangent),Math.hypot(sum(0,tangent)*210,sum(1,tangent)*110));
       pitch+=(Math.max(-.95,Math.min(.95,climb))-pitch)*(1-Math.exp(-dt*5));
       const cp=Math.cos(pitch),sp=Math.sin(pitch),cb=Math.cos(bank),sb=Math.sin(bank);
-      // A projected wing fits inside this radius at the nearest flight depth.
-      // Cap it on narrow stages so four fully spread butterflies always fit.
-      const scale=Math.min(.34*unit,Math.min(width,height)/840);
-      const radius=scale*200;
-      const center=flock.current[index];
-      const x=center.x*width,y=center.y*height;
-      let dx=margin+sum(0,weights)*(width-2*margin)-x;
-      let dy=margin+sum(1,weights)*(height-2*margin)+unit*Math.sin(wingPhase)-y;
-      for(const other of flock.current){
-        if(other===center)continue;
-        const ox=x-other.x*width,oy=y-other.y*height,d=Math.hypot(ox,oy);
-        if(d===0 || d>=radius*2.7)continue;
-        const push=(radius*2.7-d)*2;
-        dx+=ox/d*push;dy+=oy/d*push;
-      }
-      const step=Math.min(1,dt*3,dt*unit*70/(Math.hypot(dx,dy)||1));
-      const nextX=Math.max(radius,Math.min(width-radius,x+dx*step));
-      const nextY=Math.max(radius,Math.min(height-radius,y+dy*step));
-      if(flock.current.every(other=>other===center ||
-        Math.hypot(nextX-other.x*width,nextY-other.y*height)>=2*radius)){
-        center.x=nextX/width;center.y=nextY/height;
-      }
-      c.translate(center.x*width,center.y*height);
+      c.translate((right?splitX:0)+inset+sum(0,weights)*spanX,
+        (lower?splitY:0)+inset+sum(1,weights)*spanY+unit*Math.sin(wingPhase));
       c.rotate(heading);
       c.scale(scale*perspective,scale*perspective);
       function project(span:number,fore:number,lag:number,side:number){
@@ -246,6 +229,6 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:RefObjec
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{Object.assign(flight.current,{t,pace,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[seed,patternSeed,shapeSeed,companion,index,flock]);
+  },[seed,patternSeed,shapeSeed,companion,index]);
   return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
