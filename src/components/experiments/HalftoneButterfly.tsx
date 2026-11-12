@@ -7,7 +7,7 @@ const outline = "M2 -7 C18 -35 53 -65 83 -76 C106 -86 103 -57 99 -40 C96 -21 87 
 // RGB equivalents of the voice blob’s resting CMYK-inspired ink stops.
 const inks = [[0,196,250],[250,0,133],[250,225,0],[250,0,133],[22,25,44],[0,196,250]];
 
-export function HalftoneButterfly() {
+export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
   const canvas=useRef<HTMLCanvasElement>(null);
   useEffect(()=>{
     const node=canvas.current!,ctx=node.getContext("2d");
@@ -86,5 +86,5 @@ export function HalftoneButterfly() {
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
   },[]);
-  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of shifting cyan, magenta and yellow halftone dots" style={{display:"block",width:"min(100%, 560px)",maxHeight:"100%",objectFit:"contain",background:"#09090d"}}/>;
+  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of color-shifting halftone dots" style={{display:"block",width:"min(100%, 560px)",maxHeight:"100%",objectFit:"contain",filter:`hue-rotate(${hue}deg)`,background:"#09090d"}}/>;
 }
