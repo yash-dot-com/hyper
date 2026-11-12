@@ -22,7 +22,10 @@ export function GradientFolder({ color="persimmon", label="Field notes", size=24
   const open = hover || focus || pinned;
   const reduce = useReducedMotion();
   const spring = reduce ? {duration:0} : {type:"spring" as const, stiffness:300, damping:27, mass:.75};
-  const pocket = "M32 107Q31 98 42 98H86Q92 98 98 104L105 111Q109 115 116 115H218Q227 115 226 125L221 192Q220 204 207 204H52Q39 204 38 192Z";
+  // Matching contours let Motion flex the lip while every point below y=155 stays fixed.
+  const pocket = open
+    ? "M29 113Q28 104 40 104H85Q92 104 98 110L105 117Q109 122 116 122H220Q231 122 229 132L224 155L221 192Q220 204 207 204H52Q39 204 38 192L35 155Z"
+    : "M32 107Q31 98 42 98H86Q92 98 98 104L105 111Q109 115 116 115H218Q227 115 226 125L224 155L221 192Q220 204 207 204H52Q39 204 38 192L35 155Z";
   return <button type="button" aria-label={`Pin ${label} folder open`} aria-pressed={pinned}
     onPointerEnter={e=>setHover(e.pointerType!=="touch")} onPointerLeave={()=>setHover(false)}
     onFocus={e=>setFocus(e.currentTarget.matches(":focus-visible"))} onBlur={()=>setFocus(false)}
@@ -48,13 +51,13 @@ export function GradientFolder({ color="persimmon", label="Field notes", size=24
             <rect width="28" height="3" rx="1.5" opacity=".65"/><path d="M0 11h87m-87 6h72m-72 6h83" fill="none" stroke="currentColor" color="#c8c2bb" strokeWidth="2"/>
           </g>
         </motion.g>)}
-        <motion.g initial={false} animate={{rotateX:open ? -25 : 0}} transition={spring}
-          style={{transformPerspective:720, transformBox:"view-box", transformOrigin:"130px 204px"}}>
-          <path d={pocket} fill={paint("front")}/><path d={pocket} fill={paint("glaze")} stroke={glow} strokeOpacity=".46" strokeWidth="1"/>
+        <g>
+          <motion.path initial={false} animate={{d:pocket}} transition={spring} fill={paint("front")}/>
+          <motion.path initial={false} animate={{d:pocket}} transition={spring} fill={paint("glaze")} stroke={glow} strokeOpacity=".46" strokeWidth="1"/>
           <path d="M47 194q1 5 7 5h151" fill="none" stroke={shade} strokeOpacity=".13"/>
           <text x="53" y="183" fontFamily="system-ui,sans-serif" fontSize="12" fontWeight="600" fill={shade}>{label}</text>
           <g fill={shade} opacity=".75">{[0,1,2].map(i=><circle key={i} cx="203" cy={175+i*3.4} r="1.1"/>)}</g>
-        </motion.g>
+        </g>
       </g>
     </svg>
   </button>;
