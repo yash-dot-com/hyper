@@ -111,7 +111,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
 const collection = [
-  {title:"Frosted Tile Button",description:"A single wash of color passes through twenty-five softly beveled glass panes.",slug:"frosted-tile-button",component:"FrostedTileButton",icon:Layers2,preview:()=> <FrostedTileButton size={146} tabIndex={-1} inert/>},
+  {title:"Frosted Tile Button",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-button",component:"FrostedTileButton",icon:Layers2,preview:()=> <FrostedTileButton size={146} tabIndex={-1} inert/>},
   {title:"Voice Blob",description:"Pigments drift through a single blob. Louder syllables accelerate the color changes; vocal tone shifts the core. Enable the microphone to shape it with sound; audio stays in your browser.",slug:"voice-blob",component:"VoiceBlob",icon:Layers2,preview:()=> <VoiceBlob microphone={false} size={175}/>},
   {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
   {title:"Isometric Block Type",description:"Cube-built pieces tumble onto an isometric plane and assemble into your text.",slug:"isometric-block-type",component:"IsoBlockType",icon:Type,preview:()=> <IsoBlockType/>},
