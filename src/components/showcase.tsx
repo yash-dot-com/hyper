@@ -417,11 +417,14 @@ function Detail({ index, source, lines, composition }: { composition: string; in
           setDriftColors({...driftColors,[group]:next});
         }}/>)}
       </fieldset>)}
+      <div className="control-pair">
       <Button variant="outline" onClick={()=>setDriftColors(shuffleDriftPalettes())}>Shuffle colors</Button>
       <Button variant="outline" onClick={()=>setDriftColors(driftPalettes)}>Reset colors</Button>
+      </div>
       <label>Speed · {driftSpeed}×<input type="range" min="0" max="3" step=".1" value={driftSpeed} onChange={e=>setDriftSpeed(e.target.valueAsNumber)}/></label>
     </div>}
     {item.slug==="digital-kaleidoscope" && <div className="scope-controls">
+      <div className="scope-toolbar">
       <div className="demo-modes" role="group" aria-label="Optical preset">{(Object.keys(scopePresets) as (keyof typeof scopePresets)[]).map(variant=><Button key={variant} variant="outline" aria-pressed={scope.variant===variant} onClick={()=>setScope({variant,seed:0,colors:undefined,...scopePresets[variant]})}>{variant}</Button>)}</div>
       <div className="demo-modes" role="group" aria-label="Base pattern">
         <Button variant="outline" onClick={()=>setScope({...scope,seed:crypto.getRandomValues(new Uint32Array(1))[0]||1})}>Shuffle pattern</Button>
@@ -430,6 +433,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <div className="demo-modes" role="group" aria-label="Pattern colors">
         <Button variant="outline" onClick={()=>setScope({...scope,colors:shuffleScopeColors()})}>Shuffle colors</Button>
         <Button variant="outline" disabled={!scope.colors} onClick={()=>setScope({...scope,colors:undefined})}>Reset colors</Button>
+      </div>
       </div>
       <div className="scope-dials">{([["mirrors",4,16,2],["speed",-36,36,1],["zoom",.4,2.5,.05],["drift",0,3,.05]] as const).map(([key,min,max,step])=><label key={key}>{key} <output>{scope[key]}</output><input type="range" min={min} max={max} step={step} value={scope[key]} onChange={e=>setScope({...scope,[key]:e.target.valueAsNumber})}/></label>)}</div>
     </div>}
@@ -447,8 +451,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isTree && <div className="pixel-controls">
       <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>
       {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
+      <div className="control-pair">
       <Button variant="outline" onClick={()=>setTree(t=>({...t,seed:(t.seed+1+Math.floor(Math.random()*999))%1000}))}>New tree</Button>
       <Button variant="outline" onClick={()=>regrow(n=>n+1)}>Replay growth</Button>
+      </div>
     </div>}
     {isLight && <p role="status" style={{marginTop:12}}>Selected finish: {light}</p>}
     {isChrome && <div className="pixel-controls"><label>Mark<select value={mark} onChange={e=>setMark(e.target.value as EmblemMark)}>{emblemMarks.map(name=><option key={name}>{name}</option>)}</select></label></div>}
