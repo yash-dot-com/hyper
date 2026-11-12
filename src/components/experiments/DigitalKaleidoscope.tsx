@@ -24,6 +24,12 @@ export const scopePresets={
   Petal:{mirrors:12,speed:5,zoom:1.65,drift:.65},
 };
 type ScopeVariant=keyof typeof scopePresets;
+const defaultInks={
+  Prism:["#f3e625","#ed139f","#88bd29","#101334","#143892","#00bce4","#f82569"],
+  Orbit:["#14133e","#ffbc60","#ff537b","#65f4e9","#7976ef","#f7dcca"],
+  Voltage:["#23102c","#f43292","#a3ff32","#04cbd7","#ff691f"],
+  Petal:["#fbe6bd","#b02e62","#f46d5f","#458d79","#f6be37"],
+};
 // Alter the pieces before mirroring so every reflection inherits the same cut.
 function Pattern({seed,children}:{seed:number;children:ReactNode}){
   if(!seed)return <>{children}</>;
@@ -39,10 +45,11 @@ function Pattern({seed,children}:{seed:number;children:ReactNode}){
     return <g transform={`translate(${x} ${y}) rotate(${tilt}) scale(${width} ${height})`}>{piece}</g>;
   })}</>;
 }
-export function DigitalKaleidoscope({variant="Prism",seed=0,mirrors=scopePresets[variant].mirrors,speed=scopePresets[variant].speed,
+export function DigitalKaleidoscope({variant="Prism",seed=0,colors,mirrors=scopePresets[variant].mirrors,speed=scopePresets[variant].speed,
   zoom=scopePresets[variant].zoom,drift=scopePresets[variant].drift}:{
-    variant?:ScopeVariant;seed?:number;mirrors?:number;speed?:number;zoom?:number;drift?:number;
+    variant?:ScopeVariant;colors?:readonly string[];seed?:number;mirrors?:number;speed?:number;zoom?:number;drift?:number;
   }={}){
+  const inks=defaultInks[variant].map((ink,i)=>colors?.[i]??ink);
   const count=Math.max(4,Math.min(16,Math.round(mirrors/2)*2)), wedge=2*Math.PI/count;
   const sectorMap=`matrix(1 0 ${(Math.cos(wedge)-.5)*2/root3} ${Math.sin(wedge)*2/root3} 0 0)`;
   const heading=useRef(0);
@@ -76,23 +83,23 @@ export function DigitalKaleidoscope({variant="Prism",seed=0,mirrors=scopePresets
     <defs>
       <clipPath id={id+"clip"}><path d="M0 0H100L0 100Z"/></clipPath>
       <g id={id+"pane"} clipPath={`url(#${id}clip)`}>
-        <path d="M0 0H100L0 100Z" fill={{Prism:"#f3e625",Orbit:"#14133e",Voltage:"#23102c",Petal:"#fbe6bd"}[variant]}/>
+        <path d="M0 0H100L0 100Z" fill={inks[0]}/>
         <g ref={glass} transform="translate(32 39)">
           {variant==="Orbit"? <Pattern seed={seed}>
-            {[14,29,49,76].map((r,i)=><circle key={r} cx="9" cy="-9" r={r} fill="none" stroke={["#ffbc60","#ff537b","#65f4e9","#7976ef"][i]} strokeWidth={i%2?7:3}/>)}
-            <circle cx="-18" cy="5" r="8" fill="#f7dcca"/>
+            {[14,29,49,76].map((r,i)=><circle key={r} cx="9" cy="-9" r={r} fill="none" stroke={inks[i+1]} strokeWidth={i%2?7:3}/>)}
+            <circle cx="-18" cy="5" r="8" fill={inks[5]}/>
           </Pattern>:variant==="Voltage"? <Pattern seed={seed}>
-            {[-50,-16,18,52].map((x,i)=><path key={x} transform={`translate(${x} 0)`} d="M-14 -90H5L-7 -18H10L-3 19H12L-18 91L-6 34H-24L-12 -6H-24Z" fill={["#f43292","#a3ff32","#04cbd7","#ff691f"][i]}/>)}
+            {[-50,-16,18,52].map((x,i)=><path key={x} transform={`translate(${x} 0)`} d="M-14 -90H5L-7 -18H10L-3 19H12L-18 91L-6 34H-24L-12 -6H-24Z" fill={inks[i+1]}/>)}
           </Pattern>:variant==="Petal"? <Pattern seed={seed}>
-            {Array.from({length:7},(_,i)=><ellipse key={i} rx="10" ry="37" cy="-27" transform={`rotate(${i*360/7})`} fill={["#b02e62","#f46d5f","#458d79"][i%3]}/>)}
-            <circle r="10" fill="#f6be37"/>
+            {Array.from({length:7},(_,i)=><ellipse key={i} rx="10" ry="37" cy="-27" transform={`rotate(${i*360/7})`} fill={inks[1+i%3]}/>)}
+            <circle r="10" fill={inks[4]}/>
           </Pattern>:<Pattern seed={seed}>
-          <path fill="#ed139f" d="M-110 -68L80 -30 70 -9 -90 -30ZM-35 0L-7 29 -26 89 -58 64Z"/>
-          <path fill="#88bd29" d="M-87 2L-34 -38 -10 -20 -43 13ZM16 21L94 0 74 34 26 53Z"/>
-          <path fill="#101334" d="M-57 -43L-25 -24 -40 -5ZM6 14L36 12 19 39Z"/>
-          <path fill="#143892" d="M-24 -21L-3 -28 13 -10 4 12 -18 15 -32 -3Z"/>
-          <path fill="#00bce4" d="M22 -20L47 -23 59 -4 43 16 21 12 14 -5Z"/>
-          <path fill="#f82569" d="M-2 44L14 35 32 51 12 68Z"/>
+          <path fill={inks[1]} d="M-110 -68L80 -30 70 -9 -90 -30ZM-35 0L-7 29 -26 89 -58 64Z"/>
+          <path fill={inks[2]} d="M-87 2L-34 -38 -10 -20 -43 13ZM16 21L94 0 74 34 26 53Z"/>
+          <path fill={inks[3]} d="M-57 -43L-25 -24 -40 -5ZM6 14L36 12 19 39Z"/>
+          <path fill={inks[4]} d="M-24 -21L-3 -28 13 -10 4 12 -18 15 -32 -3Z"/>
+          <path fill={inks[5]} d="M22 -20L47 -23 59 -4 43 16 21 12 14 -5Z"/>
+          <path fill={inks[6]} d="M-2 44L14 35 32 51 12 68Z"/>
           </Pattern>}
         </g>
       </g>

@@ -173,6 +173,13 @@ function shuffleDriftPalettes():typeof driftPalettes {
     cool:[ink(cool,.74),ink(cool+step,.57),ink(cool+2*step,.46),ink(cool+4*step,.34),ink(cool+3*step,.50)],
   };
 }
+function shuffleScopeColors(){
+  const base=Math.random()*360,step=95+Math.random()*60;
+  return [22,72,49,35,62,81,52].map((light,i)=>{
+    const hue=Math.round((base+i*step+Math.random()*26)%360);
+    return `hsl(${hue} ${72+Math.floor(Math.random()*25)}% ${light}%)`;
+  });
+}
 function PrismDriftSample(){return <PrismDrift style={{width:"100%",height:"100%"}}/>;}
 function ChromaSheet(){
   return <div className="chroma-sheet">
@@ -240,7 +247,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [pigments,setPigments]=useState<[string,string,string,string]>([...printInks]);
   const [driftColors,setDriftColors]=useState(driftPalettes);
   const [driftSpeed,setDriftSpeed]=useState(1);
-  const [scope,setScope]=useState({variant:"Prism" as keyof typeof scopePresets,seed:0,...scopePresets.Prism});
+  const [scope,setScope]=useState({variant:"Prism" as keyof typeof scopePresets,seed:0,colors:undefined as string[]|undefined,...scopePresets.Prism});
   const [bandPalette,setBandPalette]=useState<BandPalette>("citrus");
   const [glowWord,setGlowWord]=useState("Afterglow");
   const [glowColors,setGlowColors]=useState(afterglowColors);
@@ -394,10 +401,14 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <label>Speed · {driftSpeed}×<input type="range" min="0" max="3" step=".1" value={driftSpeed} onChange={e=>setDriftSpeed(e.target.valueAsNumber)}/></label>
     </div>}
     {item.slug==="digital-kaleidoscope" && <div className="scope-controls">
-      <div className="demo-modes" role="group" aria-label="Optical preset">{(Object.keys(scopePresets) as (keyof typeof scopePresets)[]).map(variant=><Button key={variant} variant="outline" aria-pressed={scope.variant===variant} onClick={()=>setScope({variant,seed:0,...scopePresets[variant]})}>{variant}</Button>)}</div>
+      <div className="demo-modes" role="group" aria-label="Optical preset">{(Object.keys(scopePresets) as (keyof typeof scopePresets)[]).map(variant=><Button key={variant} variant="outline" aria-pressed={scope.variant===variant} onClick={()=>setScope({variant,seed:0,colors:undefined,...scopePresets[variant]})}>{variant}</Button>)}</div>
       <div className="demo-modes" role="group" aria-label="Base pattern">
         <Button variant="outline" onClick={()=>setScope({...scope,seed:crypto.getRandomValues(new Uint32Array(1))[0]||1})}>Shuffle pattern</Button>
         <Button variant="outline" disabled={!scope.seed} onClick={()=>setScope({...scope,seed:0})}>Reset pattern</Button>
+      </div>
+      <div className="demo-modes" role="group" aria-label="Pattern colors">
+        <Button variant="outline" onClick={()=>setScope({...scope,colors:shuffleScopeColors()})}>Shuffle colors</Button>
+        <Button variant="outline" disabled={!scope.colors} onClick={()=>setScope({...scope,colors:undefined})}>Reset colors</Button>
       </div>
       <div className="scope-dials">{([["mirrors",4,16,2],["speed",-36,36,1],["zoom",.4,2.5,.05],["drift",0,3,.05]] as const).map(([key,min,max,step])=><label key={key}>{key} <output>{scope[key]}</output><input type="range" min={min} max={max} step={step} value={scope[key]} onChange={e=>setScope({...scope,[key]:e.target.valueAsNumber})}/></label>)}</div>
     </div>}
