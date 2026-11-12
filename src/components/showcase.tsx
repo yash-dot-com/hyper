@@ -141,6 +141,12 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
   const isBlock = item.slug === "block-type";
   const [word,setWord]=useState("Hype");
+  const [draftWord,setDraftWord]=useState("Hype");
+  useEffect(() => {
+    if (draftWord === word) return;
+    const timer = window.setTimeout(() => setWord(draftWord), 300);
+    return () => window.clearTimeout(timer);
+  }, [draftWord, word]);
   const [drop,replayDrop]=useState(0);
   const isTree = item.slug === "procedural-tree";
   const [design,setDesign]=useState<TreeDesign>("Original");
@@ -237,7 +243,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
       {isBlock ? <BlockType text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
-    {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={word} onChange={e=>setWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>replayDrop(n=>n+1)}>Replay drop</Button></div>}
+    {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
       <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>
       {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
