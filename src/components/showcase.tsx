@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowUpRight, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
+import { ArrowUpRight, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DigitalKaleidoscope, scopePresets } from "./experiments/DigitalKaleidoscope";
@@ -463,7 +463,6 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href={`/skills/${item.slug}.zip`} download>Download skill and {isGradientSkill ? "components" : "SVG examples"} ↓</a></div>}
     <section className="editor" aria-label="Component source">
       <header>
-        <span className="source-filename"><Code2/><span>{item.component}.{isSkill ? "md" : "tsx"}</span></span>
         <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
       </header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>

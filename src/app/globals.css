@@ -153,7 +153,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .tile a::after {content:"";position:absolute;inset:0}
 .tile:focus-within,.tile:hover {background:#252523}
 .tile a svg {width:16px;color:var(--quiet)}
-.detail-head,.editor header,.source-filename {display:flex;align-items:center}
+.detail-head,.editor header {display:flex;align-items:center}
 .detail-head {justify-content:space-between;gap:16px;margin-bottom:16px}
 .wordmark-primary {
   background:#151515;color:#f3f2ee;border:2px solid currentColor;border-radius:999px;
@@ -165,10 +165,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 
 .stage {position:relative;height:clamp(310px,40vw,465px);background:#20201f}
 .editor {margin-top:22px;background:#151515;font:13px/1.65 var(--font-geist-mono),monospace;letter-spacing:0}
-.editor header {padding:12px clamp(12px,2vw,24px);gap:12px;justify-content:space-between;background:#1d1d1c;border-bottom:1px solid var(--edge)}
-.source-filename {min-width:0;gap:10px;color:#c8c8c1}
-.source-filename svg {flex:none}
-.source-filename span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.editor header {padding:8px 12px 0;justify-content:flex-end}
 .editor .prompt-action {font-family:var(--font-geist),sans-serif}
 .editor pre:focus-visible {outline:1px solid var(--quiet);outline-offset:-2px}
 .editor pre {max-height:440px;overflow:auto;padding:20px 0;tab-size:2;color:#dddcd6}
