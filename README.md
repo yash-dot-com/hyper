@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hype
 
-## Getting Started
+A quiet home for unusual React components, animations, and visuals. Built with Next.js 16 App Router, TypeScript, Tailwind CSS 4, and the latest shadcn scaffolding (Base UI / Nova).
 
-First, run the development server:
+## Run locally
 
-```bash
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the URL printed by Next.js (normally http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## The collection
 
-## Learn More
+- **Orbit** — an animated SVG orbital study.
+- **Chromatic** — translucent CSS planes in a continuous loop.
+- **Card stack** — interactive cards with keyboard support.
 
-To learn more about Next.js, take a look at the following resources:
+All three are self-contained React + CSS examples, with no animation dependencies. The gallery includes preview/code tabs, playback and restart controls, preview backgrounds, source copying, usage examples, and a full coding-agent prompt. Animations respect reduced-motion preferences. Component links use URL hashes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Add an experiment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Add a self-contained component in `src/components/experiments/`.
+2. Add its filename to the source list in `src/app/page.tsx`.
+3. Import it and add its metadata in `src/components/showcase.tsx`, in the same order.
 
-## Deploy on Vercel
+The server reads the real component files into a cached, prerendered page. Source snippets and agent prompts therefore use the same implementation as the preview. No API keys or backend services are required.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This initial collection uses React/CSS; a Remotion player and compositions are not installed yet.
