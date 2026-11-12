@@ -35,14 +35,14 @@ export function LuminousSurface({ finish="bloom", children, style }: {
       .hype-luminous:hover>.hype-light,.hype-luminous:focus-within>.hype-light{opacity:1}
       .hype-light svg{display:block;width:100%;height:100%;filter:blur(7px)}
       .hype-luminous:is(:hover,:focus-within) .hype-light svg{animation:hype-caustic 3.8s ease-in-out infinite alternate}
-      @keyframes hype-caustic{from{transform:rotate(-12deg) scale(.95,1.08)}to{transform:rotate(9deg) skewX(-9deg) scale(1.12,.9)}}
+      @keyframes hype-caustic{from{transform:rotate(-3deg) scale(.98,1.02)}to{transform:rotate(3deg) scale(1.03,.99)}}
       @media(prefers-reduced-motion:reduce){.hype-luminous .hype-light{transition:none}.hype-luminous .hype-light svg{animation:none}}
     `}</style>
     <span aria-hidden="true" className="hype-light" style={{position:"absolute",inset:0,zIndex:-1,pointerEvents:"none",
       translate:"calc(var(--light-x,50%) - 50%) calc(var(--light-y,45%) - 45%)",mixBlendMode:"screen"}}>
       <svg viewBox="0 0 160 100" preserveAspectRatio="none">
-        <path fill={rim} opacity=".48" d="M19 57C32 45 48 53 62 37S80 19 95 24C108 29 108 43 128 43C115 57 99 48 88 54S73 75 58 70C46 66 36 55 19 57Z"/>
-        <path fill="#fff" opacity=".55" d="M41 57C61 59 64 31 83 31C96 31 96 43 106 46C94 46 90 38 82 40C68 43 62 62 41 57Z"/>
+        <path fill={rim} opacity=".48" d="M27 50C26 32 45 19 66 20C81 21 91 16 105 20C125 24 136 39 133 55C131 72 112 81 94 79C78 77 66 83 50 76C36 71 27 62 27 50Z"/>
+        <path fill="#fff" opacity=".32" d="M49 47C51 34 66 29 80 30C98 29 111 38 111 49C109 61 93 66 79 64C63 65 48 59 49 47Z"/>
       </svg>
     </span>
     {children}
