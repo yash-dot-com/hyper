@@ -244,7 +244,7 @@ const collection = [
   { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Colored highlights mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", category:"Type & lettering", component: "KineticParagraph", icon: Type, preview: KineticVideo },
 ];
 
-const homeSections = [...new Set(collection.map(item => item.category))].map(category => ({
+const directorySections = [...new Set(collection.map(item => item.category))].map(category => ({
   category, items: collection.filter(item => item.category === category),
 }));
 
@@ -493,10 +493,12 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
       <div className="rail-head"><motion.a whileHover={{ rotate: -2, scale: 1.035 }} whileTap={{ rotate: 0, scale: 0.97 }} className="wordmark" href="#home" onClick={() => setOpen(false)}>hype</motion.a>
         <motion.button {...buttonGestures} className="menu-toggle" aria-expanded={open} aria-label="Component navigation" onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</motion.button>
       </div>
-      <nav aria-label="Directory navigation" onClick={() => setOpen(false)}>
+      <nav aria-label="Directory navigation" onClick={event => { if ((event.target as Element).closest("a")) setOpen(false); }}>
         <a href="#home" aria-current={index === -1 ? "page" : undefined}><Home/>Home</a>
-        <h2>Components</h2>
-        {collection.map((item, i) => <a key={item.slug} href={'#' + item.slug} aria-current={index === i ? "page" : undefined}><item.icon/>{item.title}</a>)}
+        {directorySections.map(({category, items}) => <div key={category}>
+          <h2>{category}</h2>
+          {items.map(item => <a key={item.slug} href={'#' + item.slug} aria-current={item.slug === slug ? "page" : undefined}><item.icon/>{item.title}</a>)}
+        </div>)}
       </nav>
     </aside>
     <main className="canvas" key={slug}>
@@ -504,7 +506,7 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
         <header className="directory-intro">
           <p>Hype is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
         </header>
-        {homeSections.map(({category, items}) => <section className="gallery-section" key={category}>
+        {directorySections.map(({category, items}) => <section className="gallery-section" key={category}>
           <h2>{category}</h2>
           <div className="gallery">{items.map(item => <article className={'tile art-' + item.slug} key={item.slug}>
           <div className="mini" inert aria-hidden="true"><item.preview/></div>
