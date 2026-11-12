@@ -320,3 +320,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .stage.art-digital-kaleidoscope,.art-digital-kaleidoscope .mini{background:#fffef9;grid-template:minmax(0,1fr)/minmax(0,1fr)}
 .demo-modes.band-palettes{flex-wrap:wrap;gap:10px;margin:18px 0 22px}
 .band-palettes button{height:auto;min-height:44px;padding:9px 18px}
+.scope-controls {margin-block:20px}.scope-controls .demo-modes{flex-wrap:wrap}.scope-dials{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px 22px}
+.scope-dials label{text-transform:capitalize;font-size:14px}.scope-dials output{float:right;color:var(--quiet);font-variant-numeric:tabular-nums}.scope-dials input{display:block;width:100%;margin-top:8px}
