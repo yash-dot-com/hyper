@@ -52,7 +52,7 @@ function Eye({ kind, gaze }: { kind: EyeStyle; gaze: number }) {
     return <path stroke="none" d="M-14 7Q-10-5-2-13L1-14Q8-6 13 7L10 8Q4-2 0-6Q-6-1-11 8Z"/>;
   if (kind === "sleep") return <path stroke="none" d="M-13-2Q0 10 13-3Q5 15-5 10Q-12 7-13-2Z"/>;
   if (kind === "squint") return <path stroke="none" d="M-14-8L13 0 12 3-13 10-10 6 4 1-12-4Z"/>;
-  if (kind === "spiral") return <path d="M0 0q4-4 6 1t-8 5q-9-4-4-12t16 1" fill="none"/>;
+  if (kind === "spiral") return <path className="kf-spiral" d="M0 0q4-4 6 1t-8 5q-9-4-4-12t16 1" fill="none"/>;
 
   const low = kind === "half" || kind === "droop";
   const contour = kind === "half" ? "M-14-6L13-5Q14 9 4 12Q-11 15-14 2Z" :
@@ -66,7 +66,7 @@ function Eye({ kind, gaze }: { kind: EyeStyle; gaze: number }) {
       <g transform={`translate(${gaze*3} ${low ? -1 : 0})`}>
         <ellipse rx={radius} ry={radius*1.3}/>
         {kind !== "wide" && <ellipse cx={-radius*.37} cy={-radius*.65} rx={radius*.25} ry={radius*.32} fill="#fffefa"/>}
-        {kind === "sparkle" && <path fill="#fffefa" d="m4 1 1.2 3L8 5l-2.8 1L4 9 3 6 .2 5 3 4Z"/>}
+        {kind === "sparkle" && <path className="kf-glint" fill="#fffefa" d="m4 1 1.2 3L8 5l-2.8 1L4 9 3 6 .2 5 3 4Z"/>}
       </g>
     </g>
     {low && <path d={kind==="half"?"M-14-6 13-5":"M-14-3Q-5-4 9-12"} fill="none" strokeWidth="3"/>}
@@ -89,6 +89,22 @@ const accents: Record<Accent,ReactNode> = {
   chill:<path stroke="#79baca" strokeWidth="1.5" d="M0-6V6M-5-3 5 3M-5 3 5-3"/>,
 };
 
+// The brief reaction drawing plays after the main pose has had time to read.
+const reactions: Record<KawaiiExpression, readonly [EyeStyle, MouthStyle]> = {
+  happy:["sparkle","o"], sad:["sparkle","wobble"], angry:["wide","frown"],
+  confused:["dot","gasp"], pleased:["sleep","smile"], pain:["wink","pout"],
+  scared:["dot","wobble"], serious:["wide","flat"], silly:["squint","tongue"],
+  flirty:["sparkle","tongue"], nervous:["sparkle","o"], tired:["sleep","o"],
+  surprised:["wide","gasp"], irritated:["wide","wobble"], bewildered:["dot","gasp"],
+  rage:["wide","gasp"], disgusted:["droop","flat"], confident:["squint","smile"],
+  dizzy:["spiral","wobble"], concerned:["wide","pout"], curious:["sparkle","gasp"],
+  pouty:["wide","pout"], sick:["half","o"], laughing:["beam","gasp"],
+  embarrassed:["wide","o"], incredulous:["wink","flat"], bored:["sleep","o"],
+  snooty:["wink","tongue"], cold:["spiral","wobble"], calm:["sleep","smile"],
+  crying:["sparkle","o"], mischievous:["wide","grin"], pensive:["wide","flat"],
+  excited:["squint","gasp"], triumphant:["wide","grin"],
+};
+
 export function KawaiiFace({ expression="happy", eyes, mouth, brows, accent, blush="#f19bb1", size=180, animated=true, children }: {
   expression?: KawaiiExpression; eyes?: EyeStyle; mouth?: MouthStyle; brows?: Brow; accent?: Accent;
   blush?: string | false; size?: number|string; animated?: boolean;
@@ -103,18 +119,31 @@ export function KawaiiFace({ expression="happy", eyes, mouth, brows, accent, blu
       .kf-live .kf-float{animation:kf-float 3.2s ease-in-out infinite}
       @keyframes kf-blink{0%,45%,49%,100%{transform:scaleY(1)}47%{transform:scaleY(.06)}}
       @keyframes kf-float{50%{transform:translateY(-1.4px)}}
-      @media(prefers-reduced-motion:reduce){.kf-live .kf-blink,.kf-live .kf-float{animation:none}}
+      .kf-live .kf-first{animation:kf-first 4.8s steps(1,end) infinite}
+      .kf-live .kf-second{animation:kf-second 4.8s steps(1,end) infinite}
+      @keyframes kf-first{0%,77%,100%{opacity:1}58%{opacity:0}}
+      @keyframes kf-second{0%,77%,100%{opacity:0}58%{opacity:1}}
+      .kf-live .kf-spiral{animation:kf-spin 2.8s linear infinite}
+      @keyframes kf-spin{to{transform:rotate(360deg)}}
+      .kf-live .kf-glint{transform-box:fill-box;transform-origin:center;animation:kf-shimmer 2.2s ease-in-out infinite}
+      @keyframes kf-shimmer{0%,65%,100%{transform:none}38%{transform:translate(-1.8px,-1.6px) scale(1.32) rotate(16deg)}}
+      @media(prefers-reduced-motion:reduce){.kf-live *{animation:none!important}}
     `}</style>}
     <rect x="13" y="7" width="74" height="74" fill="#fffefa" stroke="#272325" strokeWidth="1.8"/>
-    <g className="kf-float"><g transform={`rotate(${tilt} 50 46)`}>
+    <g className="kf-float">{(animated ? [false,true] : [false]).map(second => {
+      const eyeStyle = second ? eyes ?? reactions[expression][0] : eye;
+      const lipStyle = second ? mouth ?? reactions[expression][1] : lip;
+      return <g key={String(second)} className={second?"kf-second":"kf-first"} opacity={second?0:1}
+        transform={`rotate(${second ? tilt*.55-2 : tilt} 50 46)`}>
+      {second && blush && [23,77].map(x=><ellipse key={x} cx={x} cy="54" rx="7" ry="4" fill={blush} opacity=".34"/>)}
       {blush && [21,79].map(x=><path key={x} transform={`translate(${x} 54)`} d="m-6 2 3-5 -1 6 5-7 -1 6 5-5" fill="none" stroke={blush} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>)}
       {[34,66].map((x,i)=><g key={x} transform={`translate(${x} 43)`} stroke="#241f23" fill="#241f23" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
         {brow!=="none" && <path fill="none" transform={`scale(${i?-1:1} 1)`} strokeWidth="1.8" d={brow==="one"&&i?"M-6-19q5-4 12-2":brow==="knit"?"M-8-16l14 5":brow==="worried"?"M-7-15q7 0 12-6":"M-6-19q6-4 12-1"}/>}
-        <g transform={eye==="squint"&&i?"scale(-1 1)":undefined}><g className="kf-blink"><Eye kind={eye==="wink"&&i===0?"dot":eye} gaze={gaze}/></g></g>
+        <g transform={eyeStyle==="squint"&&i?"scale(-1 1)":undefined}><g className="kf-blink"><Eye kind={eyeStyle==="wink"&&i===0?"dot":eyeStyle} gaze={gaze}/></g></g>
       </g>)}
-      <path transform="translate(50 64)" d={mouths[lip]} fill={["grin","tongue","o","gasp"].includes(lip)?(lip==="grin"?"#fffefa":"#d98797"):"none"} stroke="#42343d" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
-      {lip==="grin" && <path transform="translate(50 64)" d="M-3-1q-1 3 1 6M4-2q2 3 1 5" fill="none" stroke="#382b33" strokeWidth="1.4"/>}
+      <path transform="translate(50 64)" d={mouths[lipStyle]} fill={["grin","tongue","o","gasp"].includes(lipStyle)?(lipStyle==="grin"?"#fffefa":"#d98797"):"none"} stroke="#42343d" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+      {lipStyle==="grin" && <path transform="translate(50 64)" d="M-3-1q-1 3 1 6M4-2q2 3 1 5" fill="none" stroke="#382b33" strokeWidth="1.4"/>}
       <g transform={mark==="tear"?"translate(28 51)":"translate(80 23)"}>{accents[mark]}</g>
-    </g></g>{children}
+    </g>;})}</g>{children}
   </svg>;
 }
