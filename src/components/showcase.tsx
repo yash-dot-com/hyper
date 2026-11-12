@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { BlockType } from "./experiments/BlockType";
 import { ProceduralTree, treeDesigns, type TreeDesign, type TreeSettings } from "./experiments/ProceduralTree";
 import { LuminousSurface, lightFinishes, type LightFinish } from "./experiments/LuminousSurface";
 import { MetalEmblem, emblemMarks, type EmblemMark } from "./experiments/MetalEmblem";
@@ -107,6 +108,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
 const collection = [
+  {title:"Block Type",description:"Falling pieces turn and lock into letterforms. Change the text to build a new word.",slug:"block-type",component:"BlockType",icon:Type,preview:()=> <BlockType/>},
   {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the dimensions, branching depth, or seed to grow another tree.",slug:"procedural-tree",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
   {title:"Luminous Surfaces", description:"A frosted rim surrounds a pool of color. Move across a surface to shift its light, or select a finish to copy it.",slug:"luminous-surfaces",component:"LuminousSurface",icon:Layers2,preview:LightSheet},
   {title:"Chrome Emblems", description:"Six marks from the HVNTER 2020 specimen sheet, finished with mirrored bands and polished bevels.", slug:"chrome-emblems", component:"MetalEmblem", icon:Layers2, preview:ChromeThumbnail},
@@ -137,6 +139,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
+  const isBlock = item.slug === "block-type";
+  const [word,setWord]=useState("Hype");
+  const [drop,replayDrop]=useState(0);
   const isTree = item.slug === "procedural-tree";
   const [design,setDesign]=useState<TreeDesign>("Original");
   const [tree,setTree] = useState<TreeSettings>({width:460,height:380,depth:3,seed:19});
@@ -169,7 +174,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isTree ? [
+    const text = kind === "code" ? source : isBlock ? [
+      `Integrate the named BlockType React component in a client boundary. Render <BlockType text={${JSON.stringify(word)}} />. Increment its replay prop to restart the drop. Keep the reduced-motion still and accessible text label.`, "```tsx", source, "```",
+    ].join("\n\n") : isTree ? [
       `Use the named ProceduralTree export in a React project. Render <ProceduralTree design="${design}" width={${tree.width}} height={${tree.height}} depth={${tree.depth}} seed={${tree.seed}} />. Keep seeded geometry, parent-before-child animation and reduced-motion behavior. In Next.js import from a client boundary.`,
       "```tsx", source, "```",
     ].join("\n\n") : isLight ? [
@@ -228,8 +235,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isBlock ? <BlockType text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={word} onChange={e=>setWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>replayDrop(n=>n+1)}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
       <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>
       {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
