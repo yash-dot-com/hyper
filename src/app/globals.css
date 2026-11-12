@@ -214,4 +214,4 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .pixel-controls input[type=color] { width:24px; height:28px; cursor:pointer; }
 .pixel-controls input[type=range] { max-width:120px; height:28px; accent-color:#e9d89e; }
 
-.art-agent-portrait .mini, .stage.art-agent-portrait { background: #dedbd6; }
+.art-agent-portrait .mini, .stage.art-agent-portrait { background: #f3ecd9; }
