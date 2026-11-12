@@ -449,9 +449,6 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <Button variant="outline" onClick={()=>regrow(n=>n+1)}>Replay growth</Button>
       </div>
     </div>}
-    {isLight && <p role="status" style={{marginTop:12}}>Selected finish: {light}</p>}
-    {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
-    {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
     {isFolder && <div className="demo-modes" role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
       <button key={name} aria-label={name} aria-pressed={name===sticker} onClick={()=>setSticker(name)}><span aria-hidden="true"><VoxelSticker name={name} size={56}/></span>{name}</button>
