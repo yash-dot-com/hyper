@@ -45,8 +45,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [version, restart] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [manual, setManual] = useState("");
-  const promptTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(promptTimer.current), []);
+  const copyTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
     const text = kind === "code" ? source : isVideo ? [
@@ -63,11 +63,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     ].join("\n\n");
     try {
       await navigator.clipboard.writeText(text);
-      window.clearTimeout(promptTimer.current);
+      window.clearTimeout(copyTimer.current);
       setFeedback(kind);
-      if (kind === "prompt") {
-        promptTimer.current = window.setTimeout(() => setFeedback(""), 3500);
-      }
+      copyTimer.current = window.setTimeout(() => setFeedback(""), 1000);
       setManual("");
     } catch {
       setFeedback("");
