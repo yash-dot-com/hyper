@@ -309,6 +309,8 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
   }
 }
 .art-chroma-tiles .mini,.stage.art-chroma-tiles{background:#181422;grid-template:minmax(0,1fr)/minmax(0,1fr)}
-.chroma-sheet{width:min(92%,560px);height:min(80%,300px);display:grid;grid-template:repeat(2,minmax(0,1fr))/1.1fr 1fr;gap:9px}
+.chroma-display{width:min(90%,560px);height:85%;display:flex;flex-direction:column;gap:24px}.chroma-actions{display:flex;align-items:center;justify-content:center;gap:20px}.chroma-sheet{width:100%;flex:1;min-height:0;display:grid;grid-template:repeat(2,minmax(0,1fr))/1.1fr 1fr;gap:14px}
 .chroma-sheet strong{font-size:clamp(14px,2vw,26px);letter-spacing:-.04em;line-height:1.1}
-.art-chroma-tiles .mini .chroma-sheet{max-width:340px}.art-chroma-tiles .mini strong{font-size:15px}
+.art-chroma-tiles .mini .chroma-display{max-width:340px}.art-chroma-tiles .mini strong{font-size:15px}
+
+.stage.art-breathing-bands,.art-breathing-bands .mini{background:#fff9ee;grid-template-columns:minmax(0,1fr)}.stage.art-breathing-bands{height:auto}
