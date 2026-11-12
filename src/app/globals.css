@@ -173,7 +173,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
   mask-image:linear-gradient(to bottom,#000,transparent 48px,transparent calc(100% - 48px),#000),
     linear-gradient(to right,#000,transparent 32px,transparent calc(100% - 32px),#000);
 }
-.editor-frame[data-reading] .editor-edge,.editor-frame:focus-within .editor-edge {visibility:hidden}
 .editor code {font-family:inherit}
 .editor {margin:0;background:#151515;font:13px/1.65 "JetBrains Mono",monospace;letter-spacing:0}
 .source-section {display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-block-start:clamp(24px,3vw,36px)}

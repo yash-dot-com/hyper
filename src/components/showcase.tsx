@@ -466,10 +466,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
         <h2 id="source-title">{isSkill?"Skill":"Code"}</h2>
         <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
       </div>
-      <div className="editor-frame"
-        onPointerMove={e=>{if(e.pointerType==="mouse"||e.pointerType==="pen")e.currentTarget.dataset.reading=""}}
-        onPointerLeave={e=>{delete e.currentTarget.dataset.reading}}
-        onPointerCancel={e=>{delete e.currentTarget.dataset.reading}}>
+      <div className="editor-frame">
         <pre className="editor" tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
         <span className="editor-edge" aria-hidden="true"/>
       </div>
