@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hype — Component library",
-  description: "A collection of curious React components, animations, and visuals. Preview the details, copy the source, or hand the prompt to your coding agent.",
+  title: "Hype — Visual directory",
+  description: "An open-source directory of small experiments in motion and interaction. Preview the details, copy the source, or hand the prompt to your coding agent.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

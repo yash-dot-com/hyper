@@ -178,3 +178,13 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 @media(max-width:700px){.library{display:block}.rail{height:auto;z-index:2;border-right:0;border-bottom:1px solid var(--edge);padding:14px}.wordmark{font-size:23px}.menu-toggle{display:grid;place-items:center;width:36px;height:36px}.rail nav{display:none;margin-top:18px}.rail.open nav{display:block}.rail h2{margin-top:15px}.canvas{padding:34px 20px}.gallery{grid-template-columns:1fr;margin-top:24px}.tile+.tile{border-left:0;border-top:1px solid var(--edge)}.mini{height:200px}.detail-head{margin-bottom:14px}.editor{font-size:12px}.line i{width:36px;padding-right:9px}}
 
 .component-description { max-width: 54ch; margin: 0; padding-block-end: 24px; text-align: start; text-wrap: pretty; color: var(--quiet); font-size: 16px; line-height: 1.6; letter-spacing: -.015em; }
+
+.directory-intro p {
+  max-width: 56ch;
+  margin-top: 1rem;
+  color: var(--quiet);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.directory-intro h1 + p { margin-top: 1.5rem; }

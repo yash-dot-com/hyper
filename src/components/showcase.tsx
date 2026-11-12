@@ -90,7 +90,7 @@ export function Showcase({ sources, highlighted }: { sources: string[]; highligh
       <div className="rail-head"><motion.a whileHover={{ rotate: -2, scale: 1.035 }} whileTap={{ rotate: 0, scale: 0.97 }} className="wordmark" href="#home" onClick={() => setOpen(false)}>hype</motion.a>
         <motion.button {...buttonGestures} className="menu-toggle" aria-expanded={open} aria-label="Component navigation" onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</motion.button>
       </div>
-      <nav aria-label="Library navigation" onClick={() => setOpen(false)}>
+      <nav aria-label="Directory navigation" onClick={() => setOpen(false)}>
         <a href="#home" aria-current={index === -1 ? "page" : undefined}><Home/>Home</a>
         <h2>Components</h2>
         {collection.map((item, i) => <a key={item.slug} href={'#' + item.slug} aria-current={index === i ? "page" : undefined}><item.icon/>{item.title}</a>)}
@@ -98,7 +98,11 @@ export function Showcase({ sources, highlighted }: { sources: string[]; highligh
     </aside>
     <main className="canvas" key={slug}>
       {index < 0 ? <>
-        <h1>Components</h1>
+        <header className="directory-intro">
+          <h1>Visual directory</h1>
+          <p>Hype is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
+          <p>I like to start with one thing worth looking at. Sometimes it’s the path a dot takes around a circle. My idea of minimalism is to give that detail enough room to be noticed.</p>
+        </header>
         <div className="gallery">{collection.map(item => <article className={'tile art-' + item.slug} key={item.slug}>
           <div className="mini" inert aria-hidden="true"><item.preview playing={false}/></div>
           <a href={'#' + item.slug}>{item.title}<ArrowUpRight/></a>
