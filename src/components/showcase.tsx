@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { AgentPortrait, agentStates, type AgentCharacter, type AgentState } from "./experiments/AgentPortrait";
 import { PixelCharacter } from "./experiments/PixelCharacter";
 import { PixelControls, defaultPixel, pixelPrompt } from "./pixel-settings";
 import { DemoVideo } from "./demo-video";
@@ -34,7 +35,12 @@ function PixelThumbnail() {
   return <PixelCharacter size={168}/>;
 }
 
+function AgentThumbnail() {
+  return <AgentPortrait size={184} state="thinking"/>;
+}
+
 const collection = [
+  { title: "Agent Portrait", description: "A pixel portrait that shows what your agent is doing. Choose a character and a state to see how the expression changes.", slug: "agent-portrait", component: "AgentPortrait", icon: Grid2X2, preview: AgentThumbnail },
   { title: "Pixel Character", description: "A little portrait built from colored squares. It glances to one side, tilts its head, and bobs back into place.", slug: "pixel-character", component: "PixelCharacter", icon: Grid2X2, preview: PixelThumbnail },
   { title: "Motif Globe", description: "Continents turn across a field of shifting geometric marks. A band of teal, gold, and coral travels over the surface as the globe rotates.", slug: "motif-globe", component: "MotifGlobe", icon: Globe, preview: GlobeDemo },
   { title: "Image Ripple Loader", description: "A grid of tiny marks lights up in passing waves. Watch the rings travel outward in a disc, or follow a band of color across the full frame.", slug: "image-ripple-loader", component: "ImageRippleLoader", icon: Layers2, preview: RippleDemo },
@@ -51,6 +57,9 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isAgent = item.slug === "agent-portrait";
+  const [character, setCharacter] = useState<AgentCharacter>("girl");
+  const [agentState, setAgentState] = useState<AgentState>("thinking");
   const isPixel = item.slug === "pixel-character";
   const [pixel, setPixel] = useState(defaultPixel);
   const isGlobe = item.slug === "motif-globe";
@@ -62,7 +71,12 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isPixel ? pixelPrompt(pixel, source) : isGlobe ? [
+    const text = kind === "code" ? source : isAgent ? [
+      "Use the named AgentPortrait React component below in a client boundary. Map the agent's real lifecycle events to its state prop. Keep the same character between transitions. Preserve stepped animation and reduced-motion behavior.",
+      "Supported states: " + agentStates.join(", ") + ".",
+      `Selected usage:\n\`\`\`tsx\nimport { AgentPortrait } from "./AgentPortrait";\n\nexport function Avatar() {\n  return <AgentPortrait character="${character}" state="${agentState}" size={240} />;\n}\n\`\`\``,
+      "AgentPortrait.tsx (complete source):", "```tsx", source, "```",
+    ].join("\n\n") : isPixel ? pixelPrompt(pixel, source) : isGlobe ? [
       "Integrate the named React export MotifGlobe using the complete component below. Save it as MotifGlobe.tsx in a client boundary. It imports three, including when using its software renderer. Use the project's package manager to provide three and matching TypeScript declarations if needed.",
       "Mount the globe in a responsive square. Preserve the built-in geographic mask, reduced-motion still, offscreen pause, and cleanup. Leave phase unset for animation; choose a fixed phase in [0,1) only for a still. Use a descriptive label for meaningful content or decorative for a purely decorative placement.",
       'Example usage:\n```tsx\nimport { MotifGlobe } from "./MotifGlobe";\n\nexport function Preview() {\n  return <MotifGlobe aspectRatio={1} period={5} renderer="software" background="#0B1011" colors={["#5EA79D", "#EFD38E", "#FFB49F"]} outline="#75928A" idleColor="#1E302F" label="Rotating motif globe" />;\n}\n```',
@@ -95,8 +109,12 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isAgent ? <AgentPortrait character={character} state={agentState} size="min(85%, 336px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isAgent && <div className="pixel-controls">
+      <label>Character<select value={character} onChange={e => setCharacter(e.target.value as AgentCharacter)}><option value="girl">Girl</option><option value="guy">Guy</option></select></label>
+      <label>Agent state<select value={agentState} onChange={e => setAgentState(e.target.value as AgentState)}>{agentStates.map(value => <option key={value}>{value}</option>)}</select></label>
+    </div>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
     <section className="editor" aria-label="Component source">
       <header><span><Code2/>{item.component}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
