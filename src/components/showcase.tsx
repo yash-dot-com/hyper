@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowUpRight, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
+import { ArrowUpRight, Copy, Globe, Grid2X2, Home, Layers2, Menu, Star, Type, X } from "lucide-react";
 import { motion, MotionConfig, useReducedMotion } from "motion/react";
 import { DirectoryColor } from "./ui/directory-color";
 import { DirectorySelect } from "./ui/directory-select";
@@ -474,6 +474,15 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   </>;
 }
 
+function RepositoryAction() {
+  const url = process.env.NEXT_PUBLIC_GITHUB_REPO_URL;
+  const label = <><Star size={15} aria-hidden="true"/>Star on GitHub</>;
+  return <div className="repository-action">
+    {url ? <a href={url} target="_blank" rel="noopener noreferrer">{label}</a>
+      : <button type="button" disabled title="Repository link coming soon">{label}</button>}
+  </div>;
+}
+
 export function Showcase({ sources, highlighted, composition }: { composition: string; sources: string[]; highlighted: Token[][][] }) {
   const slug = useSyncExternalStore(subscribe, snapshot, home);
   const index = collection.findIndex(item => item.slug === slug);
@@ -493,6 +502,7 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
       </nav>
     </aside>
     <main className="canvas" key={slug}>
+      <RepositoryAction/>
       {index < 0 ? <>
         <header className="directory-intro">
           <p>Hype is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
@@ -504,6 +514,10 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
           <a href={'#' + item.slug}>{item.title}<ArrowUpRight/></a>
         </article>)}</div>
         </section>)}
+        <section className="about-author">
+          <h2>About me</h2>
+          <p>I made Hype to share the details I like to play with on the web. How a wing folds, how two inks overlap, how a button feels when you press it. I leave the code with each experiment so you can take it apart and make it yours.</p>
+        </section>
       </> : <Detail composition={composition} index={index} source={sources[index]} lines={highlighted[index]}/>}
     </main>
     </div>
