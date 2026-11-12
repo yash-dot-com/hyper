@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { GradientFolder, folderColors, type FolderColor } from "./experiments/GradientFolder";
 import { PocketSampler } from "./experiments/PocketSampler";
 import { VoxelSticker, stickerNames, type StickerName } from "./experiments/VoxelSticker";
 import { KawaiiFace } from "./experiments/KawaiiFace";
@@ -60,6 +61,7 @@ function SkillExamples() {
   </figure>;
 }
 const collection = [
+  {title:"Gradient Folder", description:"Hover to fan the pages, or click to pin the folder open.", slug:"gradient-folder", component:"GradientFolder", icon:Layers2, preview:() => <GradientFolder size={195}/>},
   {title:"Axonometric Icons", description:"A reusable skill for drawing isometric and dimetric SVG objects. Copy the instructions into your agent, then describe the object you want.", slug:"axonometric-icons", component:"SKILL", icon:Layers2, preview:SkillExamples},
   {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},
   { title: "Kawaii Face Kit", description: "A blushing face for a conversation. Pick an expression, then mix the eyes, mouth, and cheek color.", slug: "kawaii-face-kit", component: "KawaiiFace", icon: Grid2X2, preview: KawaiiThumbnail },
@@ -79,6 +81,8 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isFolder = item.slug === "gradient-folder";
+  const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
   const isSkill = item.slug === "axonometric-icons";
   const isVoxel = item.slug === "voxel-stickers";
   const [sticker,setSticker] = useState<StickerName>("Globe");
@@ -95,7 +99,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isSkill ? "Create an isometric or dimetric SVG icon using the skill below. If I have not named the object yet, ask which object to draw.\n\n" + source : isVoxel ? [
+    const text = kind === "code" ? source : isFolder ? [
+      `Integrate the supplied GradientFolder named React export with motion/react from the motion package. Use a client boundary. Render <GradientFolder color="${folderColor}" label="Field notes" />. Preserve its layered gradients, staggered springs, keyboard focus and touch interaction, and reduced-motion handling.`,
+      "GradientFolder.tsx (complete source):", "```tsx", source, "```",
+    ].join("\n\n") : isSkill ? "Create an isometric or dimetric SVG icon using the skill below. If I have not named the object yet, ask which object to draw.\n\n" + source : isVoxel ? [
       "Use the named React export VoxelSticker from the complete source below. Preserve its transparent background, block geometry, and shading. It needs React only.",
       `Save as VoxelSticker.tsx, import { VoxelSticker } from "./VoxelSticker", and render <VoxelSticker name="${sticker}" size={240} />.`,
       "```tsx", source, "```",
@@ -132,8 +139,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isFolder && <div className="demo-modes" style={{marginTop:14}} role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
       <button key={name} aria-label={name} aria-pressed={name===sticker} onClick={()=>setSticker(name)}><span aria-hidden="true"><VoxelSticker name={name} size={56}/></span>{name}</button>
     )}</div>}

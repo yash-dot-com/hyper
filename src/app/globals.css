@@ -225,3 +225,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 
 .art-axonometric-icons .mini,.stage.art-axonometric-icons {background:#eeeae3}
 .skill-download {display:inline-block;margin-top:14px;text-decoration:underline;text-underline-offset:3px}
+
+.art-gradient-folder .mini,.stage.art-gradient-folder {background:#f7f3ec}
