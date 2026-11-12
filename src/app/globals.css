@@ -288,3 +288,8 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .meadow-runway .meadow-footer {position:sticky;top:0;min-height:clamp(320px,48vw,510px)}
 .stage.art-butterfly-meadow,.art-butterfly-meadow .mini {background:#f5f0df;grid-template-columns:minmax(0,1fr)}
 .stage.art-halftone-butterfly,.art-halftone-butterfly .mini {background:#09090d;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.stage.art-postal-stamps,.art-postal-stamps .mini {background:#a9bfb0;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.postage-sheet {width:min(89%,580px);height:86%;display:grid;grid-template:repeat(2,minmax(0,1fr))/repeat(3,minmax(0,1fr));gap:5%;align-items:center;justify-items:center}
+.postage-sheet>div {width:100%;height:100%;filter:drop-shadow(0 2px 1px #344c412e)}
+.postage-sheet>div:nth-child(odd){transform:rotate(-3deg)}.postage-sheet>div:nth-child(even){transform:rotate(2deg)}
+.art-postal-stamps .mini .postage-sheet{max-width:305px}

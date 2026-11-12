@@ -44,39 +44,50 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
     let visible=false, frame=0, last=0, t=0;
     // Overlapping spline spans preserve velocity through each new destination.
-    const route=[[62,100,-48],[91,112,-65],[155,72,64],[188,104,32]];
+    // Pairs of destinations at each side produce broad passes and sweeping turns.
+    const route=[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]];
+    let destination=0;
     let travel=0, heading=.55, bank=0, pitch=0, wingPhase=0;
     function paint(now:number){
       const dt=reduce.matches?0:Math.max(0,Math.min(.05,(now-last)/1000));
       t+=dt;
       last=now;
       const c=ctx!;
-      c.setTransform(3,0,0,3,0,0);c.clearRect(0,0,260,180);
-      const glide=Math.max(0,Math.sin(t*1.35+.7*Math.sin(t*.63)))**5;
-      travel+=dt*(.72+.22*Math.sin(t*.87)-.18*glide);
+      const width=node.clientWidth||260,height=node.clientHeight||180;
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      if(node.width!==Math.round(width*dpr)||node.height!==Math.round(height*dpr)){
+        node.width=Math.round(width*dpr);node.height=Math.round(height*dpr);
+      }
+      c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,width,height);
+      const unit=Math.min(width/260,height/180);
+      const margin=52*unit;
+      const glide=Math.min(1,Math.max(0,.55+.8*Math.sin(t*.85+.55*Math.sin(t*.41))));
+      travel+=dt*(.35+.045*Math.sin(t*.51)-.035*glide);
       if(travel>=1){
         travel-=1;
-        const tail=route[3];
-        const x=tail[0]>130?58+Math.random()*60:143+Math.random()*58;
-        route.shift();route.push([x,63+Math.random()*54,tail[2]>0?-82+Math.random()*48:35+Math.random()*42]);
+        const left=destination%4<2;
+        const high=(destination+1)%4<2;
+        destination++;
+        route.shift();route.push([left?Math.random()*.15:.85+Math.random()*.15,
+          high?Math.random()*.24:.76+Math.random()*.24,-58+Math.random()*102]);
       }
       const u=travel,v=1-u;
       const weights=[v**3,3*u**3-6*u*u+4,-3*u**3+3*u*u+3*u+1,u**3];
       const tangent=[-3*v*v,9*u*u-12*u,-9*u*u+6*u+3,3*u*u];
       const sum=(axis:number,coeff:number[])=>route.reduce((n,p,i)=>n+p[axis]*coeff[i]/6,0);
-      const target=Math.atan2(sum(1,tangent),sum(0,tangent))+Math.PI/2;
+      const target=Math.atan2(sum(1,tangent)*(height-2*margin),sum(0,tangent)*(width-2*margin))+Math.PI/2;
       const turn=Math.atan2(Math.sin(target-heading),Math.cos(target-heading));
       heading+=turn*(1-Math.exp(-dt*7));
       bank+=(Math.max(-.45,Math.min(.45,turn))-bank)*(1-Math.exp(-dt*4));
-      wingPhase+=dt*(13+2*Math.sin(t*1.7))*(1-.8*glide);
+      wingPhase+=dt*(7+.8*Math.sin(t*1.3))*(1-.8*glide);
       const cameraDistance=285, depth=cameraDistance-sum(2,weights);
       const perspective=cameraDistance/depth;
-      const climb=Math.atan2(sum(2,tangent),Math.hypot(sum(0,tangent),sum(1,tangent)));
+      const climb=Math.atan2(sum(2,tangent),Math.hypot(sum(0,tangent)*210,sum(1,tangent)*110));
       pitch+=(Math.max(-.95,Math.min(.95,climb))-pitch)*(1-Math.exp(-dt*5));
       const cp=Math.cos(pitch),sp=Math.sin(pitch),cb=Math.cos(bank),sb=Math.sin(bank);
-      c.translate(130+(sum(0,weights)-130)*perspective,90+(sum(1,weights)-90)*perspective+1.3*Math.sin(wingPhase));
+      c.translate(margin+sum(0,weights)*(width-2*margin),margin+sum(1,weights)*(height-2*margin)+unit*Math.sin(wingPhase));
       c.rotate(heading);
-      c.scale(.47*perspective,.47*perspective);
+      c.scale(.40*unit*perspective,.40*unit*perspective);
       const beat=wingPhase;
       for(let i=0;i<bands.length;i++){
         const phase=(i/bands.length+t*.082)*inks.length;
@@ -120,5 +131,5 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
   },[]);
-  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of color-shifting halftone dots" style={{display:"block",width:"min(100%, 560px)",maxHeight:"100%",objectFit:"contain",filter:`hue-rotate(${hue}deg)`,background:"#09090d"}}/>;
+  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of color-shifting halftone dots" style={{display:"block",width:"100%",height:"100%",minHeight:0,filter:`hue-rotate(${hue}deg)`,background:"#09090d"}}/>;
 }
