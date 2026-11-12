@@ -44,8 +44,8 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
     let visible=false, frame=0, last=0, t=0;
     // Overlapping spline spans preserve velocity through each new destination.
-    const route=[[62,100],[91,112],[155,72],[196,104]];
-    let travel=0, heading=.55, bank=0, wingPhase=0;
+    const route=[[62,100,-48],[91,112,-65],[155,72,64],[188,104,32]];
+    let travel=0, heading=.55, bank=0, pitch=0, wingPhase=0;
     function paint(now:number){
       const dt=reduce.matches?0:Math.max(0,Math.min(.05,(now-last)/1000));
       t+=dt;
@@ -58,7 +58,7 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
         travel-=1;
         const tail=route[3];
         const x=tail[0]>130?58+Math.random()*60:143+Math.random()*58;
-        route.shift();route.push([x,63+Math.random()*54]);
+        route.shift();route.push([x,63+Math.random()*54,tail[2]>0?-82+Math.random()*48:35+Math.random()*42]);
       }
       const u=travel,v=1-u;
       const weights=[v**3,3*u**3-6*u*u+4,-3*u**3+3*u*u+3*u+1,u**3];
@@ -69,9 +69,14 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
       heading+=turn*(1-Math.exp(-dt*7));
       bank+=(Math.max(-.45,Math.min(.45,turn))-bank)*(1-Math.exp(-dt*4));
       wingPhase+=dt*(13+2*Math.sin(t*1.7))*(1-.8*glide);
-      c.translate(sum(0,weights),sum(1,weights)+1.3*Math.sin(wingPhase));
+      const cameraDistance=285, depth=cameraDistance-sum(2,weights);
+      const perspective=cameraDistance/depth;
+      const climb=Math.atan2(sum(2,tangent),Math.hypot(sum(0,tangent),sum(1,tangent)));
+      pitch+=(Math.max(-.95,Math.min(.95,climb))-pitch)*(1-Math.exp(-dt*5));
+      const cp=Math.cos(pitch),sp=Math.sin(pitch),cb=Math.cos(bank),sb=Math.sin(bank);
+      c.translate(130+(sum(0,weights)-130)*perspective,90+(sum(1,weights)-90)*perspective+1.3*Math.sin(wingPhase));
       c.rotate(heading);
-      c.scale(.47,.47);
+      c.scale(.47*perspective,.47*perspective);
       const beat=wingPhase;
       for(let i=0;i<bands.length;i++){
         const phase=(i/bands.length+t*.082)*inks.length;
@@ -87,15 +92,22 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
           const dy=dot.freedom*dot.span*(2.2*Math.cos(t*1.45+dot.x*.058)+.85*Math.cos(t*1.8+dot.drift));
           for(const side of [-1,1]){
             const localBeat=wave+side*.10;
-            const fold=(.78+.21*Math.cos(localBeat))*(1-glide)+.94*glide;
-            const x=side*(dot.x*fold*(1+side*bank*.22)+dx);
-            const y=dot.y+dy+9*dot.span*dot.span*Math.sin(localBeat);
-            const radius=dot.radius*(.83+.17*fold);
+            // Hinge the membrane at the thorax, then roll and pitch it into camera space.
+            const flap=(.47-.68*Math.cos(localBeat))*(1-glide)+.18*glide;
+            const span=dot.x+dx, lateral=side*span*Math.cos(flap), lift=span*Math.sin(flap);
+            const fore=dot.y+dy;
+            const rolledZ=lateral*sb+lift*cb;
+            const localZ=rolledZ*cp-fore*sp;
+            const projection=depth/(depth-.47*localZ);
+            const x=(lateral*cb-lift*sb)*projection;
+            const y=(fore*cp+rolledZ*sp)*projection;
+            const radius=dot.radius*projection;
             c.moveTo(x+radius,y);c.arc(x,y,radius,0,Math.PI*2);
           }
         }
         c.fill();
       }
+      c.scale(cb,cp);
       c.strokeStyle="#00c4fa";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
       c.moveTo(1,-9);c.quadraticCurveTo(8,-25,16,-30);c.stroke();
       for(let j=0;j<8;j++){
