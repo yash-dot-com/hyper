@@ -48,8 +48,8 @@ function Detail({ index, source, lines }: { index: number; source: string; lines
     <header className="detail-head">
       <h1>{item.title}</h1>
       <Button className="prompt-action" onClick={() => copy("prompt")}>{feedback === "prompt" ? <Check/> : <Copy/>}{feedback === "prompt" ? "Prompt copied" : "Copy prompt"}</Button>
-      <p className="component-description">{item.description}</p>
     </header>
+    <p className="component-description">{item.description}</p>
     <section className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
       <div className="piece" key={version}><Preview playing={playing}/></div>
       <div className="playback">
