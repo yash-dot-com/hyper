@@ -25,7 +25,7 @@ import { FrostedTileFooter } from "./experiments/FrostedTileFooter";
 import { VoiceBlob } from "./experiments/VoiceBlob";
 import { CardCascade } from "./experiments/CardCascade";
 import { BlockType, IsoBlockType } from "./experiments/BlockType";
-import { ProceduralTree, treeDesigns, type TreeDesign, type TreeSettings } from "./experiments/ProceduralTree";
+import { ProceduralTree, treeDesigns, type TreeDesign } from "./experiments/ProceduralTree";
 import { LuminousSurface, lightFinishes, type LightFinish } from "./experiments/LuminousSurface";
 import { GlassBubble } from "./experiments/GlassBubble";
 import { JellyAvatar } from "./experiments/JellyAvatar";
@@ -146,7 +146,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
     </LuminousSurface>)}
   </div>;
 }
-function TreeThumbnail() {return <ProceduralTree width={1200} height={1200} seed={19}/>;}
+function TreeThumbnail() {return <ProceduralTree seed={19}/>;}
 function InkStickerSheet() {
   return <div className="ink-sticker-sheet">{(["disc","arrow","spark","bow","vase","cube"] as const).map(shape=><HalftoneSticker key={shape} shape={shape}/>)}</div>;
 }
@@ -224,7 +224,7 @@ const collection = [
   {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade", category:"Generative art",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
   {title:"Isometric Block Type",description:"Cube-built pieces tumble onto an isometric plane and assemble into your text.",slug:"isometric-block-type", category:"Type & lettering",component:"IsoBlockType",icon:Type,preview:()=> <IsoBlockType/>},
   {title:"Block Type",description:"Falling pieces turn and lock into letterforms. Change the text to build a new word.",slug:"block-type", category:"Type & lettering",component:"BlockType",icon:Type,preview:()=> <BlockType/>},
-  {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the dimensions, branching depth, or seed to grow another tree.",slug:"procedural-tree", category:"Generative art",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
+  {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the branching depth or seed to grow another tree.",slug:"procedural-tree", category:"Generative art",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
   {title:"Luminous Surfaces", description:"A frosted rim surrounds a pool of color. Move across a surface to shift its light, or select a finish to copy it.",slug:"luminous-surfaces", category:"Interface elements",component:"LuminousSurface",icon:Layers2,preview:LightSheet},
   {title:"Glass Bubbles", description:"Frosted edges catch the light around a pool of blue. The corner turns toward the sender as the message grows.", slug:"glass-bubbles", category:"Interface elements", component:"GlassBubble", icon:Layers2, preview:GlassThumbnail},
   {title:"Jelly Avatar", description:"A translucent avatar flows from a blue scallop to a pink ripple and a mint clover. Its color moves with its silhouette.", slug:"jelly-avatar", category:"Avatars & voice",component:"JellyAvatar",icon:Layers2,preview:JellyThumbnail},
@@ -266,7 +266,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [driftSpeed,setDriftSpeed]=useState(1);
   const [scope,setScope]=useState({variant:"Prism" as keyof typeof scopePresets,seed:0,colors:undefined as string[]|undefined,...scopePresets.Prism});
   const [bandPalette,setBandPalette]=useState<BandPalette>("citrus");
-  const [glowWord,setGlowWord]=useState("Afterglow");
+  const [glowWord,setGlowWord]=useState("hyperion");
   const [glowColors,setGlowColors]=useState(afterglowColors);
   const [wingSeed,setWingSeed]=useState(0);
   const [patternSeed,setPatternSeed]=useState(0);
@@ -289,7 +289,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [drop,replayDrop]=useState(0);
   const isTree = item.slug === "procedural-tree";
   const [design,setDesign]=useState<TreeDesign>("Original");
-  const [tree,setTree] = useState<TreeSettings>({width:1200,height:1200,depth:3,seed:19});
+  const [tree,setTree] = useState({depth:3,seed:19});
   useEffect(()=>{if(isTree)setTree(t=>({...t,seed:Math.floor(Math.random()*1000)}));},[isTree]);
   const [growth,regrow] = useState(0);
   const isLight = item.slug === "luminous-surfaces";
@@ -326,7 +326,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     ].join("\n\n") : isBlock ? [
       `Integrate the named ${item.component} React component in a client boundary. Render <${item.component} text={${JSON.stringify(word)}} />. Increment its replay prop to restart the drop. Keep the reduced-motion still and accessible text label.`, "```tsx", source, "```",
     ].join("\n\n") : isTree ? [
-      `Use the named ProceduralTree export in a React project. Render <ProceduralTree design="${design}" width={${tree.width}} height={${tree.height}} depth={${tree.depth}} seed={${tree.seed}} />. Keep seeded geometry, parent-before-child animation and reduced-motion behavior. In Next.js import from a client boundary.`,
+      `Use the named ProceduralTree export in a React project. Render <ProceduralTree design="${design}" depth={${tree.depth}} seed={${tree.seed}} />. Keep seeded geometry, parent-before-child animation and reduced-motion behavior. In Next.js import from a client boundary.`,
       "```tsx", source, "```",
     ].join("\n\n") : isLight ? [
       `Use the named LuminousSurface React export in a client boundary. Wrap your content with <LuminousSurface finish="${light}">…</LuminousSurface>. Preserve the frosted rim, pointer lighting, focus feedback, and reduced-motion fallback.`, "```tsx", source, "```",
@@ -443,7 +443,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
       <DirectorySelect label="Design" value={design} options={treeDesigns} onChange={setDesign}/>
-      {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:1200} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
+      {(["depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:1} max={k==="depth"?5:999} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
       <div className="control-pair">
       <Button variant="outline" onClick={()=>setTree(t=>({...t,seed:(t.seed+1+Math.floor(Math.random()*999))%1000}))}>New tree</Button>
       <Button variant="outline" onClick={()=>regrow(n=>n+1)}>Replay growth</Button>

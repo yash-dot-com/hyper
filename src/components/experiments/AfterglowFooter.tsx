@@ -6,7 +6,7 @@ export const afterglowColors = {
   sky:"#8784ef", horizon:"#d4ebe3", core:"#7270ff", rim:"#ee09dc", halo:"#ffae38",
 };
 
-export function AfterglowFooter({word="Afterglow", colors={}, heading="Made for the curious."}:{
+export function AfterglowFooter({word="hyperion", colors={}, heading="Made for the curious."}:{
   word?:string; colors?:Partial<typeof afterglowColors>; heading?:string;
 }) {
   const palette={...afterglowColors,...colors};
@@ -24,7 +24,7 @@ export function AfterglowFooter({word="Afterglow", colors={}, heading="Made for 
   const useWord={href:"#"+id+"word",strokeLinejoin:"round" as const,paintOrder:"stroke"};
   return <footer style={{position:"relative",isolation:"isolate",width:"100%",overflow:"hidden",
     background:`linear-gradient(178deg,${palette.sky} 24%,${palette.horizon} 96%)`}}>
-    <svg viewBox="0 0 1000 500" style={{display:"block",width:"100%",fontFamily:"inherit"}} role="img" aria-label={[heading,word].filter(Boolean).join(" ")}>
+    <svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMax slice" style={{display:"block",width:"100%",fontFamily:"inherit"}} role="img" aria-label={[heading,word].filter(Boolean).join(" ")}>
       <defs>
         <text ref={lettering} id={id+"word"} textAnchor="middle" fontWeight="700" fontSize="205" letterSpacing="-.045em">{word}</text>
         {[1.6,3.5,7,12].map(blur=><filter key={blur} id={id+"blur"+blur} x="-25%" y="-85%" width="150%" height="270%">
