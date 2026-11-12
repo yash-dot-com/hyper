@@ -52,11 +52,36 @@ function grow({width:w,height:h,depth,seed}:TreeSettings) {
   branch([w*.5,h-unit*3],unit*3,w-unit*3,0,0,0);
   return {stems,unit};
 }
+// Local origin is the attachment to the shoot; fruit hangs below that point.
+function Leaf({rotation=0,scale=1}: {rotation?:number; scale?:number}) {
+  return <g transform={`rotate(${rotation}) scale(${scale})`}>
+    <path fill="#64ac56" d="M0 0C-2.5-1.5-3.1-4.2-2.9-6.6C-.5-5.4 1.3-3.2 0 0Z"/>
+    <path fill="#92c96d" d="M0 0Q-1.2-3.5-2.9-6.6C-.5-5.4 1.3-3.2 0 0Z"/>
+    <path fill="none" stroke="#447d43" strokeWidth=".2" d="M0 0Q-1-3.4-2.6-6M-1-2.6l-1.1-.55M-1.4-3.8l.35-1"/>
+  </g>;
+}
 function Bloom({kind}: {kind:number}) {
-  if(kind===0)return <><path fill="#e7324a" d="M-1-1C-4-5 0-7 1-5C4-7 6-4 4-2L1 1Z"/><circle cx="1" cy="-3" r="1" fill="#ff9893"/></>;
-  if(kind===1)return <><circle cy="-1" r="2" fill="#f33e58"/><path fill="#76ba52" d="M0-2q-3 0-3-3 3-1 4 2z"/></>;
-  if(kind===2)return <><path fill="#ff9558" d="m0 0-3-1-1-2 2-1 2 2-1-3 1-1 2 1-1 3 2-2 2 1-1 2z"/><circle r=".8" fill="#ffe4a1"/></>;
-  return <><path fill="#72c76d" d="M0 1v-2q-3-1-2-4h4q1 3-1 4v2z"/><path stroke="#9ce18d" strokeWidth=".7" d="M0 0v-3"/></>;
+  if(kind===0)return <>
+    <path d="M0 0Q.9 1 .3 2.2" fill="none" stroke="#9d8050" strokeWidth=".55"/>
+    <Leaf rotation={75} scale={.46}/>
+    <path fill="#dc4353" d="M.3 2.1C1.5 1.1 3.3 1.5 3.35 3.2C3.45 4.9 2.3 6.8 1.2 6.65Q.45 6.35-.2 6.6C-1.6 7-3.1 4.65-2.85 3.05C-2.58 1.5-1.05 1.1.3 2.1Z"/>
+    <path d="M-2 3.7q-.1-1 .8-1.35" fill="none" stroke="#ff9c96" strokeLinecap="round" strokeWidth=".45"/>
+  </>;
+  if(kind===1)return <>
+    <path d="M-2.1 3.6Q-.5 2.4 0 0Q1.9 1.2 2.5 4.4" fill="none" stroke="#98a05a" strokeWidth=".42"/>
+    <Leaf rotation={-42} scale={.48}/>
+    {[[-2.1,4.5],[2.5,5.2]].map(([x,y],i)=><g key={i} transform={`translate(${x} ${y})`}>
+      <path fill={i?"#ef4857":"#c83651"} d="M0-1.2C1.3-1.9 2.1-.8 1.8.55C1.4 2.55-1.25 2.6-1.85.65C-2.25-.7-1.55-1.85 0-1.2Z"/>
+      <ellipse cx="-.7" cy="-.5" rx=".45" ry=".28" fill="#ffb0a3"/>
+    </g>)}
+  </>;
+  if(kind===2)return <><path d="M0 0q.8-1.2.4-2.4" fill="none" stroke="#71a357" strokeWidth=".55"/>
+    <g transform="translate(.4 -2.4)">{[0,72,144,216,288].map((angle,i)=><g key={angle} transform={`rotate(${angle})`}>
+      <path fill={i%2?"#ff986f":"#f78066"} d="M0 .2C-1.35-.6-2.55-2.7-1.55-3.55Q-.75-4.2-.16-3.6Q.72-4.45 1.55-3.55C2.35-2.5 1.3-.65 0 .2Z"/>
+      <path d="M0-.55l-.35-1.65" stroke="#d86259" strokeWidth=".23"/>
+    </g>)}<circle r=".94" fill="#ffc95d"/><circle cx="-.22" cy="-.26" r=".33" fill="#fff1a2"/></g>
+  </>;
+  return <><Leaf rotation={-24} scale={.78}/><Leaf rotation={62}/></>;
 }
 export function ProceduralTree({width=460,height=380,depth=3,seed,animated=true}: Partial<TreeSettings>&{animated?:boolean}) {
   const w=limit(width,160,1200,460),h=limit(height,160,1200,380);
