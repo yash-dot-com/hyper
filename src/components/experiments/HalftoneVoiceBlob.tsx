@@ -50,7 +50,7 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       }
       return sites;
     });
-    let flareAngle=0, flareAge=1, flareStrength=0;
+    const flares: {angle:number; start:number; reach:number; speed:number; travel:number; radius:number; hue:number}[]=[];
     let raf=0,last=0,time=0,energy=0,visible=true;
     function draw(now:number) {
       raf=requestAnimationFrame(draw);
@@ -71,14 +71,6 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       c.globalCompositeOperation="multiply";
       const density=.72+.28*Math.sqrt(energy);
       const roll=Math.sin(time*.8)*.14, cos=Math.cos(roll), sin=Math.sin(roll);
-      flareAge=Math.min(1,flareAge+dt/.72);
-      if(!reduce.matches && flareAge===1 && Math.random()<1-Math.exp(-dt*energy*12)){
-        flareAngle=Math.random()*Math.PI*2;
-        flareAge=0;
-        flareStrength=.12+.22*energy;
-      }
-      // One continuous deformation of the existing lattice, anchored at its center.
-      const flare=reduce.matches?0:flareStrength*Math.sin(Math.PI*flareAge)**2;
       plates.forEach((sites,k)=>{
         const hue=[193,328,54,233][k]+energy*[33,31,-21,48][k];
         c.globalAlpha=k===3?.23:.91;
@@ -95,17 +87,38 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           const emerge=Math.min(1,Math.max(0,(density-site.threshold)*10));
           if(!emerge)continue;
           if(amount<=.015)continue;
-          const alignment=Math.max(0,Math.cos(site.angle-flareAngle));
-          const stretch=flare*alignment**6*(site.distance/edge)**2;
-          const radius=(1-.8*stretch)*Math.min(4.3,4.15*Math.sqrt(amount)*Math.min(1,amount*5)*emerge*(k===3?.68:1));
+          const radius=Math.min(4.3,4.15*Math.sqrt(amount)*Math.min(1,amount*5)*emerge*(k===3?.68:1));
           // A shared rolling current keeps the four screens moving as one body.
-          const x=120+(1+stretch)*(site.x*cos-site.y*sin)+3*Math.sin(site.y/34+time);
-          const y=120+(1+stretch)*(site.x*sin+site.y*cos)+2.5*Math.cos(site.x/38-time*.9);
+          const x=120+site.x*cos-site.y*sin+3*Math.sin(site.y/34+time);
+          const y=120+site.x*sin+site.y*cos+2.5*Math.cos(site.x/38-time*.9);
           c.moveTo(x+radius,y);
           c.arc(x,y,radius,0,Math.PI*2);
         }
         c.fill();
       });
+      if(reduce.matches)flares.length=0;
+      else if(Math.random()<1-Math.exp(-dt*energy*12)){
+        const direction=Math.random()*Math.PI*2;
+        const count=1+Math.floor(energy*4);
+        for(let i=0;i<count && flares.length<80;i++){
+          const angle=direction+(Math.random()-.5)*.55;
+          const start=61+energy*12+5*Math.sin(3*angle+time);
+          flares.push({angle,start,reach:113-start,speed:22+Math.random()*28,travel:0,
+            radius:1.6+Math.random()*2,hue:[193,328,54][Math.floor(Math.random()*3)]});
+        }
+      }
+      for(let i=flares.length-1;i>=0;i--){
+        const dot=flares[i];
+        dot.travel+=dt*dot.speed;
+        const remaining=1-dot.travel/dot.reach;
+        if(remaining<=0){flares.splice(i,1);continue;}
+        const distance=dot.start+dot.travel;
+        c.globalAlpha=.85*remaining*remaining;
+        c.fillStyle=`hsl(${dot.hue} 100% 49%)`;
+        c.beginPath();
+        c.arc(120+distance*Math.cos(dot.angle),120+distance*Math.sin(dot.angle),dot.radius*remaining,0,Math.PI*2);
+        c.fill();
+      }
       c.globalAlpha=1;
     }
     function sync(){cancelAnimationFrame(raf);if(visible&&!document.hidden){last=performance.now()-110;draw(performance.now());}}
