@@ -10,7 +10,8 @@ export default async function Home() {
   const [component, composition] = await Promise.all(
     ["KineticParagraph.tsx", "Root.tsx"].map(file => readFile(path.join(directory, file), "utf8"))
   );
-  const [momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
+  const [paper, momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
+    readFile(path.join(process.cwd(), "src/components/experiments/PaperNoticeboard.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/MomentumLoader.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/InkFusion.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/HalftoneSticker.tsx"), "utf8"),
@@ -35,6 +36,6 @@ export default async function Home() {
     readFile(path.join(process.cwd(), "public/motif-globe/MotifGlobe.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"),
   ]);
-  const sources = [momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
-  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 16 || i === 18 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
+  const sources = [paper, momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
+  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 17 || i === 19 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
 }

@@ -272,3 +272,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .momentum-toggle {background:#272727;color:#f3f1eb;border:1px solid #60605c;border-radius:999px;min-width:108px;padding:9px 16px;cursor:pointer;font:inherit}
 .momentum-toggle:hover {background:#383836;border-color:#878782}
 .momentum-toggle:focus-visible {outline:2px solid #ffd620;outline-offset:3px}
+.stage.art-paper-noticeboard,.art-paper-noticeboard .mini {background:#faf8f4;grid-template-columns:minmax(0,1fr);padding:clamp(12px,3vw,40px)}
+.stage.art-paper-noticeboard {height:auto;min-height:310px}
+.art-paper-noticeboard .mini .paper-board {max-width:250px}
