@@ -30,7 +30,7 @@ function KineticVideo({ fullSize = false }: { fullSize?: boolean }) {
 
 function GlobeDemo({ fullSize = false }: { fullSize?: boolean }) {
   const base = "/motif-globe/preview" + (fullSize ? "-hd" : "");
-  return <DemoVideo base={base} width={1440} height={1440} label="Rotating globe of morphing geometric marks"/>;
+  return <DemoVideo upperHemisphere={!fullSize} base={base} width={1440} height={1440} label="Rotating globe of morphing geometric marks"/>;
 }
 
 function RippleThumbnail() { return <RippleDemo mode="frame"/>; }
