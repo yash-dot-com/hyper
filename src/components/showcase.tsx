@@ -397,7 +397,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <div className="demo-modes" role="group" aria-label="Optical preset">{(Object.keys(scopePresets) as (keyof typeof scopePresets)[]).map(variant=><Button key={variant} variant="outline" aria-pressed={scope.variant===variant} onClick={()=>setScope({variant,...scopePresets[variant]})}>{variant}</Button>)}</div>
       <div className="scope-dials">{([["mirrors",4,16,2],["speed",-36,36,1],["zoom",.4,2.5,.05],["drift",0,3,.05]] as const).map(([key,min,max,step])=><label key={key}>{key} <output>{scope[key]}</output><input type="range" min={min} max={max} step={step} value={scope[key]} onChange={e=>setScope({...scope,[key]:e.target.valueAsNumber})}/></label>)}</div>
     </div>}
-    {item.slug==="breathing-bands" && <div className="demo-modes band-palettes" role="group" aria-label="Band palette">
+    {item.slug==="breathing-bands" && <div className="demo-modes" role="group" aria-label="Band palette">
       {(["citrus","prism","lime"] as const).map(value=><Button key={value} variant="outline" aria-pressed={bandPalette===value} onClick={()=>setBandPalette(value)}>{value[0].toUpperCase()+value.slice(1)}</Button>)}
     </div>}
     {isFrost && <div className="pixel-controls">
@@ -406,7 +406,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
         const next: typeof tileColors=[...tileColors]; next[i]=e.target.value; setTileColors(next);
       }}/></label>)}
     </div>}
-    {isCascade && <div className="demo-modes" style={{marginTop:14}}><Button variant="outline" onClick={()=>setPaused(p=>!p)}>{paused?"Resume":"Pause"}</Button><Button variant="outline" onClick={()=>{setPaused(false);setDeal(n=>n+1)}}>Replay cascade</Button></div>}
+    {isCascade && <div className="demo-modes"><Button variant="outline" onClick={()=>setPaused(p=>!p)}>{paused?"Resume":"Pause"}</Button><Button variant="outline" onClick={()=>{setPaused(false);setDeal(n=>n+1)}}>Replay cascade</Button></div>}
     {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
       <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>
@@ -418,7 +418,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isChrome && <div className="pixel-controls"><label>Mark<select value={mark} onChange={e=>setMark(e.target.value as EmblemMark)}>{emblemMarks.map(name=><option key={name}>{name}</option>)}</select></label></div>}
     {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
     {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
-    {isFolder && <div className="demo-modes" style={{marginTop:14}} role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
+    {isFolder && <div className="demo-modes" role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
       <button key={name} aria-label={name} aria-pressed={name===sticker} onClick={()=>setSticker(name)}><span aria-hidden="true"><VoxelSticker name={name} size={56}/></span>{name}</button>
     )}</div>}
