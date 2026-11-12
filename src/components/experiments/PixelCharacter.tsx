@@ -81,27 +81,40 @@ export function PixelCharacter({ shape = "wave", colors, speed = 1, size = 192, 
     "--pixel-play": rate ? "running" : "paused",
   } as CSSProperties;
   return (
-    <svg viewBox="-1 -1 14 14" style={timing} role="img" aria-label={label} shapeRendering="crispEdges">
+    <svg viewBox="-2 -2 16 16" style={timing} role="img" aria-label={label} shapeRendering="crispEdges">
       <style>{`
-        .px-fringe, .px-eyes, .px-pupils { animation: var(--pixel-beat) steps(1,end) infinite; animation-play-state:var(--pixel-play); }
+        .px-pose, .px-fringe, .px-eyes, .px-pupils { animation: var(--pixel-beat) steps(1,end) infinite; animation-play-state:var(--pixel-play); }
+        .px-pose { animation-name:px-look; transform-box:fill-box; transform-origin:50% 85%; }
+        @keyframes px-look {
+          0%, 55%, 100% { transform:none; }
+          12% { transform:translateY(.25px) rotate(-3deg); }
+          22% { transform:translateY(-.5px) rotate(4deg); }
+          28% { transform:translateY(-.75px) rotate(8deg); }
+          45% { transform:translateY(-.25px) rotate(4deg); }
+          65% { transform:translateY(.5px) rotate(-2deg); }
+          74% { transform:translateY(-.25px) rotate(-6deg); }
+          90% { transform:rotate(-3deg); }
+        }
         .px-fringe { animation-name:px-twitch; }
         .px-eyes { animation-name:px-blink; transform-box:fill-box; transform-origin:center; }
         .px-pupils { animation-name:px-glance; }
         @keyframes px-twitch { 0%,40%,100% {transform:none} 32% {transform:translateY(-1px)} }
         @keyframes px-blink { 0%,71%,100% {transform:none} 68% {transform:scaleY(.18)} }
         @keyframes px-glance { 0%,58%,100% {transform:none} 24% {transform:translateX(1px)} }
-        @media (prefers-reduced-motion:reduce) { .px-fringe,.px-eyes,.px-pupils {animation:none} }
+        @media (prefers-reduced-motion:reduce) { .px-pose,.px-fringe,.px-eyes,.px-pupils {animation:none} }
       `}</style>
-      {portraits[shape].map((row, y) => [...row].map((index, x) => {
-        if (index === ".") return null;
-        const tuft = y === 0 && (x % 3 === 0 || x % 3 === 1);
-        return <rect key={y * 12 + x} className={tuft ? "px-fringe" : undefined}
-          x={x} y={y} width="1" height={tuft ? 2 : 1} fill={palette[Number(index) % palette.length]}/>;
-      }))}
-      <g className="px-eyes" fill="#FFFDF5">
-        <rect x="4" y="5" width="2" height="1"/><rect x="7" y="5" width="2" height="1"/>
-        <g className="px-pupils" fill="#14131A">
-          <rect x="4" y="5" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/>
+      <g className="px-pose">
+        {portraits[shape].map((row, y) => [...row].map((index, x) => {
+          if (index === ".") return null;
+          const tuft = y === 0 && (x % 3 === 0 || x % 3 === 1);
+          return <rect key={y * 12 + x} className={tuft ? "px-fringe" : undefined}
+            x={x} y={y} width="1" height={tuft ? 2 : 1} fill={palette[Number(index) % palette.length]}/>;
+        }))}
+        <g className="px-eyes" fill="#FFFDF5">
+          <rect x="4" y="5" width="2" height="1"/><rect x="7" y="5" width="2" height="1"/>
+          <g className="px-pupils" fill="#14131A">
+            <rect x="4" y="5" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/>
+          </g>
         </g>
       </g>
     </svg>

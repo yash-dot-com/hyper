@@ -35,7 +35,7 @@ function PixelThumbnail() {
 }
 
 const collection = [
-  { title: "Pixel Character", description: "A little portrait built from colored squares. Its fringe shifts, its eyes wander, and every so often it blinks.", slug: "pixel-character", component: "PixelCharacter", icon: Grid2X2, preview: PixelThumbnail },
+  { title: "Pixel Character", description: "A little portrait built from colored squares. It glances to one side, tilts its head, and bobs back into place.", slug: "pixel-character", component: "PixelCharacter", icon: Grid2X2, preview: PixelThumbnail },
   { title: "Motif Globe", description: "Continents turn across a field of shifting geometric marks. A band of teal, gold, and coral travels over the surface as the globe rotates.", slug: "motif-globe", component: "MotifGlobe", icon: Globe, preview: GlobeDemo },
   { title: "Image Ripple Loader", description: "A grid of tiny marks lights up in passing waves. Watch the rings travel outward in a disc, or follow a band of color across the full frame.", slug: "image-ripple-loader", component: "ImageRippleLoader", icon: Layers2, preview: RippleDemo },
   { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Colored highlights mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", component: "KineticParagraph", icon: Type, preview: KineticVideo },
