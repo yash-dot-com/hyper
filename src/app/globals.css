@@ -249,3 +249,4 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 
 .art-voice-blob .mini,.stage.art-voice-blob {background:#020403}
 .stage.art-voice-blob {min-height:365px}
+.stage.art-frosted-tile-button,.art-frosted-tile-button .mini {background:#f0f1ed}
