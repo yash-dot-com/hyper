@@ -69,10 +69,11 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       c.globalCompositeOperation="source-over";
       c.fillStyle="#fffcf5"; c.fillRect(0,0,240,240);
       c.globalCompositeOperation="multiply";
-      const density=.23+.77*Math.sqrt(energy);
+      const density=.72+.28*Math.sqrt(energy);
+      const roll=Math.sin(time*.8)*.14, cos=Math.cos(roll), sin=Math.sin(roll);
       plates.forEach((sites,k)=>{
         const hue=[193,328,54,233][k]+energy*[33,31,-21,48][k];
-        c.globalAlpha=k===3?.33:.86;
+        c.globalAlpha=k===3?.23:.91;
         c.fillStyle=`hsl(${hue} ${k===3?33:100}% ${k===3?13:49}%)`;
         const bearing=time*.5+k*Math.PI/2;
         const cx=29*Math.cos(bearing),cy=29*Math.sin(bearing);
@@ -82,13 +83,16 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           const fade=Math.min(1,Math.max(0,(edge-site.distance)/20));
           const dx=site.x-cx,dy=site.y-cy;
           const ink=Math.exp(-(dx*dx+dy*dy)/2400);
-          const amount=fade*(.18+.69*ink+.18*energy)-site.threshold*.55;
+          const amount=fade*(.22+.80*ink+.18*energy)-site.threshold*.45;
           const emerge=Math.min(1,Math.max(0,(density-site.threshold)*10));
           if(!emerge)continue;
           if(amount<=.015)continue;
           const radius=Math.min(4.3,4.15*Math.sqrt(amount)*Math.min(1,amount*5)*emerge*(k===3?.68:1));
-          c.moveTo(120+site.x+radius,120+site.y);
-          c.arc(120+site.x,120+site.y,radius,0,Math.PI*2);
+          // A shared rolling current keeps the four screens moving as one body.
+          const x=120+site.x*cos-site.y*sin+3*Math.sin(site.y/34+time);
+          const y=120+site.x*sin+site.y*cos+2.5*Math.cos(site.x/38-time*.9);
+          c.moveTo(x+radius,y);
+          c.arc(x,y,radius,0,Math.PI*2);
         }
         c.fill();
       });

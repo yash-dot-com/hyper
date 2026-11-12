@@ -114,7 +114,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
 const collection = [
-  {title:"Halftone Voice Blob",description:"Speak softly for sparse pinpoints. Louder syllables draw more dots into the silhouette and shift the ink colors.",slug:"halftone-voice-blob",component:"HalftoneVoiceBlob",icon:Layers2,preview:()=> <HalftoneVoiceBlob microphone={false} size={180}/>},
+  {title:"Halftone Voice Blob",description:"Colored ink dots roll together at rest. Louder syllables thicken the print and send fading flecks out from its edges.",slug:"halftone-voice-blob",component:"HalftoneVoiceBlob",icon:Layers2,preview:()=> <HalftoneVoiceBlob microphone={false} size={180}/>},
   {title:"Holographic Foil Button",description:"Rainbow flecks catch the light across a domed capsule. Press the face into its raised rim.",slug:"foil-button",component:"FoilButton",icon:Layers2,preview:()=> <FoilButton/>},
   {title:"Glass Trio",description:"Drag a lens and release it to send a ripple through the other two. Use the arrow keys to nudge a focused lens.",slug:"glass-trio",component:"GlassTrio",icon:Layers2,preview:()=> <GlassTrio interactive={false}/>},
   {title:"Frosted Tile Footer",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-footer",component:"FrostedTileFooter",icon:Layers2,preview:()=> <FrostedTileFooter/>},
