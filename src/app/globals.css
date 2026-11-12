@@ -291,3 +291,4 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .stage.art-afterglow-footer,.art-afterglow-footer .mini {grid-template-columns:minmax(0,1fr);background:#8784ef}.stage.art-afterglow-footer{height:auto}.afterglow-controls label{text-transform:capitalize}.afterglow-controls input:not([type=color]){max-width:14em;border:1px solid var(--edge);border-radius:6px;padding:5px 8px}
 .stage.art-magnetic-stickers,.art-magnetic-stickers .mini {background:#10100f;grid-template-columns:minmax(0,1fr)}.art-magnetic-stickers .mini>div{max-width:300px}
 .stage.art-spectrum-type,.art-spectrum-type .mini {background:#fffdf8;grid-template:minmax(0,1fr)/minmax(0,1fr);padding:12px}.art-spectrum-type h1 {height:100%;min-height:0}
+.stage.art-cut-ink-footer,.art-cut-ink-footer .mini {background:#fffdf8;grid-template-columns:minmax(0,1fr)}.stage.art-cut-ink-footer{height:auto}.art-cut-ink-footer .mini svg{max-height:155px}
