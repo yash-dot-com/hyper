@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 type LinkGroup = { title: string; links: readonly { label: string; href: string }[] };
 const directory: LinkGroup[] = [
   {title:"Directory",links:[{label:"Home",href:"#home"},{label:"Paper Noticeboard",href:"#paper-noticeboard"}]},
-  {title:"Motion",links:[{label:"Ink Fusion",href:"#ink-fusion"},{label:"Momentum Loaders",href:"#momentum-loaders"}]},
+  {title:"Motion",links:[{label:"Ink Fusion",href:"#ink-fusion"}]},
 ];
 const grain = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.77' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23g)'/%3E%3C/svg%3E\")";
 

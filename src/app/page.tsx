@@ -10,7 +10,7 @@ export default async function Home() {
   const [component, composition] = await Promise.all(
     ["KineticParagraph.tsx", "Root.tsx"].map(file => readFile(path.join(directory, file), "utf8"))
   );
-  const [kaleidoscope, breathing, drift, cutInk, spectrum, magnetic, afterglow, dottedButterfly, butterfly, meadow, paper, momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, tree, light, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
+  const [kaleidoscope, breathing, drift, cutInk, spectrum, magnetic, afterglow, dottedButterfly, butterfly, meadow, paper, fusion, stickers, halftone, frost, voice, cascade, blockType, tree, light, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
     readFile(path.join(process.cwd(), "src/components/experiments/DigitalKaleidoscope.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/BreathingBandsFooter.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/PrismDrift.tsx"), "utf8"),
@@ -22,7 +22,6 @@ export default async function Home() {
     readFile(path.join(process.cwd(), "src/components/experiments/ButterflyMeadow.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/MeadowFooter.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/PaperNoticeboard.tsx"), "utf8"),
-    readFile(path.join(process.cwd(), "src/components/experiments/MomentumLoader.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/InkFusion.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/HalftoneSticker.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/HalftoneVoiceBlob.tsx"), "utf8"),
@@ -45,6 +44,6 @@ export default async function Home() {
     readFile(path.join(process.cwd(), "public/motif-globe/MotifGlobe.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"),
   ]);
-  const sources = [kaleidoscope, breathing, drift, cutInk, spectrum, magnetic, afterglow, dottedButterfly, butterfly, meadow, paper, momentum, fusion, stickers, halftone, frost, voice, cascade, blockType, blockType, tree, light, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
-  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 26 || i === 28 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
+  const sources = [kaleidoscope, breathing, drift, cutInk, spectrum, magnetic, afterglow, dottedButterfly, butterfly, meadow, paper, fusion, stickers, halftone, frost, voice, cascade, blockType, blockType, tree, light, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
+  return <Showcase composition={composition} sources={sources} highlighted={sources.map(source => source === gradientSkill || source === skill ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
 }

@@ -225,7 +225,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .directory-outline:is([aria-pressed=true],[aria-expanded=true]) {background:#eeede8;color:#191918;border-color:#eeede8}
 .directory-outline:is([aria-pressed=true],[aria-expanded=true]):is(:hover,:focus-visible):enabled {background:#deddd6;color:#161615;border-color:#deddd6}
 .directory-outline:focus-visible {outline:2px solid var(--foreground);outline-offset:2px}
-.demo-modes button,.drift-controls .directory-outline,.pixel-controls .directory-outline,.momentum-toggle {
+.demo-modes button,.drift-controls .directory-outline,.pixel-controls .directory-outline {
   height:auto;min-height:32px;padding:5px 12px;font-size:13px;line-height:20px
 }
 .control-pair {display:flex;flex-wrap:wrap;align-items:center;gap:6px}
@@ -313,10 +313,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .ink-sticker-sheet > svg {height:100%;min-width:0;min-height:0}
 .art-parallax-ink-stickers .mini .ink-sticker-sheet {max-width:310px;padding:12px;gap:6px}
 .stage.art-ink-fusion,.art-ink-fusion .mini {background:#c9cec3;grid-template:minmax(0,1fr)/minmax(0,1fr)}
-.stage.art-momentum-loaders,.art-momentum-loaders .mini {background:#080809;grid-template-columns:minmax(0,1fr)}
-.momentum-toggle {background:#272727;color:#f3f1eb;border:1px solid #60605c;border-radius:999px;min-width:96px;cursor:pointer}
-.momentum-toggle:hover {background:#383836;border-color:#878782}
-.momentum-toggle:focus-visible {outline:2px solid #ffd620;outline-offset:3px}
 .stage.art-paper-noticeboard,.art-paper-noticeboard .mini {background:#faf8f4;grid-template-columns:minmax(0,1fr);padding:clamp(12px,3vw,40px)}
 .stage.art-paper-noticeboard {height:auto;min-height:310px}
 .art-paper-noticeboard .mini .paper-board {max-width:250px}
