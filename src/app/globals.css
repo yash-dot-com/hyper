@@ -253,3 +253,4 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .art-frosted-tile-footer .mini .frosted-tile-footer {min-height:65%;font-size:12px}
 .stage.art-glass-trio,.art-glass-trio .mini {background:#d8dbe0}.art-glass-trio .mini > div {max-width:230px}
 .stage.art-foil-button,.art-foil-button .mini {background:radial-gradient(ellipse at 48% 38%,#faf6fc,#dfd6e4)}
+.stage.art-halftone-press,.art-halftone-press .mini {background:#eee8db}.art-halftone-press button:active {translate:1px 2px}

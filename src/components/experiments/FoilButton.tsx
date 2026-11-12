@@ -30,8 +30,8 @@ export function FoilButton({ children = "Prism", type = "button", className = ""
       .foil-face::before {content:"";position:absolute;inset:0;border-radius:inherit;
         background:linear-gradient(112deg,transparent 26%,#fff8 48%,transparent 65%) -120px 0 / 110px 100% no-repeat;
         transition:background-position .5s ease}
-      .foil-caption {position:relative;line-height:1.15;text-shadow:0 1px 2px #23182c,0 0 6px #291738;
-        background:radial-gradient(ellipse,#392338b8,transparent 72%);padding:.22em .55em}
+      .foil-caption {position:relative;line-height:1.15;color:#302339;text-shadow:0 1px 0 #fff9;
+        padding:.22em .55em}
       .foil-pill:is(:hover,:focus-visible):enabled .foil-face {background-position:0 0,2px 0,100% 0}
       .foil-pill:is(:hover,:focus-visible):enabled .foil-face::before {background-position:calc(100% + 100px) 0}
       .foil-pill:active:enabled .foil-face {transform:translateY(5px)}

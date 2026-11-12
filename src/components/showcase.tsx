@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { HalftoneButton, HalftoneSticker } from "./experiments/Halftone";
 import { FoilButton } from "./experiments/FoilButton";
 import { GlassTrio } from "./experiments/GlassTrio";
 import { FrostedTileFooter } from "./experiments/FrostedTileFooter";
@@ -112,7 +113,15 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
   </div>;
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
+function HalftoneSheet() {
+  const [saved,setSaved]=useState(false);
+  return <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:20,flexWrap:"wrap"}}>
+    <HalftoneButton aria-pressed={saved} onClick={()=>setSaved(!saved)}>{saved?"Saved":"Save print"}</HalftoneButton>
+    <HalftoneSticker>Ink</HalftoneSticker>
+  </div>;
+}
 const collection = [
+  {title:"Halftone Press",description:"Three angled ink screens overlap on warm paper. Changing dot sizes give the button and sticker their printed texture.",slug:"halftone-press",component:"Halftone",icon:Layers2,preview:HalftoneSheet},
   {title:"Holographic Foil Button",description:"Rainbow flecks catch the light across a domed capsule. Press the face into its raised rim.",slug:"foil-button",component:"FoilButton",icon:Layers2,preview:()=> <FoilButton/>},
   {title:"Glass Trio",description:"Drag a lens and release it to send a ripple through the other two. Use the arrow keys to nudge a focused lens.",slug:"glass-trio",component:"GlassTrio",icon:Layers2,preview:()=> <GlassTrio interactive={false}/>},
   {title:"Frosted Tile Footer",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-footer",component:"FrostedTileFooter",icon:Layers2,preview:()=> <FrostedTileFooter/>},
@@ -201,7 +210,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : item.slug === "foil-button" ? ["Use the supplied FoilButton React component. Pass the action label as children and attach the actual action through onClick. Preserve native button and keyboard behavior.", "```tsx", source, "```"].join("\n\n") : item.slug === "glass-trio" ? [
+    const text = kind === "code" ? source : item.slug === "halftone-press" ? ["Use the supplied HalftoneButton and HalftoneSticker named exports. Pass short labels as children and connect the button through onClick.", "```tsx", source, "```"].join("\n\n") : item.slug === "foil-button" ? ["Use the supplied FoilButton React component. Pass the action label as children and attach the actual action through onClick. Preserve native button and keyboard behavior.", "```tsx", source, "```"].join("\n\n") : item.slug === "glass-trio" ? [
       "Use the named GlassTrio component below as an interactive glass sculpture. Render <GlassTrio/> and preserve the coupled springs, pointer dragging and keyboard nudges.", "```tsx", source, "```",
     ].join("\n\n") : isFrost ? [
       `Integrate the supplied FrostedTileFooter. Render <FrostedTileFooter label={${JSON.stringify(tileLabel)}} colors={${JSON.stringify(tileColors)}} /> at the bottom of the page. Pass footer links or secondary content as children if needed.`, "```tsx", source, "```",
