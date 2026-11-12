@@ -10,10 +10,11 @@ export default async function Home() {
   const [component, composition] = await Promise.all(
     ["KineticParagraph.tsx", "Root.tsx"].map(file => readFile(path.join(directory, file), "utf8"))
   );
-  const [globe, ripple] = await Promise.all([
+  const [pixel, globe, ripple] = await Promise.all([
+    readFile(path.join(process.cwd(), "src/components/experiments/PixelCharacter.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "public/motif-globe/MotifGlobe.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"),
   ]);
-  const sources = [globe, ripple, component];
+  const sources = [pixel, globe, ripple, component];
   return <Showcase composition={composition} sources={sources} highlighted={sources.map(highlight)} />;
 }
