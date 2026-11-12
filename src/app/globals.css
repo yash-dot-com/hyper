@@ -139,7 +139,7 @@ button,a {cursor:pointer} :focus-visible {outline:2px solid #e4cb94;outline-offs
 .rail nav {margin-top:52px;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin}
 .rail nav a {display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:999px;color:#b6b6b0;font-size:14px}
 .rail nav a:is(:hover,:focus-visible,[aria-current="page"]) {background:#2b2b29;color:#fff}
-.rail svg,.editor svg {width:16px;height:16px;stroke-width:1.65}
+.rail svg,.source-heading svg {width:16px;height:16px;stroke-width:1.65}
 .rail h2 {color:#90908a;font-size:12px;font-weight:500;margin:34px 12px 9px}
 .canvas {width:100%;max-width:1300px;margin-inline:auto;padding:clamp(40px,6vw,92px) clamp(24px,5vw,80px);min-width:0}
 h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-height:1.05}
@@ -153,7 +153,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .tile a::after {content:"";position:absolute;inset:0}
 .tile:focus-within,.tile:hover {background:#252523}
 .tile a svg {width:16px;color:var(--quiet)}
-.detail-head,.editor header {display:flex;align-items:center}
+.detail-head,.source-heading {display:flex;align-items:center}
 .detail-head {justify-content:space-between;gap:16px;margin-bottom:16px}
 .wordmark-primary {
   background:#151515;color:#f3f2ee;border:2px solid currentColor;border-radius:999px;
@@ -164,11 +164,11 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .prompt-action {min-height:44px;padding:8px 17px;gap:8px;font-size:15px}
 
 .stage {position:relative;height:clamp(310px,40vw,465px);background:#20201f}
-.editor {margin-top:22px;background:#151515;font:13px/1.65 var(--font-geist-mono),monospace;letter-spacing:0}
-.editor header {padding:8px 12px 0;justify-content:flex-end}
-.editor .prompt-action {font-family:var(--font-geist),sans-serif}
-.editor pre:focus-visible {outline:1px solid var(--quiet);outline-offset:-2px}
-.editor pre {max-height:440px;overflow:auto;padding:20px 0;tab-size:2;color:#dddcd6}
+.editor {margin:0;background:#151515;font:13px/1.65 var(--font-geist-mono),monospace;letter-spacing:0}
+.source-heading {justify-content:space-between;gap:16px;margin:24px 0 10px}
+.source-heading h2 {margin:0;font-size:20px;font-weight:600;letter-spacing:-.035em}
+.editor:focus-visible {outline:1px solid var(--quiet);outline-offset:-2px}
+.editor {max-height:440px;overflow:auto;padding:20px 0;tab-size:2;color:#dddcd6}
 .line {display:flex;min-width:max-content;height:1.65em}
 .line i {position:sticky;left:0;display:inline-block;background:#151515;text-align:right;padding:0 15px 0 8px;width:52px;color:#777a77;font-style:normal;user-select:none}
 .tok-keyword {color:#c4a9f7}.tok-string {color:#b1cf9b}.tok-tag {color:#efa693}.tok-attr {color:#a7c4ed}.tok-comment {color:#94988e}.tok-fn {color:#ecd193}.tok-number,.tok-type {color:#91d4d0}
