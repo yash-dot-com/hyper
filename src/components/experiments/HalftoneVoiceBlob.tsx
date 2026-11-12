@@ -85,6 +85,7 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       const density=.72+.28*Math.sqrt(energy);
       const roll=Math.sin(time*.8)*.14, cos=Math.cos(roll), sin=Math.sin(roll);
       plates.forEach((sites,k)=>{
+        const spin=rotation*[.86,1.12,1,.93][k];
         const hue=[193,328,54,233][k]+energy*[33,31,-21,48][k];
         c.globalAlpha=k===3?.23:.91;
         c.fillStyle=`hsl(${hue} ${k===3?33:100}% ${k===3?13:49}%)`;
@@ -95,7 +96,10 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           const edge=74+energy*14+(4+energy*4)*Math.sin(3*site.angle+time)+4*Math.cos(2*site.angle-time*.67);
           const fade=Math.min(1,Math.max(0,(edge-site.distance)/20));
           const dx=site.x-cx,dy=site.y-cy;
-          const ink=Math.exp(-(dx*dx+dy*dy)/2400);
+          const blobInk=Math.exp(-(dx*dx+dy*dy)/2400);
+          // Shift ink coverage around each complete screen as it rotates.
+          const ringInk=.65+.19*Math.cos(2*site.angle+k)+.12*Math.sin(3*site.angle-k);
+          const ink=blobInk+(ringInk-blobInk)*ring;
           const amount=fade*(.22+.80*ink+.18*energy)-site.threshold*.45;
           const emerge=Math.min(1,Math.max(0,(density-site.threshold)*10));
           if(!emerge)continue;
@@ -105,12 +109,9 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           let x=site.x*cos-site.y*sin+(1.6+energy*3)*Math.sin(time*1.7+drift);
           let y=site.x*sin+site.y*cos+(1.6+energy*3)*Math.cos(time*1.3+drift);
           if(ring>0){
-            // Surround each plate's lobe with its own arc so rotation reads in color.
             const start=Math.atan2(y,x);
-            const dest=k*Math.PI/2+(site.threshold-.5)*1.85;
-            const turn=Math.atan2(Math.sin(dest-start),Math.cos(dest-start));
-            const angle=start+turn*ring+rotation*ring+ring*(1-ring)*1.8;
-            const r=Math.hypot(x,y)*(1-ring)+(59+site.distance*.22)*ring;
+            const angle=start+spin*ring+ring*(1-ring)*1.8;
+            const r=Math.hypot(x,y)*(1-ring)+(50+site.distance*.42)*ring;
             x=Math.cos(angle)*r; y=Math.sin(angle)*r;
           }
           x+=120; y+=120;
