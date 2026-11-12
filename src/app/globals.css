@@ -161,7 +161,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 }
 .wordmark-primary:active:not([aria-haspopup]) {translate:none}
 .wordmark-primary:focus-visible {outline:2px solid currentColor;outline-offset:4px}
-.prompt-action {min-height:44px;padding:8px 17px;gap:8px;font-size:15px}
+.prompt-action {font-size:13px;line-height:20px}
 
 .stage {position:relative;height:clamp(310px,40vw,465px);background:#20201f}
 .editor {margin:0;background:#151515;font:13px/1.65 var(--font-geist-mono),monospace;letter-spacing:0}

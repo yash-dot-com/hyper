@@ -51,17 +51,18 @@ const buttonGestures = {
 
 function CopyAction({label,copied,onCopy}:{label:string;copied:boolean;onCopy:()=>void}){
   const reduced=useReducedMotion();
-  return <span style={{display:"flex",justifyContent:"flex-end",width:142,flexShrink:0}}>
+  const diameter=32, restingWidth=label==="Copy prompt"?118:104;
+  return <span style={{display:"flex",justifyContent:"flex-end",width:restingWidth,flexShrink:0}}>
     <MotionButton className="prompt-action" aria-label={label} onClick={onCopy}
-      style={{position:"relative",overflow:"hidden",height:44,padding:0}}
-      initial={false} animate={{width:copied&&!reduced?44:142}}
+      style={{position:"relative",overflow:"hidden",height:diameter,padding:0}}
+      initial={false} animate={{width:copied&&!reduced?diameter:restingWidth}}
       transition={{duration:reduced?0:.24,ease:[.32,0,.16,1]}}>
       <motion.span aria-hidden="true" initial={false} animate={{opacity:copied?0:1}}
         transition={{duration:reduced?0:.1,delay:copied||reduced?0:.12}}
-        style={{display:"inline-flex",alignItems:"center",gap:8,whiteSpace:"nowrap"}}>
+        style={{display:"inline-flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
         <Copy/>{label}
       </motion.span>
-      <svg aria-hidden="true" viewBox="0 0 24 24" style={{position:"absolute",width:22,height:22,color:"#7ce4a0"}}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" style={{position:"absolute",width:18,height:18,color:"#7ce4a0"}}>
         <motion.path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           initial={false} animate={{pathLength:copied?1:0,opacity:copied?1:0}}
           transition={{duration:reduced?0:copied?.19:.08,delay:copied&&!reduced?.24:0}}/>
