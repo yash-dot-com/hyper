@@ -36,7 +36,7 @@ function assemble(word:string){
     }
     for(const [dx,dy] of group)mask[(y+dy)*w+x+dx]=0;
     const color=palette[Math.floor(random()*palette.length)];
-    pieces.push({x,y,path:group.map(([dx,dy])=>`M${dx+.05} ${dy+.05}h.9v.9h-.9Z`).join(""),
+    pieces.push({x,y,cells:group,path:group.map(([dx,dy])=>`M${dx+.05} ${dy+.05}h.9v.9h-.9Z`).join(""),
       color,land:y<11&&random()<.82?"#fff9ef":color,delay:(h-y)*.043+random()*.48,
       drift:(random()-.5)*24,turn:(Math.floor(random()*5)-2)*90});
   }
@@ -54,6 +54,31 @@ export function BlockType({text="Hype",replay=0}:{text?:string;replay?:number}) 
     <g key={word+":"+replay}>{model.pieces.map((p,i)=><g key={i} transform={`translate(${p.x} ${p.y+height/2-17})`}>
       <path className="block-type-piece" fill={p.land} d={p.path} style={{"--dx":p.drift+"px","--dy":-(height+12)+"px","--turn":p.turn+"deg","--fly":p.color,"--land":p.land,
         transformBox:"fill-box",transformOrigin:"center",animation:`block-type-drop .94s cubic-bezier(.45,.04,.72,1) ${p.delay}s both`} as CSSProperties}/>
+    </g>)}</g>
+  </svg>;
+}
+
+// The lettering lies on an isometric base plane. Each unit tile is one cube;
+// a piece drops as a rigid group before all its cubes meet that plane.
+export function IsoBlockType({text="Hype",replay=0}:{text?:string;replay?:number}) {
+  const word=Array.from(text.trim()).slice(0,24).join("");
+  const [model,setModel]=useState<ReturnType<typeof assemble>>();
+  useEffect(()=>{setModel(assemble(word));},[word]);
+  if(!model||!word)return null;
+  const u=Math.sqrt(3)/2;
+  const width=(model.w+36)*u+6, height=(model.w+36)/2+12;
+  const ordered=model.pieces.slice().sort((a,b)=>a.x+a.y-b.x-b.y);
+  return <svg viewBox={`${-36*u-3} -5 ${width} ${height}`} role="img" aria-label={word}
+    style={{display:"block",width:"96%",height:"100%",overflow:"hidden"}}>
+    <style>{`@keyframes iso-block-drop{0%{opacity:0;transform:translate(var(--sway),var(--fall)) rotate(var(--spin))}8%{opacity:1}76%{transform:translateY(-3px)}90%{transform:none}96%{transform:translateY(-.55px)}100%{transform:none}}@media(prefers-reduced-motion:reduce){.iso-block-piece{animation:none!important}}`}</style>
+    <g key={word+":"+replay}>{ordered.map((piece,i)=><g key={i} transform={`translate(${(piece.x-piece.y)*u} ${(piece.x+piece.y)/2})`}>
+      <g className="iso-block-piece" style={{"--sway":piece.drift*.4+"px","--fall":-(height+8)+"px","--spin":piece.turn/2+"deg",transformBox:"fill-box",transformOrigin:"center",animation:`iso-block-drop 1.12s cubic-bezier(.42,.05,.8,1) ${piece.delay}s both`} as CSSProperties}>
+        {piece.cells.slice().sort(([x,y],[a,b])=>x+y-a-b).map(([x,y])=><g key={x+","+y} transform={`translate(${(x-y)*u} ${(x+y)/2})`} fill={piece.land}>
+          <path d={`M-${u} .5 0 1v.96l-${u}-.5Z`}/><path fill="#13253b" opacity=".27" d={`M-${u} .5 0 1v.96l-${u}-.5Z`}/>
+          <path d={`M0 1 ${u} .5v.96l-${u} .5Z`}/><path fill="#14182b" opacity=".48" d={`M0 1 ${u} .5v.96l-${u} .5Z`}/>
+          <path d={`M0 0 ${u} .5 0 1 -${u} .5Z`} stroke="#fff" strokeOpacity=".25" strokeWidth=".035"/>
+        </g>)}
+      </g>
     </g>)}</g>
   </svg>;
 }

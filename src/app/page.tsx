@@ -28,6 +28,6 @@ export default async function Home() {
     readFile(path.join(process.cwd(), "public/motif-globe/MotifGlobe.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"),
   ]);
-  const sources = [blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
-  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 8 || i === 10 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
+  const sources = [blockType, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
+  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 9 || i === 11 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
 }
