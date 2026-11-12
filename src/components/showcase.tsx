@@ -100,7 +100,6 @@ export function Showcase({ sources, highlighted }: { sources: string[]; highligh
       {index < 0 ? <>
         <header className="directory-intro">
           <p>Hype is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
-          <p>I like to start with one thing worth looking at. Sometimes it’s the path a dot takes around a circle. My idea of minimalism is to give that detail enough room to be noticed.</p>
         </header>
         <div className="gallery">{collection.map(item => <article className={'tile art-' + item.slug} key={item.slug}>
           <div className="mini" inert aria-hidden="true"><item.preview playing={false}/></div>
