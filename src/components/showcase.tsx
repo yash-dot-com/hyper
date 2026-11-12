@@ -361,7 +361,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   return <>
     <header className="detail-head">
       <h1>{item.title}</h1>
-      <Button className="prompt-action" onClick={() => copy("prompt")}>{feedback === "prompt" ? <Check/> : <Copy/>}{feedback === "prompt" ? "Prompt copied" : "Copy prompt"}</Button>
+      <EmbossedBadge compact className="prompt-action" label={feedback==="prompt"?"Prompt copied":"Copy prompt"}
+        icon={feedback==="prompt"?<Check size={17}/>:<Copy size={17}/>} onClick={()=>copy("prompt")}/>
     </header>
     <p className="component-description">{item.description}</p>
     {item.slug === "halftone-butterfly" && <div className="demo-modes">
