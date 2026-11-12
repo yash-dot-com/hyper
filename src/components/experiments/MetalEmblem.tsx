@@ -33,7 +33,11 @@ export const emblemMarks = Object.keys(marks) as EmblemMark[];
 export function MetalEmblem({mark="Specimen", size="100%"}:{mark?:EmblemMark;size?:number|string}) {
   const id=useId(), art=marks[mark], href="#"+id+"-mark";
   const paint=(name:string)=>`url(#${id}-${name})`;
-  return <svg viewBox={art.box} role="img" aria-label={mark+" polished chrome emblem"} style={{display:"block",width:size,maxWidth:"100%",height:"auto"}}>
+  const [x,y,w,h] = art.box.split(" ").map(Number);
+  // Vertical front face: X recedes at 30°, Y stays upright, depth runs down-right.
+  const u = Math.sqrt(3)/2, thickness = 18;
+  const box = [u*x-4,y-(x+w)/2-4,u*(w+thickness)+8,h+(w+thickness)/2+8].join(" ");
+  return <svg viewBox={box} role="img" aria-label={mark+" polished chrome emblem"} style={{display:"block",width:size,maxWidth:"100%",height:"auto"}}>
     <defs>
       <path id={id+"-mark"} d={art.path}/>
       <linearGradient id={id+"-mirror"} x1=".46" y1="0" x2=".54" y2="1">
@@ -41,12 +45,25 @@ export function MetalEmblem({mark="Specimen", size="100%"}:{mark?:EmblemMark;siz
       </linearGradient>
       <linearGradient id={id+"-rim"} x2=".4" y2="1"><stop stopColor="#fff"/><stop offset=".36" stopColor="#a7b8ce"/><stop offset=".51" stopColor="#263040"/><stop offset=".74" stopColor="#e8f5ff"/><stop offset="1" stopColor="#718496"/></linearGradient>
       <linearGradient id={id+"-reflection"}><stop stopColor="white" stopOpacity="0"/><stop offset=".51" stopColor="#fff" stopOpacity=".72"/><stop offset="1" stopColor="white" stopOpacity="0"/></linearGradient>
+      <linearGradient id={id+"-wall"} x1="0" y1=".2" x2="1" y2=".65">
+        <stop stopColor="#192332"/><stop offset=".24" stopColor="#92a7bd"/><stop offset=".32" stopColor="#323b49"/><stop offset=".62" stopColor="#161d28"/><stop offset=".79" stopColor="#c2d2de"/><stop offset="1" stopColor="#42495c"/>
+      </linearGradient>
+      <filter id={id+"-polish"} x="-3%" y="-12%" width="106%" height="124%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="rounded"/>
+        <feSpecularLighting in="rounded" surfaceScale="4" specularConstant="1.1" specularExponent="18" lightingColor="#f4faff"><feDistantLight azimuth="230" elevation="42"/></feSpecularLighting>
+        <feComposite in2="SourceAlpha" operator="in"/>
+      </filter>
       <clipPath id={id+"-cut"}><use href={href}/></clipPath>
     </defs>
     <style>{`.chrome-pass{animation:hype-chrome-pass 6.5s ease-in-out infinite}@keyframes hype-chrome-pass{0%,18%{transform:translateX(-220px) skewX(-18deg)}70%,100%{transform:translateX(780px) skewX(-18deg)}}@media(prefers-reduced-motion:reduce){.chrome-pass{animation:none;opacity:0}}`}</style>
-    <use href={href} transform="translate(2 7)" fill="#252d39" stroke="#11151c" strokeWidth="1.4"/>
-    <use href={href} transform="translate(1 4)" fill={paint("rim")} stroke={paint("rim")} strokeWidth="2"/>
+    {Array.from({length:thickness},(_,i)=>{
+      const z=thickness-i;
+      return <use key={z} href={href} transform={`matrix(${u} -.5 0 1 ${u*z} ${z*.5})`} fill={paint("wall")}/>;
+    })}
+    <g transform={`matrix(${u} -.5 0 1 0 0)`}>
     <use href={href} fill={paint("mirror")} stroke={paint("rim")} strokeWidth="2.6" strokeLinejoin="round"/>
+    <use href={href} filter={paint("polish")} opacity=".85"/>
     <g clipPath={paint("cut")}><rect className="chrome-pass" x="0" y="-12" width="110" height="220" fill={paint("reflection")}/></g>
+    </g>
   </svg>;
 }

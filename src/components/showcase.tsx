@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { LuminousSurface, lightFinishes, type LightFinish } from "./experiments/LuminousSurface";
 import { MetalEmblem, emblemMarks, type EmblemMark } from "./experiments/MetalEmblem";
 import { GlassBubble } from "./experiments/GlassBubble";
 import { JellyAvatar } from "./experiments/JellyAvatar";
@@ -96,7 +97,15 @@ function GlassConversation({compact=false}:{compact?:boolean}) {
 }
 function GlassThumbnail() { return <GlassConversation compact/>; }
 function ChromeThumbnail() { return <MetalEmblem mark="Glacier I" size="84%"/>; }
+function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
+  return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",width:"86%",maxWidth:450,gap:8,fontSize:choose?16:10,textAlign:"center"}}>
+    {lightFinishes.map(finish=><LuminousSurface key={finish} finish={finish} style={{padding:0}}>
+      {choose?<button style={{width:"100%",padding:"1.5em 0",textTransform:"capitalize"}} onClick={()=>choose(finish)}>{finish}</button>:<span style={{display:"block",padding:"1em",textTransform:"capitalize"}}>{finish}</span>}
+    </LuminousSurface>)}
+  </div>;
+}
 const collection = [
+  {title:"Luminous Surfaces", description:"A frosted rim surrounds a pool of color. Move across a surface to shift its light, or select a finish to copy it.",slug:"luminous-surfaces",component:"LuminousSurface",icon:Layers2,preview:LightSheet},
   {title:"Chrome Emblems", description:"Six marks from the HVNTER 2020 specimen sheet, finished with mirrored bands and polished bevels.", slug:"chrome-emblems", component:"MetalEmblem", icon:Layers2, preview:ChromeThumbnail},
   {title:"Glass Bubbles", description:"Frosted edges catch the light around a pool of blue. The corner turns toward the sender as the message grows.", slug:"glass-bubbles", component:"GlassBubble", icon:Layers2, preview:GlassThumbnail},
   {title:"Jelly Avatar", description:"A translucent avatar flows from a blue scallop to a pink ripple and a mint clover. Its color moves with its silhouette.", slug:"jelly-avatar",component:"JellyAvatar",icon:Layers2,preview:JellyThumbnail},
@@ -125,6 +134,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
+  const isLight = item.slug === "luminous-surfaces";
+  const [light,setLight] = useState<LightFinish>("bloom");
   const isChrome = item.slug === "chrome-emblems";
   const [mark,setMark] = useState<EmblemMark>("Glacier I");
   const isGlass = item.slug === "glass-bubbles";
@@ -150,7 +161,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isChrome ? [
+    const text = kind === "code" ? source : isLight ? [
+      `Use the named LuminousSurface React export in a client boundary. Wrap your content with <LuminousSurface finish="${light}">…</LuminousSurface>. Preserve the frosted rim, pointer lighting, focus feedback, and reduced-motion fallback.`, "```tsx", source, "```",
+    ].join("\n\n") : isChrome ? [
       `Use the supplied MetalEmblem React SVG component with mark="${mark}". Preserve its cutouts, layered extrusion, chrome reflections, and reduced-motion handling. The source artwork is credited to HVNTER 2020.`,
       "```tsx", source, "```",
     ].join("\n\n") : isGlass ? [
@@ -204,8 +217,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isLight && <p role="status" style={{marginTop:12}}>Selected finish: {light}</p>}
     {isChrome && <div className="pixel-controls"><label>Mark<select value={mark} onChange={e=>setMark(e.target.value as EmblemMark)}>{emblemMarks.map(name=><option key={name}>{name}</option>)}</select></label></div>}
     {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
     {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
