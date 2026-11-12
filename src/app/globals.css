@@ -276,3 +276,10 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .stage.art-paper-noticeboard {height:auto;min-height:310px}
 .art-paper-noticeboard .mini .paper-board {max-width:250px}
 .stage.art-meadow-footer,.art-meadow-footer .mini {background:#87b5df;grid-template-columns:minmax(0,1fr)}.stage.art-meadow-footer{height:auto}.art-meadow-footer .mini .meadow-footer{height:100%}
+.meadow-scrub {display:flex;align-items:center;justify-content:center;gap:1rem;padding:14px;background:#e8ebdc;color:#26372a;font-size:14px}
+.meadow-scrub input {width:min(45%,220px);accent-color:#446551}
+.art-paper-noticeboard .mini .paper-copy p {display:none}
+.art-paper-noticeboard .mini .paper-piece {display:grid;place-items:center;position:relative}
+.art-paper-noticeboard .mini .paper-copy {position:absolute;left:16%;right:22%;top:53%;transform:translateY(-50%)}
+.art-paper-noticeboard .mini .paper-copy h3 {font-size:clamp(9px,4.4cqw,13px);line-height:1.12}
+.art-paper-noticeboard .mini .paper-piece:nth-child(4) .paper-copy {left:23%;right:27%;top:48%}

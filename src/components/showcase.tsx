@@ -133,10 +133,18 @@ function MomentumSheet({fullSize=false}: {fullSize?:boolean} = {}) {
 }
 function NoticeboardSample() { return <PaperNoticeboard/>; }
 function MeadowSample({fullSize=false}: {fullSize?:boolean} = {}) {
-  return fullSize?<MeadowFooter/>:<MeadowFooter groups={[]} description="" credit=""/>;
+  const preview=useRef<HTMLDivElement>(null);
+  if(!fullSize)return <MeadowFooter groups={[]} description=""/>;
+  return <div ref={preview} style={{width:"100%"}}>
+    <MeadowFooter/>
+    <label className="meadow-scrub">Preview parallax
+      <input type="range" min="-24" max="24" defaultValue="0"
+        onInput={e=>preview.current?.style.setProperty("--meadow-preview-shift",e.currentTarget.value+"px")}/>
+    </label>
+  </div>;
 }
 const collection = [
-  {title:"Meadow Footer",description:"Scroll through the footer to move the clouds, trees, and furrows at different speeds.",slug:"meadow-footer",component:"MeadowFooter",icon:Layers2,preview:MeadowSample},
+  {title:"Meadow Footer",description:"Scroll or drag the preview slider to move the clouds, trees, and fields at different speeds.",slug:"meadow-footer",component:"MeadowFooter",icon:Layers2,preview:MeadowSample},
   {title:"Paper Noticeboard",description:"Four die-cut paper pieces hold a short set of notices. Give each piece a heading, a detail, and an optional link.",slug:"paper-noticeboard",component:"PaperNoticeboard",icon:Layers2,preview:NoticeboardSample},
   {title:"Momentum Loaders",description:"Three spinning studies in squares and dots. Wind them down to watch each pattern fold into a single frame and dot.",slug:"momentum-loaders",component:"MomentumLoader",icon:Layers2,preview:MomentumSheet},
   {title:"Ink Fusion",description:"Move the pointer across the print. Nearby dots draw together and fuse, then release as you pass.",slug:"ink-fusion",component:"InkFusion",icon:Layers2,preview:FusionSample},
