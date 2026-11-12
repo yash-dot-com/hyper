@@ -138,7 +138,7 @@ function MeadowSample({fullSize=false}: {fullSize?:boolean} = {}) {
   return <div ref={preview} style={{width:"100%"}}>
     <MeadowFooter/>
     <label className="meadow-scrub">Preview parallax
-      <input type="range" min="-24" max="24" defaultValue="0"
+      <input type="range" min="-65" max="65" defaultValue="0"
         onInput={e=>preview.current?.style.setProperty("--meadow-preview-shift",e.currentTarget.value+"px")}/>
     </label>
   </div>;

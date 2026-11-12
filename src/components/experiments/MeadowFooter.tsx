@@ -31,8 +31,8 @@ export function MeadowFooter({brand="Hype",description="An open directory of vis
       frame=0;
       const rect=node.getBoundingClientRect();
       if(reduced.matches){node.style.setProperty("--meadow-shift","0px");return;}
-      const travel=(innerHeight-rect.top)/(innerHeight+rect.height);
-      node.style.setProperty("--meadow-shift",((Math.max(0,Math.min(1,travel))-.5)*48)+"px");
+      const travel=(innerHeight-rect.top)/(innerHeight+rect.height*.25);
+      node.style.setProperty("--meadow-shift",((Math.max(0,Math.min(1,travel))-.5)*130)+"px");
     }
     function schedule(){if(!frame)frame=requestAnimationFrame(paint)}
     paint();window.addEventListener("scroll",schedule,{passive:true,capture:true});
@@ -41,20 +41,21 @@ export function MeadowFooter({brand="Hype",description="An open directory of vis
   },[]);
   return <footer ref={footer} className="meadow-footer">
     <svg viewBox="0 0 960 330" preserveAspectRatio="none" aria-hidden="true" className="meadow-art">
-      <g fill="#fff0d7" style={{transform:"translateY(calc(var(--meadow-preview-shift,var(--meadow-shift,0px)) * .35))"}}>
+      <g fill="#fff0d7" style={{transform:"translateY(calc(var(--meadow-depth) * .72))"}}>
         <path d="M-10 85Q17 86 30 95Q32 51 115 52Q194 48 195 88Q194 100 228 99Q284 99 294 115Q300 126 252 126L174 126Q145 131 176 137Q213 147 348 140Q397 132 412 151Q425 168 376 166Q352 168 365 176Q416 193 487 178Q533 169 612 166Q699 164 704 152Q705 143 676 145Q590 153 536 151Q506 146 550 137Q585 129 622 129Q628 81 662 82Q691 81 699 120Q741 82 785 115Q812 112 824 140Q853 126 880 150Q914 141 972 151V340H-10Z"/>
         <path d="M108 26Q147 19 191 31Q219 39 228 50Q173 35 119 34Z M279 84Q295 83 311 94Q284 97 271 89Z"/>
       </g>
-      <g fill="#d97c56" style={{transform:"translateY(calc(var(--meadow-preview-shift,var(--meadow-shift,0px)) * .55))"}}>
+      <g fill="#d97c56" style={{transform:"translateY(calc(var(--meadow-depth) * .14))"}}>
+        <path d="M-20 260 Q195 288 371 264 T720 259 T983 251 V355 H-20Z"/>
         {Array.from({length:57},(_,i)=> <path key={i} d={crown} transform={`translate(${i*18-14} ${(259+13*Math.sin(i*.12)+5*Math.cos(i*2)).toFixed(1)}) scale(.42 .29)`}/>)}
       </g>
-      <g fill="#527d97" style={{transform:"translateY(calc(var(--meadow-preview-shift,var(--meadow-shift,0px)) * .75))"}}>
-        <path d="M182 272L179 224L161 199L179 214L182 180L186 214L205 196L186 225L189 273Z"/>
+      <g fill="#527d97" style={{transform:"translateY(calc(var(--meadow-depth) * -.31))"}}>
+        <path d="M182 302L179 224L161 199L179 214L182 180L186 214L205 196L186 225L189 303Z"/>
         <path d={crown} transform="translate(161 209) scale(.65 .63)"/><path d={crown} transform="translate(184 184) scale(.78 .81)"/><path d={crown} transform="translate(205 210) scale(.63 .67)"/>
         <path fill="none" stroke="#fff0d7" strokeWidth="2" d="M180 223l-14-18m18 8 3-29m-1 34 17-16"/>
       </g>
-      <g style={{transform:"translateY(var(--meadow-preview-shift,var(--meadow-shift,0px)))"}}>
-        <path fill="#a0ab72" d="M-10 253Q212 246 412 279Q676 239 970 243V370H-10Z"/>
+      <g style={{transform:"translateY(calc(var(--meadow-depth) * -.64))"}}>
+        <path fill="#a0ab72" d="M-10 253Q212 246 412 279Q676 239 970 243V392H-10Z"/>
         <g fill="#f9edce"><path d="M-5 260Q171 254 407 280Q202 263-5 265ZM400 280Q706 246 963 250V254Q708 251 459 284ZM-5 323L171 278L-5 311ZM18 338L178 283L48 338ZM692 269L947 337H968L723 269ZM760 264L970 293V286ZM511 305L712 322L528 312Z"/></g>
       </g>
     </svg>
@@ -64,7 +65,7 @@ export function MeadowFooter({brand="Hype",description="An open directory of vis
     </div>
     {credit && <small>{credit}</small>}
     <style>{`
-      .meadow-footer{isolation:isolate;position:relative;overflow:hidden;background:#87b5df;color:#182f39;width:100%;container-type:inline-size}
+      .meadow-footer{--meadow-depth:clamp(-65px,calc(var(--meadow-shift,0px) + var(--meadow-preview-shift,0px)),65px);isolation:isolate;position:relative;overflow:hidden;background:#87b5df;color:#182f39;width:100%;container-type:inline-size}
       .meadow-art,.meadow-grain{position:absolute;pointer-events:none;width:100%;inset:auto 0 -1px;height:66%;z-index:-2}
       .meadow-grain{inset:0;height:100%;opacity:.22;mix-blend-mode:multiply;z-index:-1}
       .meadow-links{display:flex;align-items:flex-start;flex-wrap:wrap;gap:clamp(12px,4cqw,48px);padding:5cqw 5cqw 30cqw;font-size:clamp(12px,1.65cqw,16px)}
