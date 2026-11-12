@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
-import { motion, MotionConfig } from "motion/react";
+import { motion, MotionConfig, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { DigitalKaleidoscope, scopePresets } from "./experiments/DigitalKaleidoscope";
 import { BreathingBandsFooter, type BandPalette } from "./experiments/BreathingBandsFooter";
@@ -48,6 +48,27 @@ const buttonGestures = {
   whileHover: { y: -1 },
   whileTap: { y: 0, scale: 0.97 },
 };
+
+function CopyPromptButton({copied,onCopy}:{copied:boolean;onCopy:()=>void}){
+  const reduced=useReducedMotion();
+  return <span style={{display:"flex",justifyContent:"flex-end",width:142,flexShrink:0}}>
+    <MotionButton className="prompt-action" aria-label="Copy prompt" onClick={onCopy}
+      style={{position:"relative",overflow:"hidden",height:44,padding:0}}
+      initial={false} animate={{width:copied&&!reduced?44:142}}
+      transition={{duration:reduced?0:.24,ease:[.32,0,.16,1]}}>
+      <motion.span aria-hidden="true" initial={false} animate={{opacity:copied?0:1}}
+        transition={{duration:reduced?0:.1,delay:copied||reduced?0:.12}}
+        style={{display:"inline-flex",alignItems:"center",gap:8,whiteSpace:"nowrap"}}>
+        <Copy/>Copy prompt
+      </motion.span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" style={{position:"absolute",width:22,height:22,color:"#7ce4a0"}}>
+        <motion.path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          initial={false} animate={{pathLength:copied?1:0,opacity:copied?1:0}}
+          transition={{duration:reduced?0:copied?.19:.08,delay:copied&&!reduced?.24:0}}/>
+      </svg>
+    </MotionButton>
+  </span>;
+}
 
 function KineticVideo({ fullSize = false }: { fullSize?: boolean }) {
   const base = fullSize ? "/kinetic-paragraph/preview-hd" : "/kinetic-paragraph/preview";
@@ -361,9 +382,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   return <>
     <header className="detail-head">
       <h1>{item.title}</h1>
-      <Button className="prompt-action" onClick={()=>copy("prompt")}>
-        {feedback==="prompt"?<Check/>:<Copy/>}{feedback==="prompt"?"Prompt copied":"Copy prompt"}
-      </Button>
+      <CopyPromptButton copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
     </header>
     <p className="component-description">{item.description}</p>
     {item.slug === "halftone-butterfly" && <div className="demo-modes">
