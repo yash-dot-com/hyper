@@ -51,4 +51,4 @@ Render at intended size and at 2×. Check silhouette first, then look for floati
 
 **Repair a flat drawing:** “Inspect [existing SVG]. Classify every visible detail as printed, raised, recessed or cut through. Keep printed geometry on its plane. Rebuild raised and recessed geometry using shared world coordinates. Preserve object identity and API, then compare both projection views.”
 
-The examples folder contains two standalone worked drawings: a turntable in isometric and a compact camera in dimetric. Use them to inspect how geometry meets, not as mandatory templates.
+The examples folder contains six standalone worked drawings: a turntable, cassette, keyboard, speaker and handheld console in isometric, plus a compact camera in dimetric. Use them to inspect how geometry meets, not as mandatory templates.

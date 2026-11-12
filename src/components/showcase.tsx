@@ -46,10 +46,17 @@ function KawaiiThumbnail() { return <KawaiiFace size={180} expression="pleased"/
 function StickerThumbnail() { return <VoxelSticker size={186}/>; }
 
 function SkillExamples() {
-  return <figure style={{display:"grid",gridTemplateColumns:"repeat(3, minmax(0, 1fr))",alignItems:"center",gap:"3%",width:"92%",margin:"0 auto"}} aria-label="Axonometric icon examples">
-    <img style={{display:"block",width:"100%",height:"auto"}} src="/skills/axonometric-icons/examples/turntable.svg" alt="Isometric turntable"/>
-    <PocketSampler size="100%"/>
-    <img style={{display:"block",width:"100%",height:"auto"}} src="/skills/axonometric-icons/examples/camera.svg" alt="Dimetric film camera"/>
+  const tiles = [
+    ["turntable", 3, 6, 24, 43], ["speaker", 32, 2, 14, 44],
+    ["sampler", 50, 7, 25, 43], ["handheld", 80, 5, 16, 45],
+    ["cassette", 9, 55, 21, 39], ["camera", 36, 50, 24, 47],
+    ["keyboard", 65, 54, 29, 39],
+  ] as const;
+  return <figure aria-label="Axonometric icon collage" style={{position:"relative",width:"100%",height:"100%",minHeight:0,margin:0,containerType:"size"}}>
+    {tiles.map(([name,x,y,w,h]) => <div key={name} style={{position:"absolute",left:x+"%",top:y+"%",width:w+"%",height:h+"%",display:"grid",placeItems:"center"}}>
+      {name==="sampler" ? <div style={{width:"min(100%, 32cqh)"}}><PocketSampler size="100%"/></div> :
+        <img src={`/skills/axonometric-icons/examples/${name}.svg`} alt={name} style={{width:"100%",height:"100%",objectFit:"contain"}}/>}
+    </div>)}
   </figure>;
 }
 const collection = [
