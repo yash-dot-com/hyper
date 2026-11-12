@@ -33,7 +33,15 @@ function build(name:StickerName) {
     return (name==="Television"?3:2)+Number(relief);
   };
   // Orthographic projection: x runs right, y down, z towards the viewer.
-  const project=(x:number,y:number,z:number)=>[10*x-4.6*z,1.8*x+10*y+3.6*z];
+  const yaw = 24 * Math.PI / 180, pitch = 16 * Math.PI / 180;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const cp = Math.cos(pitch), sp = Math.sin(pitch);
+  const project = (x:number, y:number, z:number) => [
+    10 * (x * cy - z * sy),
+    10 * (y * cp + (x * sy + z * cy) * sp),
+  ];
+  const depth = (cell: {x:number; y:number; z:number}) =>
+    (cell.x * sy + cell.z * cy) * cp - cell.y * sp;
   const faces:{points:string;color:string}[]=[];
   const xs:number[]=[],ys:number[]=[];
   function face(vertices:number[][],hex:string,light:number) {
@@ -43,7 +51,7 @@ function build(name:StickerName) {
   const cells=[];
   for(let y=0;y<rows.length;y++) for(let x=0;x<width;x++) for(let z=0;z<height(x,y);z++) cells.push({x,y,z});
   // The viewer sees right, top and front. Paint far cubes before nearer ones.
-  cells.sort((a,b)=>(a.x-a.y+a.z)-(b.x-b.y+b.z));
+  cells.sort((a,b) => depth(a) - depth(b));
   for(const {x,y,z} of cells){
     const hex=materials[rows[y][x]],grain=((x*17+y*31)%7-3)*.009;
     if(height(x,y-1)<=z) face([[x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1]],hex,1.43+grain);
@@ -60,6 +68,6 @@ export function VoxelSticker({name="Globe",size=240}:{name?:StickerName;size?:nu
   if(!mesh){mesh=build(name);cache.set(name,mesh);}
   return <svg viewBox={mesh.viewBox} aria-labelledby={id} role="img" style={{width:size,maxWidth:"100%",height:"auto",display:"block"}}>
     <title id={id}>{name} voxel sticker</title>
-    {mesh.faces.map((face,i)=><polygon key={i} points={face.points} fill={face.color} stroke="#29232b" strokeOpacity=".22" strokeWidth=".24" strokeLinejoin="round"/>)}
+    {mesh.faces.map((face,i)=><polygon key={i} points={face.points} fill={face.color} stroke={face.color} strokeWidth=".18" strokeLinejoin="miter"/>)}
   </svg>;
 }
