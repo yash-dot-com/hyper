@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { JellyAvatar } from "./experiments/JellyAvatar";
 import { EmbossedBadge, badgeFinishes, type BadgeFinish } from "./experiments/EmbossedBadge";
 import { MotionBadge, badgeKinds, type BadgeKind } from "./experiments/MotionBadge";
 import { FolderSticker } from "./experiments/GradientObjects";
@@ -81,7 +82,9 @@ function EmbossedSheet({choose}:{choose?:(finish:BadgeFinish)=>void}) {
     </div>)}
   </div>;
 }
+function JellyThumbnail() { return <JellyAvatar size={176}/>; }
 const collection = [
+  {title:"Jelly Avatar", description:"A translucent avatar flows from a blue scallop to a pink ripple and a mint clover. Its color moves with its silhouette.", slug:"jelly-avatar",component:"JellyAvatar",icon:Layers2,preview:JellyThumbnail},
   {title:"Embossed Badges", description:"Three softly beveled labels with engraved marks. Select a finish to copy its usage.", slug:"embossed-badges", component:"EmbossedBadge", icon:Layers2, preview:EmbossedSheet},
   {title:"Motion Badges", description:"Six pastel badges with a gesture for each icon. Select a badge to use it in your prompt.", slug:"motion-badges", component:"MotionBadge", icon:Layers2, preview:BadgeSheet},
   {title:"Gradient Stickers", description:"Four folder stickers for projects, receipts, scripts, and documents. Hover to peek inside, or tap to pin one open.", slug:"gradient-objects", component:"SKILL", icon:Layers2, preview:GradientObjectsDemo},
@@ -107,6 +110,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
+  const isJelly = item.slug === "jelly-avatar";
   const isEmbossed = item.slug === "embossed-badges";
   const [finish,setFinish] = useState<BadgeFinish>("branding");
   const isBadge = item.slug === "motion-badges";
@@ -128,7 +132,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isEmbossed ? [
+    const text = kind === "code" ? source : isJelly ? [
+      'Save the complete source as JellyAvatar.tsx and import its named JellyAvatar export. Render <JellyAvatar size={240} cycleSeconds={12} />. Keep the shape and color tracks synchronized, scoped SVG definitions, and reduced-motion fallback. Set animated={false} for a static avatar.',
+      "```tsx", source, "```",
+    ].join("\n\n") : isEmbossed ? [
       `Use the complete EmbossedBadge React component with motion/react. Render <EmbossedBadge finish="${finish}" />. Preserve its matching face, bevel, engraved text and icon treatments. Use label for custom copy and onClick for an interactive badge.`, "```tsx", source, "```",
     ].join("\n\n") : isBadge ? [
       `Integrate the named MotionBadge React export below using motion/react. Render <MotionBadge kind="${badge}" />. Pass label to customize the text or onClick for an actionable badge. Preserve reduced-motion support.`,
@@ -173,7 +180,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
     {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}

@@ -10,7 +10,8 @@ export default async function Home() {
   const [component, composition] = await Promise.all(
     ["KineticParagraph.tsx", "Root.tsx"].map(file => readFile(path.join(directory, file), "utf8"))
   );
-  const [embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
+  const [jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
+    readFile(path.join(process.cwd(), "src/components/experiments/JellyAvatar.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/EmbossedBadge.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/MotionBadge.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "public/skills/gradient-objects/SKILL.md"), "utf8"),
@@ -22,6 +23,6 @@ export default async function Home() {
     readFile(path.join(process.cwd(), "public/motif-globe/MotifGlobe.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"),
   ]);
-  const sources = [embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
-  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 2 || i === 4 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
+  const sources = [jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple, component];
+  return <Showcase composition={composition} sources={sources} highlighted={sources.map((source, i) => i === 3 || i === 5 ? source.split("\n").map(text => [{ text, kind: "plain" }]) : highlight(source))} />;
 }
