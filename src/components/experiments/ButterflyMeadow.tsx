@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useRef } from "react";
 
-const starts=[[94,92],[241,145],[378,75]];
-const colors=[["#ffd367","#db6230"],["#abede0","#2b8eae"],["#ffc09e","#c66786"]];
+const starts=[[94,92],[241,145],[378,75],[53,165],[303,51],[436,155]];
+const colors=[["#ffd367","#db6230"],["#abede0","#2b8eae"],["#ffc09e","#c66786"],["#c6b3ff","#7258a9"],["#def69b","#709842"],["#ffaca6","#be5264"]];
 
 export function ButterflyMeadow() {
   const svg=useRef<SVGSVGElement>(null), id=useId();
@@ -60,7 +60,7 @@ export function ButterflyMeadow() {
     reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);sync();
     return ()=>{cancelAnimationFrame(raf);observer.disconnect();node.removeEventListener("pointermove",startle);node.removeEventListener("pointerdown",startle);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
   },[]);
-  return <svg ref={svg} viewBox="0 0 500 215" role="img" aria-label="Three butterflies roaming in open space" style={{display:"block",width:"100%",background:"#f5f0df"}}>
+  return <svg ref={svg} viewBox="0 0 500 215" role="img" aria-label="Six butterflies roaming in open space" style={{display:"block",width:"100%",background:"#f5f0df"}}>
     <defs>{colors.map(([light,dark],i)=><linearGradient key={i} id={id+i} x2=".8" y2="1"><stop stopColor={light}/><stop offset="1" stopColor={dark}/></linearGradient>)}</defs>
     {colors.map((_,i)=><g key={i} data-butterfly="" transform={`translate(${starts[i].join(" ")}) rotate(${i*15-20})`}>
       {[0,1].map(side=><g key={side} data-wing="" transform={`scale(${side?1:-1} 1)`}>

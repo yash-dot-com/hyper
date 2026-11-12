@@ -43,17 +43,17 @@ function pigment(hue:number,saturation:number,light:number) {
 }
 
 export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0, shapeSeed=0 }: {hue?:number;seed?:number;patternSeed?:number;shapeSeed?:number} = {}) {
-  return <div role="img" aria-label="Two flying butterflies with distinct color-shifting halftone wings"
+  return <div role="img" aria-label="Four flying butterflies with distinct color-shifting halftone wings"
     style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
-    <ButterflyLayer shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed} companion={false}/>
-    <ButterflyLayer shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed} companion/>
+    {[0,1,2,3].map(index=><ButterflyLayer key={index} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
   </div>;
 }
 
-function ButterflyLayer({seed,patternSeed,shapeSeed,companion}:{seed:number;patternSeed:number;shapeSeed:number;companion:boolean}) {
+function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternSeed:number;shapeSeed:number;index:number}) {
+  const companion=index%2===1;
   const canvas=useRef<HTMLCanvasElement>(null);
-  const flight=useRef({t:companion?3.4:0,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:companion?2:0,destination:companion?2:0,
-    route:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
+  const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,destination:companion?2:0,
+    route:index===2?[[.13,.25,-30],[.2,.16,-22],[.83,.62,12],[.7,.87,26]]:index===3?[[.94,.83,11],[.85,.89,-18],[.3,.52,-41],[.18,.24,19]]:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
   useEffect(()=>{
     const node=canvas.current!,ctx=node.getContext("2d");
     if(!ctx)return;
@@ -70,16 +70,16 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,companion}:{seed:number;patt
     // Batch dots by pigment phase so each frame needs only a few fill calls.
     type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number;freedom:number};
     const pair=generator(seed);
-    const base=(seed===0?195:pair()*360)+(companion?150+pair()*60:0);
-    const random=generator(seed^(companion?0x6271dac3:0x15f389bd));
-    const classic=!companion&&seed===0;
+    const base=(seed===0?195:pair()*360)+[0,180,90,270][index];
+    const random=generator(seed^(companion?0x6271dac3:0x15f389bd)^(index>>1)*0x45d9f3b);
+    const classic=index===0&&seed===0;
     const inks=classic?originalInks:Array.from({length:4+Math.floor(random()*4)},()=>
       pigment((base+(random()-.5)*116+360)%360,.68+random()*.31,.38+random()*.38));
     const frequency=.006+random()*.022, stripes=2+random()*6;
     const spotX=20+random()*50,spotY=-48+random()*70, twist=random()*5;
     const spacing=2.55+random()*.9;
     // Sample one bilateral ink field at construction; each dot keeps its marking in flight.
-    const pattern=generator(patternSeed^(companion?0x31a5b7:0x7ab123));
+    const pattern=generator(patternSeed^(index>>1)*0x45d9f3b^(companion?0x31a5b7:0x7ab123));
     const spots=Array.from({length:2+Math.floor(pattern()*7)},()=>({
       x:pattern()*102,y:pattern()*140-80,rx:6+pattern()*25,ry:6+pattern()*32,
       strength:pattern()*.95+.2,
@@ -217,6 +217,6 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,companion}:{seed:number;patt
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{Object.assign(flight.current,{t,destination,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[seed,patternSeed,shapeSeed,companion]);
+  },[seed,patternSeed,shapeSeed,companion,index]);
   return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
