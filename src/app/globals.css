@@ -287,3 +287,4 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .meadow-runway {min-height:195%;position:relative}
 .meadow-runway .meadow-footer {position:sticky;top:0;min-height:clamp(320px,48vw,510px)}
 .stage.art-butterfly-meadow,.art-butterfly-meadow .mini {background:#f5f0df;grid-template-columns:minmax(0,1fr)}
+.stage.art-halftone-butterfly,.art-halftone-butterfly .mini {background:#09090d;grid-template:minmax(0,1fr)/minmax(0,1fr)}

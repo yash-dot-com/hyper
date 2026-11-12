@@ -1,0 +1,62 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+// A single wing in local coordinates, with the thorax at the origin.
+const outline = "M2 -7 C18 -35 53 -65 83 -76 C106 -86 103 -57 99 -40 C96 -21 87 -5 75 0 Q63 6 47 5 C68 12 83 33 71 46 Q67 53 60 51 Q55 63 46 57 Q36 66 28 55 C12 50 6 27 2 12 Z";
+const inks = [[26,60,246],[15,136,255],[83,223,255],[255,205,213],[255,94,87],[255,123,49],[255,235,119],[255,178,185],[78,187,255]];
+
+export function HalftoneButterfly() {
+  const canvas=useRef<HTMLCanvasElement>(null);
+  useEffect(()=>{
+    const node=canvas.current!,ctx=node.getContext("2d");
+    if(!ctx)return;
+    const wing=new Path2D(outline);
+    // Batch dots by pigment phase so each frame needs only a few fill calls.
+    const bands=Array.from({length:64},()=>new Path2D());
+    for(let row=0;row<61;row++){
+      const y=-80+row*2.5;
+      for(let col=0;col<40;col++){
+        const x=col*2.9+(row%2)*1.45;
+        if(!ctx.isPointInPath(wing,x,y))continue;
+        const distance=Math.hypot(x,y),angle=Math.atan2(y,x);
+        const veins=Math.pow(.5+.5*Math.cos(angle*29+distance*.045),7);
+        const phase=distance*.007+.18*Math.sin(angle*3)+.12*veins+(y>6?.18:0);
+        const band=bands[(Math.floor(phase*64)%64+64)%64];
+        const radius=.84+.51*veins+.19*Math.sin(distance*.12);
+        band.moveTo(x+radius,y);band.arc(x,y,radius,0,Math.PI*2);
+      }
+    }
+    const reduce=matchMedia("(prefers-reduced-motion: reduce)");
+    let visible=false, frame=0, last=0, t=0;
+    function paint(now:number){
+      if(!reduce.matches)t+=Math.max(0,Math.min(.05,(now-last)/1000));
+      last=now;
+      const c=ctx!;
+      c.setTransform(3,0,0,3,0,0);c.clearRect(0,0,260,180);
+      c.translate(130,99+2*Math.sin(t*1.1));
+      c.rotate(.035*Math.sin(t*.85));
+      const beat=t*4.8+.65*Math.sin(t*1.7);
+      for(let i=0;i<bands.length;i++){
+        const phase=(i/bands.length+t*.082)*inks.length;
+        const n=Math.floor(phase),f=phase-n,a=inks[n%inks.length],b=inks[(n+1)%inks.length];
+        c.fillStyle=`rgb(${a.map((v,j)=>Math.round(v+(b[j]-v)*f)).join(",")})`;
+        for(const side of [-1,1]){
+          const fold=.79+.20*Math.cos(beat+side*.08);
+          c.save();c.transform(side*fold,-.12*(1-fold),0,1,0,0);c.fill(bands[i]);c.restore();
+        }
+      }
+      c.strokeStyle="#8ab8ef";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
+      c.moveTo(1,-9);c.quadraticCurveTo(8,-25,16,-30);c.stroke();
+      for(let j=0;j<8;j++){
+        c.fillStyle=j<3?"#adeaff":"#5489d9";c.beginPath();c.ellipse(0,-9+j*3,2.4-j*.18,1.5,0,0,Math.PI*2);c.fill();
+      }
+      if(visible&&!document.hidden&&!reduce.matches)frame=requestAnimationFrame(paint);
+    }
+    function sync(){cancelAnimationFrame(frame);last=performance.now();if(visible&&!document.hidden)paint(last)}
+    const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
+    observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
+    return ()=>{observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
+  },[]);
+  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of shifting blue, coral and lemon halftone dots" style={{display:"block",width:"min(100%, 560px)",maxHeight:"100%",objectFit:"contain",background:"#09090d"}}/>;
+}
