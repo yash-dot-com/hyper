@@ -45,18 +45,18 @@ function pigment(hue:number,saturation:number,light:number) {
 type Flyer = {x:number;y:number;vx:number;vy:number;radius:number};
 
 export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0, shapeSeed=0 }: {hue?:number;seed?:number;patternSeed?:number;shapeSeed?:number} = {}) {
-  const flock=useRef<Flyer[]>([[.2,.72],[.8,.25],[.21,.22],[.79,.78]].map(([x,y])=>({x,y,vx:0,vy:0,radius:0})));
-  return <div role="img" aria-label="Four flying butterflies with distinct color-shifting halftone wings"
+  const flock=useRef<Flyer[]>([[.2,.72],[.8,.25],[.21,.22],[.79,.78],[.5,.48]].map(([x,y])=>({x,y,vx:0,vy:0,radius:0})));
+  return <div role="img" aria-label="Five flying butterflies with distinct color-shifting halftone wings"
     style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
-    {[0,1,2,3].map(index=><ButterflyLayer key={index} flock={flock.current} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
+    {flock.current.map((_,index)=><ButterflyLayer key={index} flock={flock.current} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
   </div>;
 }
 
 function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:Flyer[];seed:number;patternSeed:number;shapeSeed:number;index:number}) {
   const companion=index%2===1;
   const canvas=useRef<HTMLCanvasElement>(null);
-  const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,pace:[.32,.40,.29,.36][index],
-    route:index===2?[[.13,.25,-30],[.2,.16,-22],[.83,.62,12],[.7,.87,26]]:index===3?[[.94,.83,11],[.85,.89,-18],[.3,.52,-41],[.18,.24,19]]:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
+  const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,pace:[.32,.40,.29,.36,.34][index],
+    route:index===4?[[.32,.14,-18],[.49,.48,6],[.64,.78,20],[.91,.52,-22]]:index===2?[[.13,.25,-30],[.2,.16,-22],[.83,.62,12],[.7,.87,26]]:index===3?[[.94,.83,11],[.85,.89,-18],[.3,.52,-41],[.18,.24,19]]:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
   useEffect(()=>{
     const node=canvas.current!,ctx=node.getContext("2d");
     if(!ctx)return;
@@ -73,7 +73,7 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:Flyer[];
     // Batch dots by pigment phase so each frame needs only a few fill calls.
     type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number;freedom:number};
     const pair=generator(seed);
-    const base=(seed===0?195:pair()*360)+[0,180,90,270][index];
+    const base=(seed===0?195:pair()*360)+[0,180,90,270,45][index];
     const random=generator(seed^(companion?0x6271dac3:0x15f389bd)^(index>>1)*0x45d9f3b);
     const classic=index===0&&seed===0;
     const inks=classic?originalInks:Array.from({length:4+Math.floor(random()*4)},()=>

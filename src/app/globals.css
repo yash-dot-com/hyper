@@ -380,3 +380,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 
 .art-afterglow-footer .mini > footer,
 .art-afterglow-footer .mini > footer > svg {height:100%}
+
+.art-breathing-bands .mini > footer {height:100%}
+.art-breathing-bands .mini canvas {height:100% !important;min-height:0 !important;object-fit:cover}

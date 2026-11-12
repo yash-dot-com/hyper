@@ -211,7 +211,7 @@ const collection = [
   {title:"Spectrum Type",description:"Turn the angle to cast a tapered spectrum from the letters. Depth sets how far the color travels.",slug:"spectrum-type", category:"Type & lettering",component:"SpectrumType",icon:Type,preview:()=> <SpectrumType/>},
   {title:"Magnetic Stickers",description:"Six paper cuts lean toward your pointer and spring back into place when you leave.",slug:"magnetic-stickers", category:"Icons & stickers",component:"MagneticSticker",icon:Layers2,preview:MagneticSheet},
   {title:"Afterglow Footer",description:"A soft horizon and fine guide lines frame a word edged in fluorescent light.",slug:"afterglow-footer", category:"Footers",component:"AfterglowFooter",icon:Layers2,preview:()=> <AfterglowFooter/>},
-  {title:"Halftone Butterfly",description:"Four butterflies glide on separate paths. Shuffle their wings for new palettes and dot patterns.",slug:"halftone-butterfly", category:"Generative art",component:"HalftoneButterfly",icon:Layers2,preview:()=> <HalftoneButterfly/>},
+  {title:"Halftone Butterfly",description:"Five butterflies glide on separate paths. Shuffle their wings for new palettes and dot patterns.",slug:"halftone-butterfly", category:"Generative art",component:"HalftoneButterfly",icon:Layers2,preview:()=> <HalftoneButterfly/>},
   {title:"Butterfly Meadow",description:"Six butterflies roam independently, alternating quick wingbeats with short glides. Move close to one to change its course.",slug:"butterfly-meadow", category:"Generative art",component:"ButterflyMeadow",icon:Layers2,preview:()=> <ButterflyMeadow/>},
   {title:"Meadow Footer",description:"Scroll inside the landscape to reveal the river and farm beyond the fields.",slug:"meadow-footer", category:"Footers",component:"MeadowFooter",icon:Layers2,preview:MeadowSample},
   {title:"Paper Noticeboard",description:"Four die-cut paper pieces hold a short set of notices. Give each piece a heading, a detail, and an optional link.",slug:"paper-noticeboard", category:"Interface elements",component:"PaperNoticeboard",icon:Layers2,preview:NoticeboardSample},
@@ -310,6 +310,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [pixel, setPixel] = useState(defaultPixel);
   const isGlobe = item.slug === "motif-globe";
   const isRipple = item.slug === "image-ripple-loader";
+  const [previewHue,setPreviewHue]=useState(0);
+  const paletteInstruction=previewHue ? `Wrap the rendered preview in a div with style={{filter:"hue-rotate(${previewHue}deg)"}} to reproduce the selected colors.` : "";
   const [mode, setMode] = useState<RippleDemoMode>("disc");
   const [feedback, setFeedback] = useState("");
   const [manual, setManual] = useState("");
@@ -352,8 +354,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       "Integrate the named React export MotifGlobe using the complete component below. Save it as MotifGlobe.tsx in a client boundary. It imports three, including when using its software renderer. Use the project's package manager to provide three and matching TypeScript declarations if needed.",
       "Mount the globe in a responsive square. Preserve the built-in geographic mask, reduced-motion still, offscreen pause, and cleanup. Leave phase unset for animation; choose a fixed phase in [0,1) only for a still. Use a descriptive label for meaningful content or decorative for a purely decorative placement.",
       'Example usage:\n```tsx\nimport { MotifGlobe } from "./MotifGlobe";\n\nexport function Preview() {\n  return <MotifGlobe aspectRatio={1} period={5} renderer="software" background="#0B1011" colors={["#5EA79D", "#EFD38E", "#FFB49F"]} outline="#75928A" idleColor="#1E302F" label="Rotating motif globe" />;\n}\n```',
-      "MotifGlobe.tsx (complete source):", "```tsx", source, "```",
-    ].join("\n\n") : isRipple ? ripplePrompt(mode, source) : [
+      paletteInstruction, "MotifGlobe.tsx (complete source):", "```tsx", source, "```",
+    ].join("\n\n") : isRipple ? [paletteInstruction,ripplePrompt(mode, source)].filter(Boolean).join("\n\n") : [
       "Use the named export KineticParagraph from the full component below in a Remotion composition. Keep its existing animation. Return ready-to-use TSX for the composition.",
       "The example uses an original paragraph beginning with a word that stands alone. Pass it through text. Set background for the canvas, ink for text and outlines, and blue and yellow for the two highlights. Keep these prop names. If adapting the palette, keep ink legible on all three surfaces.",
       "Use one complete 5.6-second cycle with durationInFrames={Math.round(fps * durationSeconds)}. Register the composition in the project's Remotion root.",
@@ -382,10 +384,11 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <Button variant="outline" onClick={()=>setPatternSeed(crypto.getRandomValues(new Uint32Array(1))[0] || 1)}>Randomize markings</Button>
       <Button variant="outline" disabled={wingSeed===0 && patternSeed===0} onClick={()=>{setWingSeed(0);setPatternSeed(0)}}>Reset wings</Button>
     </div>}
-    {isRipple && <div className="demo-modes" role="group" aria-label="Preview style">
-      {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
+    {(isGlobe||isRipple) && <div className="demo-modes" role="group" aria-label="Preview controls">
+      {isRipple && (["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
+      <Button variant="outline" onClick={()=>setPreviewHue(hue=>(hue+45+Math.floor(Math.random()*271))%360)}>Shuffle colors</Button>
     </div>}
-    <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
+    <section style={(isGlobe||isRipple)&&previewHue ? {filter:`hue-rotate(${previewHue}deg)`} : undefined} data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
       {item.slug === "digital-kaleidoscope" ? <DigitalKaleidoscope {...scope}/> : item.slug === "breathing-bands" ? <BreathingBandsFooter palette={bandPalette}/> : item.slug === "prism-drift" ? <PrismDrift speed={driftSpeed} palettes={driftColors} style={{width:"100%",height:"100%"}}/> : item.slug === "cut-ink-footer" ? <CutInkFooter word={printWord} inks={pigments}/> : item.slug === "spectrum-type" ? <SpectrumType text={prismText} angle={prismAngle} depth={prismDepth}/> : item.slug === "afterglow-footer" ? <AfterglowFooter word={glowWord} colors={glowColors}/> : item.slug === "halftone-butterfly" ? <HalftoneButterfly seed={wingSeed} patternSeed={patternSeed}/> : item.slug === "halftone-voice-blob" ? <HalftoneVoiceBlob size="min(64vw, 260px)"/> : isFrost ? <FrostedTileFooter label={tileLabel} colors={tileColors}/> : isVoice ? <VoiceBlob size="min(63vw, 280px)"/> : isCascade ? <CardCascade paused={paused} replay={deal}/> : isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {item.slug === "afterglow-footer" && <div className="pixel-controls afterglow-controls">
