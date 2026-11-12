@@ -1,3 +1,4 @@
+import { DirectoryColor } from "./ui/directory-color";
 import { DirectorySelect } from "./ui/directory-select";
 import { KawaiiFace, kawaiiExpressions, type KawaiiExpression, type EyeStyle, type MouthStyle } from "./experiments/KawaiiFace";
 
@@ -12,7 +13,7 @@ export function KawaiiControls({value,change}:{value:FaceSettings;change:(value:
     <div className="pixel-controls">
       <DirectorySelect label="Eyes" value={value.eyes} options={["",...eyeStyles]} defaultLabel="Expression default" onChange={eyes=>change({...value,eyes})}/>
       <DirectorySelect label="Mouth" value={value.mouth} options={["",...mouthStyles]} defaultLabel="Expression default" onChange={mouth=>change({...value,mouth})}/>
-      <label>Blush<input type="color" value={value.blush} onChange={e=>change({...value,blush:e.target.value})}/></label>
+      <DirectoryColor label="Blush" value={value.blush} onChange={blush=>change({...value,blush})}/>
     </div>
     <div role="group" aria-label="Expression presets" className="face-sheet">{names.map(name=>
       <button key={name} aria-label={name} aria-pressed={value.expression===name} onClick={()=>change({...value,expression:name,eyes:"",mouth:""})}>

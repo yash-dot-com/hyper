@@ -353,3 +353,17 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 /* Hide native scrollbar chrome while keeping each scroll container interactive. */
 * {scrollbar-width:none}
 *::-webkit-scrollbar {display:none}
+.ink-control{display:inline-grid;gap:8px;color:var(--quiet);font-size:12px;text-transform:capitalize}
+.ink-control.compact{margin-right:3px;vertical-align:middle}
+.ink-swatch{width:34px;height:32px;padding:3px;border:1px solid #555550;border-radius:10px;background:#242423;cursor:pointer}
+.ink-swatch i{display:block;height:100%;border-radius:6px;box-shadow:inset 0 1px 1px #ffffff50,inset 0 -1px 1px #0003}
+.ink-picker{width:min(222px,calc(100vw - 24px));padding:12px;display:grid;gap:12px;border:1px solid #484845;border-radius:15px;background:#20201f;color:#efeee9;box-shadow:0 8px 24px #0005}
+.ink-picker-title{margin:0;font-size:13px;font-weight:550;text-transform:capitalize}
+.shade-plane{position:relative;height:116px;border-radius:9px;overflow:hidden;cursor:crosshair;touch-action:none}
+.shade-plane i{position:absolute;pointer-events:none;width:13px;height:13px;transform:translate(-50%,-50%);border:2px solid white;border-radius:50%;box-shadow:0 0 0 1px #0009}
+.hue-track{width:100%;height:14px;border-radius:99px;appearance:none;background:linear-gradient(to right,red,yellow,lime,cyan,blue,magenta,red);cursor:pointer}
+.hue-track::-webkit-slider-thumb{appearance:none;width:16px;height:16px;background:transparent;border:2px solid white;border-radius:50%;box-shadow:0 0 0 1px #0008}
+.hue-track::-moz-range-thumb{width:12px;height:12px;background:transparent;border:2px solid white;border-radius:50%}
+.ink-hex{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--quiet)}
+.ink-hex input{min-width:0;width:100%;border:1px solid #555550;border-radius:7px;background:#181818;color:var(--foreground);padding:5px 9px;font-family:monospace}
+.ink-picker :focus-visible,.ink-swatch:focus-visible{outline:2px solid var(--foreground);outline-offset:2px}

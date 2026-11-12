@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig, useReducedMotion } from "motion/react";
+import { DirectoryColor } from "./ui/directory-color";
 import { DirectorySelect } from "./ui/directory-select";
 import { Button } from "@/components/ui/button";
 import { DigitalKaleidoscope, scopePresets } from "./experiments/DigitalKaleidoscope";
@@ -391,7 +392,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     </section>
     {item.slug === "afterglow-footer" && <div className="pixel-controls afterglow-controls">
       <label>Word<input value={glowWord} onChange={e=>setGlowWord(e.target.value)}/></label>
-      {(Object.keys(afterglowColors) as (keyof typeof afterglowColors)[]).map(key=><label key={key}>{key}<input type="color" value={glowColors[key]} onChange={e=>setGlowColors({...glowColors,[key]:e.target.value})}/></label>)}
+      {(Object.keys(afterglowColors) as (keyof typeof afterglowColors)[]).map(key=><DirectoryColor key={key} label={key} value={glowColors[key]} onChange={hex=>setGlowColors({...glowColors,[key]:hex})}/>)}
     </div>}
     {item.slug==="spectrum-type" && <div className="pixel-controls">
       <label>Hero text<input value={prismText} onChange={e=>setPrismText(e.target.value)}/></label>
@@ -400,14 +401,14 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     </div>}
     {item.slug==="cut-ink-footer" && <div className="pixel-controls afterglow-controls">
       <label>Word<input value={printWord} onChange={e=>setPrintWord(e.target.value)}/></label>
-      {pigments.map((ink,i)=><label key={i}>Ink {i+1}<input type="color" value={ink} onChange={e=>{
-        const next:typeof pigments=[...pigments];next[i]=e.target.value;setPigments(next);
-      }}/></label>)}
+      {pigments.map((ink,i)=><DirectoryColor key={i} label={`Ink ${i+1}`} value={ink} onChange={hex=>{
+        const next:typeof pigments=[...pigments];next[i]=hex;setPigments(next);
+      }}/>)}
     </div>}
     {item.slug==="prism-drift" && <div className="drift-controls">
       {(["warm","cool"] as const).map(group=><fieldset key={group}><legend>{group==="warm"?"Warm palette":"Cool palette"}</legend>
-        {driftColors[group].map((ink,i)=><input key={i} aria-label={group+" color "+(i+1)} type="color" value={ink} onChange={e=>{
-          const next=[...driftColors[group]] as [string,string,string,string,string];next[i]=e.target.value;
+        {driftColors[group].map((ink,i)=><DirectoryColor compact key={i} label={group+" "+(i+1)} value={ink} onChange={hex=>{
+          const next=[...driftColors[group]] as [string,string,string,string,string];next[i]=hex;
           setDriftColors({...driftColors,[group]:next});
         }}/>)}
       </fieldset>)}
@@ -436,9 +437,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     </div>}
     {isFrost && <div className="pixel-controls">
       <label>Footer text<input value={tileLabel} maxLength={48} placeholder="Bloom" onChange={e=>setTileLabel(e.target.value)}/></label>
-      {["Base","Midtone","Highlight"].map((name,i)=><label key={name}>{name}<input type="color" value={tileColors[i]} onChange={e=>{
-        const next: typeof tileColors=[...tileColors]; next[i]=e.target.value; setTileColors(next);
-      }}/></label>)}
+      {["Base","Midtone","Highlight"].map((name,i)=><DirectoryColor key={name} label={name} value={tileColors[i]} onChange={hex=>{
+        const next: typeof tileColors=[...tileColors]; next[i]=hex; setTileColors(next);
+      }}/>)}
     </div>}
     {isCascade && <div className="demo-modes"><Button variant="outline" onClick={()=>setPaused(p=>!p)}>{paused?"Resume":"Pause"}</Button><Button variant="outline" onClick={()=>{setPaused(false);setDeal(n=>n+1)}}>Replay cascade</Button></div>}
     {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
