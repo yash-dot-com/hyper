@@ -42,14 +42,17 @@ function pigment(hue:number,saturation:number,light:number) {
   });
 }
 
+type Flyer = {x:number;y:number;vx:number;vy:number;radius:number};
+
 export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0, shapeSeed=0 }: {hue?:number;seed?:number;patternSeed?:number;shapeSeed?:number} = {}) {
+  const flock=useRef<Flyer[]>([[.2,.72],[.8,.25],[.21,.22],[.79,.78]].map(([x,y])=>({x,y,vx:0,vy:0,radius:0})));
   return <div role="img" aria-label="Four flying butterflies with distinct color-shifting halftone wings"
     style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
-    {[0,1,2,3].map(index=><ButterflyLayer key={index} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
+    {[0,1,2,3].map(index=><ButterflyLayer key={index} flock={flock.current} index={index} shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed}/>)}
   </div>;
 }
 
-function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternSeed:number;shapeSeed:number;index:number}) {
+function ButterflyLayer({seed,patternSeed,shapeSeed,index,flock}:{flock:Flyer[];seed:number;patternSeed:number;shapeSeed:number;index:number}) {
   const companion=index%2===1;
   const canvas=useRef<HTMLCanvasElement>(null);
   const flight=useRef({t:index*3.4,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:index*1.7,pace:[.32,.40,.29,.36][index],
@@ -137,14 +140,9 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
       }
       c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,width,height);
       const unit=Math.min(width/260,height/180);
-      // Give each spline its own flight space. Stagger the horizontal divides
-      // so the two pairs roam at different heights without influencing one another.
-      const right=index%2===1, lower=index===0 || index===3;
-      const splitX=width*.5,splitY=height*(right?.55:.45);
-      const scale=Math.min(.4*unit,Math.min(splitX,height*.45)/410);
-      const inset=scale*160+unit;
-      const spanX=splitX-2*inset;
-      const spanY=(lower?height-splitY:splitY)-2*inset;
+      const scale=Math.min(.4*unit,Math.min(width*.5,height*.45)/410);
+      const inset=scale*145+unit;
+      const spanX=width-2*inset,spanY=height-2*inset;
       const glide=Math.min(1,Math.max(0,.55+.8*Math.sin(t*.85+.55*Math.sin(t*.41))));
       travel+=dt*(pace+.045*Math.sin(t*.51)-.035*glide);
       if(travel>=1){
@@ -164,18 +162,60 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
       const weights=[v**3,3*u**3-6*u*u+4,-3*u**3+3*u*u+3*u+1,u**3];
       const tangent=[-3*v*v,9*u*u-12*u,-9*u*u+6*u+3,3*u*u];
       const sum=(axis:number,coeff:number[])=>route.reduce((n,p,i)=>n+p[axis]*coeff[i]/6,0);
-      const target=Math.atan2(sum(1,tangent)*spanY,sum(0,tangent)*spanX)+Math.PI/2;
-      const turn=Math.atan2(Math.sin(target-heading),Math.cos(target-heading));
-      heading+=turn*(1-Math.exp(-dt*7));
+      const bird=flock[index],x=bird.x*width,y=bird.y*height;
+      bird.radius=scale*146*285/(285-sum(2,weights));
+      const aimX=inset+sum(0,weights)*spanX-x+sum(0,tangent)*spanX*.28;
+      const aimY=inset+sum(1,weights)*spanY-y+sum(1,tangent)*spanY*.28;
+      const desired=Math.atan2(aimY,aimX);
+      const bearing=heading-Math.PI/2,speed=unit*(20+pace*42-3*glide);
+      let best=Infinity,course=bearing;
+      // Compare short forward arcs. A near miss costs nothing once the paths diverge.
+      for(let i=-12;i<=12;i++){
+        const angle=bearing+i*Math.PI/12,vx=speed*Math.cos(angle),vy=speed*Math.sin(angle);
+        let cost=1-Math.cos(angle-desired)+.55*(1-Math.cos(angle-bearing));
+        const look=1.7;
+        const edge=Math.min(x+vx*look,width-x-vx*look,y+vy*look,height-y-vy*look);
+        cost+=8*Math.max(0,(inset-edge)/inset)**2;
+        for(const other of flock){
+          if(other===bird)continue;
+          const dx=other.x*width-x,dy=other.y*height-y;
+          const rvx=vx-other.vx,rvy=vy-other.vy;
+          const encounter=(dx*rvx+dy*rvy)/(rvx*rvx+rvy*rvy+1);
+          if(encounter<=0)continue;
+          const ahead=Math.min(look,encounter);
+          const clearance=bird.radius+(other.radius||bird.radius)+2*unit;
+          const miss=Math.hypot(dx-rvx*ahead,dy-rvy*ahead);
+          cost+=20*Math.max(0,1-miss/clearance)**2;
+        }
+        if(cost<best){best=cost;course=angle}
+      }
+      const turn=Math.atan2(Math.sin(course-bearing),Math.cos(course-bearing));
+      heading+=Math.max(-1.8*dt,Math.min(1.8*dt,turn*(1-Math.exp(-dt*4))));
       bank+=(Math.max(-.45,Math.min(.45,turn))-bank)*(1-Math.exp(-dt*4));
+      bird.vx=Math.sin(heading)*speed;bird.vy=-Math.cos(heading)*speed;
+      // At close range spend forward speed along the tangent as clearance runs out.
+      for(const other of flock){
+        if(other===bird)continue;
+        const dx=other.x*width-x,dy=other.y*height-y,d=Math.hypot(dx,dy);
+        const gap=d-bird.radius-(other.radius||bird.radius);
+        if(d===0 || gap>speed*.6)continue;
+        const nx=dx/d,ny=dy/d;
+        const closing=bird.vx*nx+bird.vy*ny;
+        const excess=closing-Math.max(0,gap)/.6;
+        if(excess<=0)continue;
+        const side=bird.vx*(-ny)+bird.vy*nx>=0?1:-1;
+        bird.vx-=excess*(nx+side*ny);
+        bird.vy-=excess*(ny-side*nx);
+      }
+      bird.x=Math.max(inset,Math.min(width-inset,x+bird.vx*dt))/width;
+      bird.y=Math.max(inset,Math.min(height-inset,y+bird.vy*dt))/height;
       wingPhase+=dt*(7+.8*Math.sin(t*1.3))*(1-.8*glide);
       const cameraDistance=285, depth=cameraDistance-sum(2,weights);
       const perspective=cameraDistance/depth;
       const climb=Math.atan2(sum(2,tangent),Math.hypot(sum(0,tangent)*210,sum(1,tangent)*110));
       pitch+=(Math.max(-.95,Math.min(.95,climb))-pitch)*(1-Math.exp(-dt*5));
       const cp=Math.cos(pitch),sp=Math.sin(pitch),cb=Math.cos(bank),sb=Math.sin(bank);
-      c.translate((right?splitX:0)+inset+sum(0,weights)*spanX,
-        (lower?splitY:0)+inset+sum(1,weights)*spanY+unit*Math.sin(wingPhase));
+      c.translate(bird.x*width,bird.y*height);
       c.rotate(heading);
       c.scale(scale*perspective,scale*perspective);
       function project(span:number,fore:number,lag:number,side:number){
@@ -229,6 +269,6 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{Object.assign(flight.current,{t,pace,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[seed,patternSeed,shapeSeed,companion,index]);
+  },[seed,patternSeed,shapeSeed,companion,index,flock]);
   return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
