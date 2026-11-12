@@ -88,11 +88,26 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
       const wash=c.createLinearGradient(62,50,166,192);
       wash.addColorStop(0,pigment(rimPhase,0));wash.addColorStop(.37,pigment(phase,1));wash.addColorStop(.68,pigment(corePhase,3));wash.addColorStop(1,pigment(rimPhase,0));
       c.fillStyle=wash;c.fillRect(20,20,200,200);
-      c.save();c.translate(120,120);c.rotate(-.5+Math.sin(t*.7)*.28);c.scale(1,.76);
       const offset=12*Math.sin(t)+e*12;
-      const core=c.createRadialGradient(offset,17,3,offset,18,81);
-      core.addColorStop(0,pigment(corePhase,2));core.addColorStop(.52,pigment(corePhase+.12,2));core.addColorStop(.75,pigment(corePhase,3));core.addColorStop(1,pigment(corePhase,3,0));
-      c.fillStyle=core;c.fillRect(-122,-150,244,300);c.restore();
+      c.save();
+      c.translate(120+9*Math.sin(t*.61),125+6*Math.sin(t*.83));
+      c.rotate(-.35+.28*Math.sin(t*.7));
+      // Independent harmonics change the pigment's silhouette, not just its position.
+      const pool=new Path2D(), voiceTone=reduce.matches?0:bright*e;
+      for(let i=0;i<=96;i++){
+        const a=i*Math.PI/48;
+        const radius=44+(10+7*e)*Math.cos(2*a+t*.97)
+          +(8+5*voiceTone)*Math.sin(3*a-t*1.21+voiceTone*2)
+          +4*Math.cos(4*a+t*.56);
+        const x=radius*Math.cos(a)*1.13;
+        const y=radius*Math.sin(a)*.91+8*Math.sin(x/29+t*.81);
+        if(i)pool.lineTo(x,y);else pool.moveTo(x,y);
+      }
+      pool.closePath();
+      const core=c.createLinearGradient(-49,-29,42,39);
+      core.addColorStop(0,pigment(corePhase,3));core.addColorStop(.39,pigment(corePhase,2));
+      core.addColorStop(.73,pigment(corePhase+.22,2));core.addColorStop(1,pigment(corePhase,3));
+      c.filter="blur(6px)";c.fillStyle=core;c.fill(pool);c.restore();
       c.save();c.filter="blur(9px)";c.strokeStyle=pigment(corePhase,3,.7);c.lineWidth=13;
       c.beginPath();c.moveTo(61,112);c.bezierCurveTo(68,157+offset,109,180,162,129-offset*.4);c.stroke();c.restore();
       c.strokeStyle=pigment(rimPhase,1,.6);c.lineWidth=4;c.filter="blur(2px)";c.stroke(outline);c.restore();
