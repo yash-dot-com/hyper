@@ -503,7 +503,7 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
     <main className="canvas" key={slug}>
       <RepositoryAction/>
       {slug === "about" ? <section className="author-profile" aria-labelledby="author-name">
-        <header className="detail-head"><h1 id="author-name">Yash Sonalekar</h1></header>
+        <header className="detail-head"><h1 id="author-name" className="author-block-name" aria-label="Yash Sonalekar"><BlockType text="yash sonalekar"/></h1></header>
         <div className="author-story">
           <p className="author-lead">I’m a software engineering student who likes building things for the web.</p>
           <p className="component-description">Hype is my place to play with small details. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
