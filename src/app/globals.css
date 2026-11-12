@@ -227,3 +227,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .skill-download {display:inline-block;margin-top:14px;text-decoration:underline;text-underline-offset:3px}
 
 .art-gradient-folder .mini,.stage.art-gradient-folder {background:#f7f3ec}
+
+.art-gradient-objects .mini,.stage.art-gradient-objects {background:#f7f3ec}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { RockerSwitch, SlideLatch, FileDrawer } from "./experiments/GradientObjects";
 import { GradientFolder, folderColors, type FolderColor } from "./experiments/GradientFolder";
 import { PocketSampler } from "./experiments/PocketSampler";
 import { VoxelSticker, stickerNames, type StickerName } from "./experiments/VoxelSticker";
@@ -60,7 +61,14 @@ function SkillExamples() {
     </div>)}
   </figure>;
 }
+function GradientObjectsDemo() {
+  return <div className="material-objects" style={{width:"94%",height:"96%",display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gridTemplateRows:"repeat(2,minmax(0,1fr))",justifyItems:"center",alignItems:"center",containerType:"size"}}>
+    <GradientFolder size="min(96%, 48cqh)"/><RockerSwitch size="min(96%, 49cqh)"/>
+    <SlideLatch size="min(96%, 49cqh)"/><FileDrawer size="min(96%, 49cqh)"/>
+  </div>;
+}
 const collection = [
+  {title:"Gradient Objects", description:"Hover over the folder, flip the rocker, slide the latch, or pull out the drawer. A reusable skill for shaping light, color, and motion around a physical object.", slug:"gradient-objects", component:"SKILL", icon:Layers2, preview:GradientObjectsDemo},
   {title:"Gradient Folder", description:"Hover to fan the pages, or click to pin the folder open.", slug:"gradient-folder", component:"GradientFolder", icon:Layers2, preview:() => <GradientFolder size={195}/>},
   {title:"Axonometric Icons", description:"A reusable skill for drawing isometric and dimetric SVG objects. Copy the instructions into your agent, then describe the object you want.", slug:"axonometric-icons", component:"SKILL", icon:Layers2, preview:SkillExamples},
   {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},
@@ -83,7 +91,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
-  const isSkill = item.slug === "axonometric-icons";
+  const isGradientSkill = item.slug === "gradient-objects";
+  const isSkill = isGradientSkill || item.slug === "axonometric-icons";
   const isVoxel = item.slug === "voxel-stickers";
   const [sticker,setSticker] = useState<StickerName>("Globe");
   const isKawaii = item.slug === "kawaii-face-kit";
@@ -102,7 +111,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     const text = kind === "code" ? source : isFolder ? [
       `Integrate the supplied GradientFolder named React export with motion/react from the motion package. Use a client boundary. Render <GradientFolder color="${folderColor}" label="Field notes" />. Preserve its layered gradients, staggered springs, keyboard focus and touch interaction, and reduced-motion handling.`,
       "GradientFolder.tsx (complete source):", "```tsx", source, "```",
-    ].join("\n\n") : isSkill ? "Create an isometric or dimetric SVG icon using the skill below. If I have not named the object yet, ask which object to draw.\n\n" + source : isVoxel ? [
+    ].join("\n\n") : isGradientSkill ? "Use this skill to design a gradient object. Ask which object and palette if unspecified.\n\n" + source : isSkill ? "Create an isometric or dimetric SVG icon using the skill below. If I have not named the object yet, ask which object to draw.\n\n" + source : isVoxel ? [
       "Use the named React export VoxelSticker from the complete source below. Preserve its transparent background, block geometry, and shading. It needs React only.",
       `Save as VoxelSticker.tsx, import { VoxelSticker } from "./VoxelSticker", and render <VoxelSticker name="${sticker}" size={240} />.`,
       "```tsx", source, "```",
@@ -139,7 +148,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {isFolder && <div className="demo-modes" style={{marginTop:14}} role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
@@ -147,7 +156,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     )}</div>}
     {isKawaii && <KawaiiControls value={face} change={setFace}/>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
-    {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href="/skills/axonometric-icons.zip" download>Download skill and SVG examples ↓</a></div>}
+    {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href={`/skills/${item.slug}.zip`} download>Download skill and {isGradientSkill ? "components" : "SVG examples"} ↓</a></div>}
     <section className="editor" aria-label="Component source">
       <header><span><Code2/>{item.component}.{isSkill ? "md" : "tsx"}</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : isSkill ? "Copy skill" : "Copy code"}</motion.button></header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
