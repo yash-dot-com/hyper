@@ -1,29 +1,51 @@
 "use client";
 
-import {useId} from "react";
-import {motion,useReducedMotion} from "motion/react";
+import { useId, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 
-const stickers = {
-  heart: { colors:["#ffdfd7","#ff929d","#eb496e","#ab3159"], path:"M60 96C49 88 14 65 14 40C14 18 42 10 60 32C78 10 106 18 106 40C106 65 72 89 60 96Z", gloss:"M24 39Q25 28 38 26" },
-  chat: { colors:["#deffe5","#8bedcb","#3abda9","#277d89"], path:"M34 20H86Q107 20 107 41V65Q107 87 84 87H54L32 100Q27 103 29 96L32 85Q13 82 13 65V42Q13 22 34 20Z", gloss:"M22 42Q22 30 36 29" },
-  bell: { colors:["#fff4c4","#ffda76","#ffa345","#d37a34"], path:"M54 24Q52 14 60 14Q68 14 66 24Q89 28 90 51Q91 68 101 78Q106 86 97 87H23Q14 86 19 78Q29 67 30 51Q31 29 54 24Z", gloss:"M40 50Q40 37 51 34" },
+const folders = {
+  progress: { label:"Projects", back:"#ec921a", cavity:"#b96910", lip:"#ffc577", base:"#f49a28", ink:"#654014" },
+  receipts: { label:"Receipts", back:"#5267df", cavity:"#293b98", lip:"#ffe089", base:"#f5bb3e", ink:"#624414" },
+  scripts:  { label:"Scripts", back:"#f56e32", cavity:"#b33b17", lip:"#f7ccba", base:"#d87c58", ink:"#663326" },
+  files:    { label:"Documents", back:"#8dcefa", cavity:"#2789c6", lip:"#a6ddff", base:"#319de1", ink:"#154d73" },
 };
-export type StickerKind = keyof typeof stickers;
-export function GradientSticker({kind,size=96,decorative=false}:{kind:StickerKind;size?:number|string;decorative?:boolean}) {
+export type FolderKind = keyof typeof folders;
+export function FolderSticker({kind,size=180}:{kind:FolderKind;size?:number|string}) {
   const id=useId(), reduce=useReducedMotion();
-  const {colors:[rim,light,body,edge],path,gloss}=stickers[kind];
-  return <motion.svg viewBox="0 0 120 116" role={decorative?undefined:"img"} aria-hidden={decorative||undefined} aria-label={kind}
-    initial="rest" animate="rest" whileHover="hover" whileTap="press" style={{width:size,maxWidth:"100%",height:"auto",display:"block"}}>
-    <defs>
-      <linearGradient id={id+"face"} x2=".6" y2="1"><stop stopColor={light}/><stop offset=".55" stopColor={body}/><stop offset="1" stopColor={edge}/></linearGradient>
-      <radialGradient id={id+"shine"} cx=".25" cy=".1" r=".8"><stop stopColor={rim} stopOpacity=".85"/><stop offset="1" stopColor={light} stopOpacity="0"/></radialGradient>
-    </defs>
-    <motion.g style={{transformOrigin:kind==="bell"?"60px 20px":"60px 60px"}} variants={{rest:{scale:1,rotate:0,y:0},hover:reduce?{}:kind==="bell"?{rotate:[0,-12,8,-4,0]}:kind==="heart"?{scale:1.07,rotate:-4}:{y:-3,rotate:3},press:reduce?{}:{scale:.96}}}>
-      {kind==="bell" && <path d="M48 83h24q0 17-12 17T48 83Z" fill={edge} stroke="#fffaf4" strokeWidth="5"/>}
-      <path d={path} transform="translate(0 3)" fill={edge} stroke="#fffaf4" strokeWidth="6" strokeLinejoin="round"/>
-      <path d={path} fill={`url(#${id}face)`}/><path d={path} fill={`url(#${id}shine)`}/>
-      <path d={gloss} fill="none" stroke={rim} strokeWidth="3.5" strokeLinecap="round"/>
-      {kind==="chat" && [0,1,2].map(i=><motion.circle key={i} cx={42+i*18} cy="55" r="4.5" fill="#faffed" variants={{rest:{y:0},hover:reduce?{}:{y:[0,-4,0],transition:{duration:.32,delay:i*.09}}}}/>)}
-    </motion.g>
-  </motion.svg>;
+  const [hover,setHover]=useState(false),[focus,setFocus]=useState(false),[pinned,pin]=useState(false);
+  const open=hover||focus||pinned, c=folders[kind];
+  const wallet=kind==="receipts", stack=kind==="files", simple=kind==="progress";
+  const spring=reduce?{duration:0}:{type:"spring" as const,stiffness:290,damping:28};
+  const drop=open?4:0, spread=open?2:0;
+  const top=wallet?80:stack?70:simple?56:62;
+  const contour=`M${20-spread} ${top+12+drop} Q${20-spread} ${top+drop} 33 ${top+drop} C58 ${top+drop} 62 ${top+drop+(wallet?10:simple||stack?0:17)} 76 ${top+drop+(wallet?14:simple||stack?0:17)} L148 ${top+drop+(wallet?32:simple||stack?0:17)} Q${160+spread} ${top+drop+(wallet?35:simple||stack?0:17)} ${160+spread} ${top+drop+(wallet?44:simple||stack?12:29)} L157 147 Q157 156 146 156 H34 Q23 156 23 146Z`;
+  const count=stack?5:simple?1:3;
+  return <button type="button" aria-pressed={pinned} aria-label={`Pin ${c.label} folder open`}
+    onPointerEnter={e=>setHover(e.pointerType!=="touch")} onPointerLeave={()=>setHover(false)}
+    onFocus={e=>setFocus(e.currentTarget.matches(":focus-visible"))} onBlur={()=>setFocus(false)} onClick={()=>pin(!pinned)}
+    style={{width:size,maxWidth:"100%",background:"transparent",padding:0,border:0,display:"block",borderRadius:12}}>
+    <svg viewBox="0 0 180 180" aria-hidden="true" style={{width:"100%",display:"block"}}>
+      <defs>
+        <linearGradient id={id+"b"} x2=".25" y2="1"><stop stopColor={c.back}/><stop offset="1" stopColor={c.cavity}/></linearGradient>
+        <linearGradient id={id+"f"} x2=".2" y2="1"><stop stopColor={c.lip}/><stop offset=".45" stopColor={c.lip}/><stop offset="1" stopColor={c.base}/></linearGradient>
+        <radialGradient id={id+"g"} cx=".38" cy="0" r=".88"><stop stopColor="white" stopOpacity={kind==="scripts"?".52":".2"}/><stop offset="1" stopColor="white" stopOpacity="0"/></radialGradient>
+      </defs>
+      <path d={simple||stack?"M23 39Q23 29 34 29H57Q64 29 70 35L76 39H146Q157 39 157 49V145Q157 155 146 155H34Q23 155 23 145Z":"M23 41Q23 28 37 28H143Q157 28 157 42V144Q157 155 145 155H35Q23 155 23 143Z"} fill={`url(#${id}b)`}/>
+      {Array.from({length:count},(_,i)=>{
+        const x=stack?40-i*3:simple?30:42+i*3,y=stack?39+i*6:simple?47:48+i*5,w=stack?100+i*6:simple?120:90;
+        return <motion.g key={i} initial={false} animate={{y:open?-(stack?12-i*2:simple?10:18-i*4):0, rotate:stack||simple?0:(i-1)*(open?12:7)}} style={{transformOrigin:"90px 110px"}} transition={{...spring,delay:reduce?0:i*.022}}>
+          <rect x={x} y={y} width={w} height="87" rx="5" fill={stack?"#e6f5ff":"#fffaf2"} stroke={stack?"#b9dfef":"#e6ded4"} strokeWidth=".8"/>
+          {stack?<path d={`M${x+6} ${y+4}h${w-12}`} stroke="#fff"/>:<g fill="#dedbd5"><rect x={x+8} y={y+8} width="24" height="3" rx="1"/><rect x={x+8} y={y+16} width={w-20} height="2" rx="1"/></g>}
+        </motion.g>;
+      })}
+      {wallet && <motion.g animate={{y:open?-7:0}} transition={spring}>
+        <path d="M23 89Q23 79 34 75L145 49Q156 48 157 61V143H24Z" fill="#8790ff"/>
+        <g transform="rotate(9 115 92)"><rect x="83" y="80" width="62" height="33" rx="4" fill="#fffaf1"/><path d="M90 88h22m-22 5h16" stroke="#746f78" strokeWidth="2"/></g>
+      </motion.g>}
+      <path d={contour} fill={`url(#${id}f)`} style={{transition:reduce?"none":"d 260ms ease-out"}}/>
+      <path d={contour} fill={`url(#${id}g)`} style={{transition:reduce?"none":"d 260ms ease-out"}}/>
+      <text x="33" y="143" fontSize="9" fontFamily="system-ui,sans-serif" fill={c.ink}>{c.label}</text>
+      {simple && <text x="146" y="143" textAnchor="end" fontSize="15" fill={c.ink} fontFamily="system-ui,sans-serif">78%</text>}
+    </svg>
+  </button>;
 }

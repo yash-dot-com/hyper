@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { GradientSticker } from "./experiments/GradientObjects";
+import { FolderSticker } from "./experiments/GradientObjects";
 import { GradientFolder, folderColors, type FolderColor } from "./experiments/GradientFolder";
 import { PocketSampler } from "./experiments/PocketSampler";
 import { VoxelSticker, stickerNames, type StickerName } from "./experiments/VoxelSticker";
@@ -63,12 +63,12 @@ function SkillExamples() {
 }
 function GradientObjectsDemo() {
   return <div className="material-objects" style={{width:"94%",height:"96%",display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gridTemplateRows:"repeat(2,minmax(0,1fr))",justifyItems:"center",alignItems:"center",containerType:"size"}}>
-    <GradientFolder size="min(96%, 48cqh)"/><GradientSticker kind="heart" size="min(96%, 49cqh)"/>
-    <GradientSticker kind="chat" size="min(96%, 49cqh)"/><GradientSticker kind="bell" size="min(96%, 49cqh)"/>
+    <FolderSticker kind="progress" size="min(96%, 48cqh)"/><FolderSticker kind="receipts" size="min(96%, 49cqh)"/>
+    <FolderSticker kind="scripts" size="min(96%, 49cqh)"/><FolderSticker kind="files" size="min(96%, 49cqh)"/>
   </div>;
 }
 const collection = [
-  {title:"Gradient Stickers", description:"A folder for files, a heart for favorites, a bubble for messages, and a bell for notifications. Hover to try each sticker.", slug:"gradient-objects", component:"SKILL", icon:Layers2, preview:GradientObjectsDemo},
+  {title:"Gradient Stickers", description:"Four folder stickers for projects, receipts, scripts, and documents. Hover to peek inside, or tap to pin one open.", slug:"gradient-objects", component:"SKILL", icon:Layers2, preview:GradientObjectsDemo},
   {title:"Gradient Folder", description:"Hover to fan the pages, or click to pin the folder open.", slug:"gradient-folder", component:"GradientFolder", icon:Layers2, preview:() => <GradientFolder size={195}/>},
   {title:"Axonometric Icons", description:"A reusable skill for drawing isometric and dimetric SVG objects. Copy the instructions into your agent, then describe the object you want.", slug:"axonometric-icons", component:"SKILL", icon:Layers2, preview:SkillExamples},
   {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},

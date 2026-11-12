@@ -32,9 +32,10 @@ If the mechanism is unfamiliar, ask for a reference before drafting. If images c
 List fixed parts, moving parts, attachment points, rest position and mechanical stop. Paint the recess first, moving parts next, foreground retainers last. Position the midpoint of the gesture manually and check whether it could exist in the physical object.
 
 - **Folder:** back and bottom seam stay still. Only the front lip spreads a few pixels and drops. Use matching SVG path commands in both poses. Raise the papers at slightly different times; keep the label on the anchored lower pocket.
-- **Favorite heart:** give the lobes a warm pink highlight and the lower edge a deeper berry fold. Lift on hover and compress on press.
-- **Messages:** keep the tail legible at small sizes. Three pale dots lift in sequence over a mint-to-teal face.
-- **Notifications:** shade the bell from pale gold to amber and copper. Swing from its crown, leaving room around the silhouette.
+- **Progress folder:** amber back, honey front, one cream sheet. Raise the sheet slightly while the percentage stays anchored to the pocket.
+- **Receipt wallet:** contrast a cobalt cavity and periwinkle divider with a golden diagonal lip. Fan slips from the base while the divider lifts to reveal a card.
+- **Script sleeve:** use a coral back and apricot front with a broad warm reflection. Rotate sheets at different angles so their corners separate above the notched lip.
+- **Expanding file:** layer pale blue dividers in increasing widths. Reveal the backmost divider furthest, with successively less travel toward the blue front pocket.
 
 ## Implement and verify
 
