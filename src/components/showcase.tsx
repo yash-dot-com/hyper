@@ -5,7 +5,7 @@ import { ArrowUpRight, Copy, Globe, Grid2X2, Home, Layers2, Menu, Star, Type, Us
 import { motion, MotionConfig, useReducedMotion } from "motion/react";
 import { DirectoryColor } from "./ui/directory-color";
 import { DirectorySelect } from "./ui/directory-select";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { DigitalKaleidoscope, scopePresets } from "./experiments/DigitalKaleidoscope";
 import { BreathingBandsFooter, type BandPalette } from "./experiments/BreathingBandsFooter";
 import { PrismDrift, driftPalettes } from "./experiments/PrismDrift";
@@ -510,19 +510,16 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
             <p className="component-description">Hype is my place to play with small details. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
             <p className="component-description">Every experiment comes with its code so you can take it apart and make it yours.</p>
             <nav className="author-links" aria-label="Social profiles">
-              {([
-                ["GitHub", "https://github.com/yash-dot-com", "website"],
-                ["LinkedIn", "https://www.linkedin.com/in/yash-sonalekar/", "branding"],
-                ["YouTube", "https://www.youtube.com/@Yashhh02", "interface"],
-              ] as const).map(([label, href, finish]) => <a key={label} href={href} target="_blank" rel="me noopener noreferrer">
-                <EmbossedBadge compact finish={finish} label={label} icon={<ArrowUpRight size={15}/>}/>
-              </a>)}
+              {[
+                ["GitHub", "https://github.com/yash-dot-com"],
+                ["LinkedIn", "https://www.linkedin.com/in/yash-sonalekar/"],
+                ["YouTube", "https://www.youtube.com/@Yashhh02"],
+              ].map(([label, href]) => <motion.a {...buttonGestures} className={buttonVariants()} key={label} href={href} target="_blank" rel="me noopener noreferrer">
+                {label}<ArrowUpRight size={15} aria-hidden="true"/>
+              </motion.a>)}
             </nav>
           </div>
-          <article className="tile author-print">
-            <div className="author-print-art" aria-hidden="true"><CutInkFooter word="Yash"/></div>
-            <a href="#cut-ink-footer">Cut Ink Footer<ArrowUpRight aria-hidden="true"/></a>
-          </article>
+          <div className="author-print author-print-art" aria-hidden="true"><CutInkFooter word="Yash"/></div>
         </div>
       </section> : index < 0 ? <>
         <header className="directory-intro">
