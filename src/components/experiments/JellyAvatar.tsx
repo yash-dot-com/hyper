@@ -59,7 +59,22 @@ export function JellyAvatar({size=240,animated=true,cycleSeconds=12}:{size?:numb
     <g opacity=".28" transform="translate(0 6)" filter={url("blur")}>{layer(url("skin"))}</g>
     {layer(url("skin"))}{layer(url("rim"))}{layer(url("shine"))}{layer(url("flecks"))}
     <g>{animated&&!still && <animateTransform {...timing} attributeName="transform" type="rotate" values="-8 100 100;-8 100 100;-16 100 100;-16 100 100;9 100 100;9 100 100;-8 100 100"/>}
-      {[85,104].map(x=><g key={x} fill="white"><rect x={x-1} y="85" width="11" height="23" rx="5.5" opacity=".8" filter={url("glow")}/><rect x={x} y="86" width="9" height="21" rx="4.5"/></g>)}
+      <g>
+        {animated&&!still && <animateTransform attributeName="transform" type="translate" dur="6.7s" repeatCount="indefinite"
+          values="0 0;0 0;5 -3;5 -3;2 -2;2 -2;-4 2;-4 2;0 0" keyTimes="0;.18;.21;.39;.42;.57;.61;.82;1"/>}
+        {[0,1].map(i => {
+          // The same cubic spine stretches into a curious look, then curls into a smile.
+          const poses = ["M0-6 C0-3 0 3 0 6", i ? "M0-10 C-1-5 0 3 1 8" : "M-2-4 C-1-3 0 1 1 3", "M-5 2 C-3-5 3-5 5 2"];
+          return <g key={i} transform={`translate(${89+20*i} 96)`}>
+            <g>
+              {animated&&!still && <animateTransform attributeName="transform" type="scale" begin={i?"0.035s":"0s"} dur="5.3s" repeatCount="indefinite"
+                values="1 1;1 1;1.14 .12;1 1;1 1" keyTimes="0;.6;.619;.65;1"/>}
+              {[true,false].map(glow=><path key={String(glow)} d={poses[0]} fill="none" stroke="white" strokeLinecap="round"
+                strokeWidth={glow?11:8} opacity={glow?.66:1} filter={glow?url("glow"):undefined}>{tween("d",poses)}</path>)}
+            </g>
+          </g>;
+        })}
+      </g>
     </g>
   </svg>;
 }
