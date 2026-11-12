@@ -1,15 +1,14 @@
-import { useId } from "react";
 
 // A dot is empty space. Each other character names a material.
 const models = {
   Globe: ["....gggg....","..ggggggbb..",".ggggggbbbb.",".gggbggbbbb.","bbggbbbbbbbb","bbbgggbbbbgg","bbgggggbbbgg","bbbgggggbbgg",".bbbggggbbb.",".bbbgggbbbb.","..bbggbbbb..","....gbbb...."],
-  Cursor: ["u..........","uu.........","uwu........","uwwu.......","uwwwu......","uwwwwu.....","uwwwwwu....","uwwwwwwu...","uwwwwwwwwu.","uwwwwuuuuu.","uwwuwwu....","uwu.uwwu...","uu..uwwu...","u....uu...."],
+  Cursor: ["u............", "uu...........", "uwu..........", "uwwu.........", "uwwwu........", "uwwwwu.......", "uwwwwwu......", "uwwwwwwu.....", "uwwwwwwwu....", "uwwwwwwwwu...", "uwwwwwwwwwu..", "uwwwwwwwwwwu.", "uwwwwwwwwwwwu", "uwwwwwwwuuuuu", "uwwwwuwwu....", "uwwwuuwwu....", "uwwu.uwwwu...", "uwu...uwwu...", "uu....uwwwu..", "u......uwwu..", "........uu..."],
   Television: ["..k.......k..","...k.....k...","....k...k....",".....kkk.....",".kkkkkkkkkkk.","kkkkkkkkkkkkk","kkwybgprukkck","kkwybgprukkkk","kkwybgprukkck","kkwybgprukkkk","kkwybgprukkkk",".kkkkkkkkkkk.","..kk.....kk.."],
   Horns: ["..kk.....kk.",".kwwk...kwwk",".kwwk...kwwk",".kwwk...kwwk",".kwwkkkkkwwk",".kwwkwwkwwwk",".kwwkwwkwwwk",".kkkkwwkwwwk","kwwwwkkwwwwk","kwwwwwwwwwwk",".kwwwwwwwwk.","..kwwwwwwk..","...kkkkkk..."],
-  Coin: ["....yyyy....","..yyooooyy..",".yoooyyoooy.",".yooyyyy o y.","yoooyooooooy","yoooyyyooooy","yooooyyyoooy","yooooooyoooy",".yooyyyy o y.",".yoooyyoooy.","..yyooooyy..","....yyyy...."].map(row=>row.replaceAll(" ","")),
-  Rainbow: ["....rrrrrr....","...roooooor...","..royyyyyyor..",".royggggggyor.","roygbbbbb bgyor","roygbu uuubgyor","roygbu..ubgyor","roygbu..ubgyor"].map(row=>row.replaceAll(" ","")),
+  Coin: ["....yyyy....", "..yyooooyy..", ".yoooyooooy.", ".yooyyyyooy.", "yoooyooooooy", "yoooyyyooooy", "yoooooyyoooy", "yooooooyoooy", ".yooyyyyooy.", ".yoooyooooy.", "..yyooooyy..", "....yyyy...."],
+  Rainbow: ["....rrrrrr....", "...roooooor...", "..royyyyyyor..", ".royggggggyor.", "roygbbbbbbgyor", "roygbuuuubgyor", "roygbu..ubgyor", "roygbu..ubgyor"],
   Bloom: [".....pp.....","...pppppp...",".pppppppppp.","pppppyyppppp",".pppyyyyppp.","..pppyyppp..",".pppppppppp.","..pppggppp..",".....gg..gg.","..gg.gg.gg..","...gggggg...",".....gg....."],
-  Camera: ["...kkkk.....","..kcccck.yy.",".ccccccccccc","cwwccccccycc","ccccckkkcccc","kkkkuuuukkkk","kkkubwwuukkk","kkkubbu uukkk","kkkkuuuukkkk",".kkkkkkk kkk."].map(row=>row.replaceAll(" ","")),
+  Camera: ["...kkkk.....", "..kcccck.yy.", ".cccccccccc.", "cwwccccccycc", "ccccckkkcccc", "kkkkuuuukkkk", "kkkubwwuukkk", "kkkubbuuukkk", "kkkkuuuukkkk", ".kkkkkkkkkk."],
   Landscape: ["bbbbbbbbbbbb","buuuuuuuyyyb","buwwuuuuyyyb","bwwwwwuuuuub","buuuuuuuguub","buuguuugggub","bugggugggggb","bggggggggggb","bggggggggggb","bbbbbbbbbbbb"],
   Mushroom: ["....rrrr....","..rrwwrrrr..",".rrrwwrrwwr.","rrwwrrrrwwrr","rrwwrrrrrrrr","rrrrrrwwrrrr",".kkkkkkkkkk.","....wwww....","...wwkwwkw..","...wwwwwww..","....wwwww..."],
 } as const;
@@ -36,10 +35,11 @@ function build(name:StickerName) {
   const yaw = 24 * Math.PI / 180, pitch = 16 * Math.PI / 180;
   const cy = Math.cos(yaw), sy = Math.sin(yaw);
   const cp = Math.cos(pitch), sp = Math.sin(pitch);
-  const project = (x:number, y:number, z:number) => [
-    10 * (x * cy - z * sy),
-    10 * (y * cp + (x * sy + z * cy) * sp),
-  ];
+  const roll = name === "Cursor" ? -22 * Math.PI / 180 : 0;
+  const project = (x:number, y:number, z:number) => {
+    const u = 10 * (x * cy - z * sy), v = 10 * (y * cp + (x * sy + z * cy) * sp);
+    return [u * Math.cos(roll) - v * Math.sin(roll), u * Math.sin(roll) + v * Math.cos(roll)];
+  };
   const depth = (cell: {x:number; y:number; z:number}) =>
     (cell.x * sy + cell.z * cy) * cp - cell.y * sp;
   const faces:{points:string;color:string}[]=[];
@@ -63,11 +63,9 @@ function build(name:StickerName) {
 }
 const cache=new Map<StickerName,ReturnType<typeof build>>();
 export function VoxelSticker({name="Globe",size=240}:{name?:StickerName;size?:number|string}) {
-  const id=useId();
   let mesh=cache.get(name);
   if(!mesh){mesh=build(name);cache.set(name,mesh);}
-  return <svg viewBox={mesh.viewBox} aria-labelledby={id} role="img" style={{width:size,maxWidth:"100%",height:"auto",display:"block"}}>
-    <title id={id}>{name} voxel sticker</title>
+  return <svg viewBox={mesh.viewBox} aria-label={name + " voxel sticker"} role="img" style={{width:size,maxWidth:"100%",height:"auto",display:"block"}}>
     {mesh.faces.map((face,i)=><polygon key={i} points={face.points} fill={face.color} stroke={face.color} strokeWidth=".18" strokeLinejoin="miter"/>)}
   </svg>;
 }
