@@ -24,15 +24,15 @@ function pigment(hue:number,saturation:number,light:number) {
   });
 }
 
-export function HalftoneButterfly({ hue=0, seed=0 }: {hue?:number;seed?:number} = {}) {
+export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0 }: {hue?:number;seed?:number;patternSeed?:number} = {}) {
   return <div role="img" aria-label="Two flying butterflies with distinct color-shifting halftone wings"
     style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
-    <ButterflyLayer seed={seed} companion={false}/>
-    <ButterflyLayer seed={seed} companion/>
+    <ButterflyLayer patternSeed={patternSeed} seed={seed} companion={false}/>
+    <ButterflyLayer patternSeed={patternSeed} seed={seed} companion/>
   </div>;
 }
 
-function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
+function ButterflyLayer({seed,patternSeed,companion}:{seed:number;patternSeed:number;companion:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
   const flight=useRef({t:companion?3.4:0,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:companion?2:0,destination:companion?2:0,
     route:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
@@ -59,6 +59,14 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
     const frequency=.006+random()*.022, stripes=2+random()*6;
     const spotX=20+random()*50,spotY=-48+random()*70, twist=random()*5;
     const spacing=2.55+random()*.9;
+    // Sample one bilateral ink field at construction; each dot keeps its marking in flight.
+    const pattern=generator(patternSeed^(companion?0x31a5b7:0x7ab123));
+    const spots=Array.from({length:2+Math.floor(pattern()*7)},()=>({
+      x:pattern()*102,y:pattern()*140-80,rx:6+pattern()*25,ry:6+pattern()*32,
+      strength:pattern()*.95+.2,
+    }));
+    const tilt=pattern()*Math.PI, pitchX=Math.cos(tilt),pitchY=Math.sin(tilt);
+    const stripeWidth=9+pattern()*46, bend=pattern()*2, offset=pattern()*6;
     const bands=Array.from({length:64},(): Dot[]=>[]);
     for(let row=0;row<Math.ceil(148/(classic?2.5:spacing*.86));row++){
       const y=-80+row*(classic?2.5:spacing*.86);
@@ -67,8 +75,16 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
         if(!ctx.isPointInPath(wing,x,y))continue;
         const distance=Math.hypot(x,y),angle=Math.atan2(y,x);
         const veins=Math.pow(.5+.5*Math.cos(angle*29+distance*.045),7);
-        const phase=classic?distance*.007+.18*Math.sin(angle*3)+.12*veins+(y>6?.18:0)
+        let phase=classic?distance*.007+.18*Math.sin(angle*3)+.12*veins+(y>6?.18:0)
           : Math.hypot(x-spotX,y-spotY)*frequency+.24*Math.sin(angle*stripes+twist+distance*.035)+.16*veins;
+        if(patternSeed){
+          const across=x*pitchX+y*pitchY,along=y*pitchX-x*pitchY;
+          phase=.45*Math.sin(across/stripeWidth+bend*Math.sin(along/23+offset));
+          for(const spot of spots){
+            const r2=((x-spot.x)/spot.rx)**2+((y-spot.y)/spot.ry)**2;
+            phase+=spot.strength*Math.exp(-r2)*Math.cos(3*r2);
+          }
+        }
         const band=bands[(Math.floor(phase*64)%64+64)%64];
         const radius=.84+.51*veins+.19*Math.sin(distance*.12);
         const span=Math.min(1,distance/118);
@@ -182,6 +198,6 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{Object.assign(flight.current,{t,destination,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[seed,companion]);
+  },[seed,patternSeed,companion]);
   return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
