@@ -50,6 +50,7 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       }
       return sites;
     });
+    const flares: {angle:number; start:number; reach:number; speed:number; travel:number; radius:number; hue:number}[]=[];
     let raf=0,last=0,time=0,energy=0,visible=true;
     function draw(now:number) {
       raf=requestAnimationFrame(draw);
@@ -68,8 +69,10 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       c.globalCompositeOperation="source-over";
       c.fillStyle="#fffcf5"; c.fillRect(0,0,240,240);
       c.globalCompositeOperation="multiply";
+      const density=.23+.77*Math.sqrt(energy);
       plates.forEach((sites,k)=>{
         const hue=[193,328,54,233][k]+energy*[33,31,-21,48][k];
+        c.globalAlpha=k===3?.33:.86;
         c.fillStyle=`hsl(${hue} ${k===3?33:100}% ${k===3?13:49}%)`;
         const bearing=time*.5+k*Math.PI/2;
         const cx=29*Math.cos(bearing),cy=29*Math.sin(bearing);
@@ -79,14 +82,40 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           const fade=Math.min(1,Math.max(0,(edge-site.distance)/20));
           const dx=site.x-cx,dy=site.y-cy;
           const ink=Math.exp(-(dx*dx+dy*dy)/2400);
-          const amount=fade*(.13+.67*ink+.55*energy)-site.threshold*.56;
+          const amount=fade*(.18+.69*ink+.18*energy)-site.threshold*.55;
+          const emerge=Math.min(1,Math.max(0,(density-site.threshold)*10));
+          if(!emerge)continue;
           if(amount<=.015)continue;
-          const radius=Math.min(4.3,4.6*Math.sqrt(amount)*Math.min(1,amount*5));
+          const radius=Math.min(4.3,4.15*Math.sqrt(amount)*Math.min(1,amount*5)*emerge*(k===3?.68:1));
           c.moveTo(120+site.x+radius,120+site.y);
           c.arc(120+site.x,120+site.y,radius,0,Math.PI*2);
         }
         c.fill();
       });
+      if(reduce.matches)flares.length=0;
+      else if(Math.random()<1-Math.exp(-dt*energy*12)){
+        const direction=Math.random()*Math.PI*2;
+        const count=1+Math.floor(energy*4);
+        for(let i=0;i<count && flares.length<80;i++){
+          const angle=direction+(Math.random()-.5)*.55;
+          const start=61+energy*12+5*Math.sin(3*angle+time);
+          flares.push({angle,start,reach:113-start,speed:22+Math.random()*28,travel:0,
+            radius:1.6+Math.random()*2,hue:[193,328,54][Math.floor(Math.random()*3)]});
+        }
+      }
+      for(let i=flares.length-1;i>=0;i--){
+        const dot=flares[i];
+        dot.travel+=dt*dot.speed;
+        const remaining=1-dot.travel/dot.reach;
+        if(remaining<=0){flares.splice(i,1);continue;}
+        const distance=dot.start+dot.travel;
+        c.globalAlpha=.85*remaining*remaining;
+        c.fillStyle=`hsl(${dot.hue} 100% 49%)`;
+        c.beginPath();
+        c.arc(120+distance*Math.cos(dot.angle),120+distance*Math.sin(dot.angle),dot.radius*remaining,0,Math.PI*2);
+        c.fill();
+      }
+      c.globalAlpha=1;
     }
     function sync(){cancelAnimationFrame(raf);if(visible&&!document.hidden){last=performance.now()-110;draw(performance.now());}}
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync();});observer.observe(node);
