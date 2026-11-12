@@ -21,7 +21,7 @@ function arrangement(motif:number,count:number) {
     let y=Math.sin(angle)*spread*(.4+.6*step);
     if(motif===0){x=(n%4-1.5)*10; y=(Math.floor(n/4)-1)*12;}
     if(motif===1){x=(n-5)*4; y=Math.sin(angle)*spread;}
-    const jitter=1.5;
+    const jitter=2+count/6;
     x+=(Math.random()-.5)*jitter+satellite*5;
     y+=(Math.random()-.5)*jitter-satellite*4;
     return {x,y,r: satellite?2+Math.random()*4:5+Math.random()*8,visible:i<count?1:0};
@@ -45,7 +45,7 @@ export function MomentumLoader({active=true,variant="lattice",size=112}:{
     const reduced=matchMedia("(prefers-reduced-motion: reduce)");
     let last=performance.now(),raf=0;
     let count=6, motif=index;
-    let from=arrangement(motif,count), to=from;
+    let from=arrangement(motif,count), to=arrangement(motif,count);
     state.phase=0;
     function draw(now:number){
       const dt=Math.min(.05,(now-last)/1000);last=now;
@@ -55,29 +55,18 @@ export function MomentumLoader({active=true,variant="lattice",size=112}:{
       if(Math.abs(target-state.speed)<.003)state.speed=target;
       if(!reduced.matches){
         state.angle=(state.angle+dt*100*state.speed)%360;
-        state.phase+=dt*.46*state.speed;
+        state.phase+=dt*.65*state.speed;
         if(state.phase>=1){
           state.phase-=1; from=to;
-          const previousCount=count;
-          count=Math.min(24,count+2);
+          count=Math.min(24,count+2+Math.floor(Math.random()*4));
           motif=(motif+1+Math.floor(Math.random()*2))%3;
-          const sketch=arrangement(motif,count);
-          // Grow each new pair beside an existing pair. Move established parts
-          // only a short distance toward the new motif on each transition.
-          from=from.map((part,i)=>i>=previousCount && i<count
-            ? {...from[i-2],r:0,visible:0} : part);
-          to=sketch.map((goal,i)=>{
-            const start=from[i], dx=goal.x-start.x, dy=goal.y-start.y;
-            const step=Math.min(.48,6/Math.max(1,Math.hypot(dx,dy)));
-            return {...goal,x:start.x+dx*step,y:start.y+dy*step,
-              r:start.visible?start.r+(goal.r-start.r)*.24:goal.r};
-          });
+          to=arrangement(motif,count);
         }
       }
       if(!active && state.speed===0 && count>6){count=6;from=to=arrangement(index,count);state.phase=0;}
       rotor.setAttribute("transform",`rotate(${state.angle} 50 50)`);
       const fraction=state.phase;
-      const t=fraction**3*(fraction*(6*fraction-15)+10);
+      const t=fraction*fraction*(3-2*fraction);
       parts.forEach((part,i)=>{
         const a=from[i],b=to[i];
         const amount=state.speed;
