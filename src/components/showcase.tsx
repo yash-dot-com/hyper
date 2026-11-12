@@ -49,39 +49,26 @@ const buttonGestures = {
   whileTap: { y: 0, scale: 0.97 },
 };
 
-function ActionPill({label,copied,onCopy,href}:{label:string;copied:boolean;onCopy:()=>void;href?:string}){
+function CopyAction({label,copied,onCopy}:{label:string;copied:boolean;onCopy:()=>void}){
   const reduced=useReducedMotion();
-  const Element=href?motion.a:motion.button;
-  const Icon=href?(label==="Star on GitHub"?Star:ArrowUpRight):Copy;
-  const diameter=32, restingWidth=href?Math.max(86,label.length*7+36):label==="Copy prompt"?118:104;
+  const diameter=32, restingWidth=label==="Copy prompt"?118:104;
   return <span style={{display:"flex",justifyContent:"flex-end",width:restingWidth,flexShrink:0}}>
-    <Element {...(href?{href,target:"_blank",rel:"noopener noreferrer"}:{type:"button" as const})} className={buttonVariants()+" prompt-action"} aria-label={label} onClick={onCopy}
+    <MotionButton className="prompt-action" aria-label={label} onClick={onCopy}
       style={{position:"relative",overflow:"hidden",height:diameter,padding:0}}
       initial={false} animate={{width:copied&&!reduced?diameter:restingWidth}}
       transition={{duration:reduced?0:.24,ease:[.32,0,.16,1]}}>
       <motion.span aria-hidden="true" initial={false} animate={{opacity:copied?0:1}}
         transition={{duration:reduced?0:.1,delay:copied||reduced?0:.12}}
         style={{display:"inline-flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
-        <Icon/>{label}
+        <Copy/>{label}
       </motion.span>
       <svg aria-hidden="true" viewBox="0 0 24 24" style={{position:"absolute",width:18,height:18,color:"#7ce4a0"}}>
         <motion.path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           initial={false} animate={{pathLength:copied?1:0,opacity:copied?1:0}}
           transition={{duration:reduced?0:copied?.19:.08,delay:copied&&!reduced?.24:0}}/>
       </svg>
-    </Element>
+    </MotionButton>
   </span>;
-}
-
-function ProfileLink({label,href}:{label:string;href:string}) {
-  const [active,setActive]=useState(false);
-  const timer=useRef<number|undefined>(undefined);
-  useEffect(()=>()=>window.clearTimeout(timer.current),[]);
-  return <ActionPill label={label} href={href} copied={active} onCopy={()=>{
-    window.clearTimeout(timer.current);
-    setActive(true);
-    timer.current=window.setTimeout(()=>setActive(false),1000);
-  }}/>;
 }
 
 function KineticVideo({ fullSize = false }: { fullSize?: boolean }) {
@@ -390,7 +377,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     <header className="detail-head">
       <h1>{item.title}</h1>
       <div className="detail-actions"><RepositoryAction/>
-        <ActionPill label="Copy prompt" copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
+        <CopyAction label="Copy prompt" copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
       </div>
     </header>
     <p className="component-description">{item.description}</p>
@@ -477,7 +464,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     <section className="source-section" aria-labelledby="source-title">
       <div className="source-heading">
         <h2 id="source-title">{isSkill?"Skill":"Code"}</h2>
-        <ActionPill label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
+        <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
       </div>
       <div className="editor-frame">
         <pre className="editor" tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
@@ -529,8 +516,12 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
               ["GitHub", "https://github.com/yash-dot-com"],
               ["LinkedIn", "https://www.linkedin.com/in/yash-sonalekar/"],
               ["YouTube", "https://www.youtube.com/@Yashhh02"],
-              ["Star on GitHub", repositoryUrl],
-            ].map(([label, href]) => <ProfileLink key={href} label={label} href={href}/>)}
+            ].map(([label, href]) => <motion.a {...buttonGestures} className={buttonVariants()} key={label} href={href} target="_blank" rel="me noopener noreferrer">
+              {label}<ArrowUpRight size={15} aria-hidden="true"/>
+            </motion.a>)}
+            <motion.a {...buttonGestures} className={buttonVariants()} href={repositoryUrl} target="_blank" rel="noopener noreferrer">
+              <Star size={15} aria-hidden="true"/>Star on GitHub
+            </motion.a>
           </nav>
         </div>
       </section> : index < 0 ? <>
