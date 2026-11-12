@@ -17,6 +17,24 @@ function generator(seed:number) {
   };
 }
 
+function wingContour(seed:number,companion:boolean) {
+  if(!seed)return outline;
+  const random=generator(seed^(companion?0x615eaa:0x1408dd));
+  // Alternate which butterfly gets the long forewing and tapered hindwing.
+  const pointed=Boolean(seed&1)!==companion;
+  const tipX=(pointed?89:70)+random()*10;
+  const tipY=(pointed?-77:-60)+random()*8;
+  const notch=36+random()*16;
+  const hip=58+random()*18;
+  const hindwing=pointed
+    ? `Q${hip+5} 38 ${hip-7} 39 Q${hip-11} 45 ${hip-16} ${56+random()*8} Q${hip-20} 50 ${hip-22} 47`
+    : `C${hip+4} 50 ${hip-6} 62 ${hip-18} 57 Q${hip-25} 64 ${hip-31} 54`;
+  return `M2 -7 Q28 -51 ${tipX} ${tipY}
+    Q${pointed?tipX+3:tipX+26} ${pointed?tipY+2:tipY-8} ${pointed?tipX-2:tipX+19} -34
+    Q85 -2 ${notch} 5 Q${hip+4} 13 ${hip} 31
+    ${hindwing} Q12 55 2 12 Z`;
+}
+
 function pigment(hue:number,saturation:number,light:number) {
   return [0,8,4].map(offset=>{
     const k=(offset+hue/30)%12;
@@ -24,15 +42,15 @@ function pigment(hue:number,saturation:number,light:number) {
   });
 }
 
-export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0 }: {hue?:number;seed?:number;patternSeed?:number} = {}) {
+export function HalftoneButterfly({ hue=0, seed=0, patternSeed=0, shapeSeed=0 }: {hue?:number;seed?:number;patternSeed?:number;shapeSeed?:number} = {}) {
   return <div role="img" aria-label="Two flying butterflies with distinct color-shifting halftone wings"
     style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
-    <ButterflyLayer patternSeed={patternSeed} seed={seed} companion={false}/>
-    <ButterflyLayer patternSeed={patternSeed} seed={seed} companion/>
+    <ButterflyLayer shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed} companion={false}/>
+    <ButterflyLayer shapeSeed={shapeSeed} patternSeed={patternSeed} seed={seed} companion/>
   </div>;
 }
 
-function ButterflyLayer({seed,patternSeed,companion}:{seed:number;patternSeed:number;companion:boolean}) {
+function ButterflyLayer({seed,patternSeed,shapeSeed,companion}:{seed:number;patternSeed:number;shapeSeed:number;companion:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
   const flight=useRef({t:companion?3.4:0,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:companion?2:0,destination:companion?2:0,
     route:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
@@ -40,9 +58,10 @@ function ButterflyLayer({seed,patternSeed,companion}:{seed:number;patternSeed:nu
     const node=canvas.current!,ctx=node.getContext("2d");
     if(!ctx)return;
     ctx.resetTransform();
-    const wing=new Path2D(outline);
+    const silhouette=wingContour(shapeSeed,companion);
+    const wing=new Path2D(silhouette);
     const contour=document.createElementNS("http://www.w3.org/2000/svg","path");
-    contour.setAttribute("d",outline);
+    contour.setAttribute("d",silhouette);
     const length=contour.getTotalLength(), count=Math.ceil(length/2);
     const rim=Array.from({length:count},(_,i)=>{
       const {x,y}=contour.getPointAtLength(i*length/count);
@@ -198,6 +217,6 @@ function ButterflyLayer({seed,patternSeed,companion}:{seed:number;patternSeed:nu
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
     return ()=>{Object.assign(flight.current,{t,destination,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[seed,patternSeed,companion]);
+  },[seed,patternSeed,shapeSeed,companion]);
   return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
