@@ -527,7 +527,7 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
           <p>Hyper is an open-source directory of small experiments in motion and interaction.<br/>
             Try a component, take its code, or give your coding agent one of the UI skills or prompts.
           </p>
-          <p>Made a weird, esoteric component or UI skill? Feel free to add it to the directory.</p>
+          <p>Feel free to contribute components or AI skills.</p>
         </header>
         {directorySections.map(({category, items}) => <section className="gallery-section" key={category}>
           <h2>{category}</h2>
