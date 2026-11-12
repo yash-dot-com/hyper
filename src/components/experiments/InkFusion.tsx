@@ -1,11 +1,22 @@
 "use client";
 
-import { useId, useRef, type ComponentPropsWithoutRef, type PointerEvent } from "react";
+import { useEffect, useState, useId, useRef, type ComponentPropsWithoutRef, type PointerEvent } from "react";
 
 export function InkFusion({ children, ink = "#1c1918", style, className = "", ...props }:
   ComponentPropsWithoutRef<"div"> & { ink?: string }) {
   const filter = useId();
   const svg = useRef<SVGSVGElement>(null);
+  const [grid,setGrid]=useState({width:160,height:150});
+  useEffect(()=>{
+    const node=svg.current!;
+    const observer=new ResizeObserver(([entry])=>{
+      const {width,height}=entry.contentRect;
+      if(width && height)setGrid({width,height});
+    });
+    observer.observe(node);
+    return ()=>observer.disconnect();
+  },[]);
+  const columns=Math.ceil(grid.width/21)+1, rows=Math.ceil(grid.height/21)+1;
   function track(event: PointerEvent<HTMLDivElement>) {
     const matrix = svg.current?.getScreenCTM();
     if (!matrix || !svg.current) return;
@@ -26,16 +37,16 @@ export function InkFusion({ children, ink = "#1c1918", style, className = "", ..
     onPointerLeave={e=>{reset();props.onPointerLeave?.(e)}}
     onPointerCancel={e=>{reset();props.onPointerCancel?.(e)}}
     onPointerUp={e=>{if(e.pointerType==="touch")reset();props.onPointerUp?.(e)}} className={`ink-fusion ${className}`} style={{position:"relative",isolation:"isolate",...style}}>
-    <svg ref={svg} className="ink-fusion-field" aria-hidden="true" focusable="false" viewBox="0 0 160 150" preserveAspectRatio="xMidYMid slice"
+    <svg ref={svg} className="ink-fusion-field" aria-hidden="true" focusable="false" viewBox={`0 0 ${grid.width} ${grid.height}`} preserveAspectRatio="xMidYMid slice"
       style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",borderRadius:"inherit",zIndex:-1}}>
       <defs><filter id={filter} x="-15%" y="-15%" width="130%" height="130%" colorInterpolationFilters="sRGB">
         <feGaussianBlur stdDeviation="2.3"/>
         <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -8"/>
       </filter></defs>
       <g fill={ink} filter={`url(#${filter})`}>
-        {Array.from({length:49},(_,i)=>{
-          const x=i%7, y=Math.floor(i/7);
-          return <circle key={i} cx={13+x*21+(y%2)*9} cy={12+y*21} r={4+(x*3+y*5)%3}/>;
+        {Array.from({length:columns*rows},(_,i)=>{
+          const x=i%columns, y=Math.floor(i/columns);
+          return <circle key={i} cx={x*21+(y%2)*9} cy={y*21} r={4+(x*3+y*5)%3}/>;
         })}
       </g>
     </svg>

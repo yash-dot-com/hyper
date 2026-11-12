@@ -118,7 +118,7 @@ function InkStickerSheet() {
   return <div className="ink-sticker-sheet">{(["disc","arrow","spark","bow","vase","cube"] as const).map(shape=><HalftoneSticker key={shape} shape={shape}/>)}</div>;
 }
 function FusionSample({fullSize=false}: {fullSize?:boolean} = {}) {
-  return <InkFusion className="fusion-sample" style={{width:fullSize?320:168,maxWidth:"100%",aspectRatio:"16 / 15",background:"#c9cec3"}} role="img" aria-label="Interactive ink dot pattern" tabIndex={0}/>;
+  return <InkFusion className="fusion-sample" style={{width:fullSize?"100%":168,height:fullSize?"100%":undefined,maxWidth:"100%",aspectRatio:"16 / 15",background:"#c9cec3"}} role="img" aria-label="Interactive ink dot pattern" tabIndex={0}/>;
 }
 function MomentumSheet({fullSize=false}: {fullSize?:boolean} = {}) {
   const [running,setRunning]=useState(true);
@@ -126,7 +126,7 @@ function MomentumSheet({fullSize=false}: {fullSize?:boolean} = {}) {
     <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",width:fullSize?"min(96%,560px)":"min(96%,300px)"}}>
       {(["lattice","relay","bloom"] as const).map(variant=><MomentumLoader key={variant} variant={variant} active={running} size="100%"/>)}
     </div>
-    {fullSize && <Button variant="outline" onClick={()=>setRunning(!running)}>{running?"Wind down":"Spin again"}</Button>}
+    {fullSize && <button type="button" className="momentum-toggle" onClick={()=>setRunning(!running)}>{running?"Wind down":"Spin again"}</button>}
   </div>;
 }
 const collection = [

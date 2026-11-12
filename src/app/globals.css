@@ -269,3 +269,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .art-parallax-ink-stickers .mini .ink-sticker-sheet {max-width:310px;padding:12px;gap:6px}
 .stage.art-ink-fusion,.art-ink-fusion .mini {background:#c9cec3;grid-template:minmax(0,1fr)/minmax(0,1fr)}
 .stage.art-momentum-loaders,.art-momentum-loaders .mini {background:#080809;grid-template-columns:minmax(0,1fr)}
+.momentum-toggle {background:#272727;color:#f3f1eb;border:1px solid #60605c;border-radius:999px;min-width:108px;padding:9px 16px;cursor:pointer;font:inherit}
+.momentum-toggle:hover {background:#383836;border-color:#878782}
+.momentum-toggle:focus-visible {outline:2px solid #ffd620;outline-offset:3px}
