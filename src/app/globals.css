@@ -215,3 +215,9 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .pixel-controls input[type=range] { max-width:120px; height:28px; accent-color:#e9d89e; }
 
 .art-agent-portrait .mini, .stage.art-agent-portrait { background: #f3ecd9; }
+
+.stage.art-kawaii-face-kit,.art-kawaii-face-kit .mini { background:#f5e3e7; }
+.face-sheet {display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px;margin-top:20px}
+.face-sheet button {display:grid;justify-items:center;padding:6px 2px 9px;background:#212020;border:1px solid var(--edge);border-radius:10px;font-size:11px;text-transform:capitalize}
+.face-sheet button:hover {background:#30292c}
+.face-sheet button[aria-pressed=true] {border-color:#edaac0;background:#352a30}
