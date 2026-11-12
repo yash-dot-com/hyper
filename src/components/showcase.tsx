@@ -16,11 +16,11 @@ const buttonGestures = {
 };
 
 function KineticPoster() {
-  return <img src="/kinetic-paragraph/poster.png" alt="" width={1280} height={720} loading="lazy"/>;
+  return <img src="/kinetic-paragraph/poster.webp" alt="" width={720} height={720} loading="lazy"/>;
 }
 
 const collection = [
-  { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Blocks of mint and apricot mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", component: "KineticParagraph", icon: Type, preview: KineticPoster },
+  { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Colored highlights mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", component: "KineticParagraph", icon: Type, preview: KineticPoster },
   { title: "Orbit", description: "Three satellites trace intersecting ellipses around an amber sun. Each follows its own path through the same twelve-second loop.", slug: "orbit", component: "Orbit", icon: OrbitIcon, preview: Orbit },
   { title: "Chromatic", description: "Translucent planes fan out, then fold back together. Lilac and coral overlap to form deeper shades as the angles change.", slug: "chromatic", component: "Chromatic", icon: Sparkles, preview: Chromatic },
   { title: "Card stack", description: "Three pastel cards sit at slightly different angles. Click the front card or press Enter while it has focus to send it to the back.", slug: "card-stack", component: "CardStack", icon: Layers2, preview: CardStack },
@@ -78,7 +78,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     <p className="component-description">{item.description}</p>
     <section className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
       {isVideo ? (
-        <video controls playsInline muted loop preload="none" poster="/kinetic-paragraph/poster.png" aria-label="Kinetic paragraph animation" src="/kinetic-paragraph/preview.mp4"/>
+        <video controls playsInline muted loop preload="none" poster="/kinetic-paragraph/poster.webp" aria-label="Kinetic paragraph animation" src="/kinetic-paragraph/preview.mp4"/>
       ) : <>
       <div className="piece" key={version}><Preview playing={playing}/></div>
       <div className="playback">
