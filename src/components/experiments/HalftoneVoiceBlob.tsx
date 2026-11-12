@@ -75,8 +75,8 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       const gathering=cycle<2.05 && !reduce.matches && !!audio.current;
       gather=Math.max(0,Math.min(1,gather+(gathering?1.5:-1.35)*dt));
       const ring=gather*gather*(3-2*gather);
-      if(gather===0)rotation=0;
-      else rotation+=dt*3.6*ring;
+      // Ease angular speed while preserving the heading reached by each ink plate.
+      rotation+=dt*3.6*ring;
       const c=ctx!;
       c.setTransform(node.width/240,0,0,node.height/240,0,0);
       c.globalCompositeOperation="source-over";
@@ -86,6 +86,7 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       const roll=Math.sin(time*.8)*.14, cos=Math.cos(roll), sin=Math.sin(roll);
       plates.forEach((sites,k)=>{
         const spin=rotation*[.86,1.12,1,.93][k];
+        const spinCos=Math.cos(spin), spinSin=Math.sin(spin);
         const hue=[193,328,54,233][k]+energy*[33,31,-21,48][k];
         c.globalAlpha=k===3?.23:.91;
         c.fillStyle=`hsl(${hue} ${k===3?33:100}% ${k===3?13:49}%)`;
@@ -110,13 +111,13 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           let y=site.x*sin+site.y*cos+(1.6+energy*3)*Math.cos(time*1.3+drift);
           if(ring>0){
             const start=Math.atan2(y,x);
-            const angle=start+spin*ring+ring*(1-ring)*1.8;
             const r=Math.hypot(x,y)*(1-ring)+(50+site.distance*.42)*ring;
-            x=Math.cos(angle)*r; y=Math.sin(angle)*r;
+            x=Math.cos(start)*r; y=Math.sin(start)*r;
           }
-          x+=120; y+=120;
-          c.moveTo(x+radius,y);
-          c.arc(x,y,radius,0,Math.PI*2);
+          const screenX=120+x*spinCos-y*spinSin;
+          const screenY=120+x*spinSin+y*spinCos;
+          c.moveTo(screenX+radius,screenY);
+          c.arc(screenX,screenY,radius,0,Math.PI*2);
         }
         c.fill();
       });
