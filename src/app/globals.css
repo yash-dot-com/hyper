@@ -236,3 +236,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .art-embossed-badges .mini,.stage.art-embossed-badges {background:#faf9f7}
 
 .art-jelly-avatar .mini,.stage.art-jelly-avatar {background:#fffdfd}
+
+.stage.art-glass-bubbles,.art-glass-bubbles .mini {background:radial-gradient(ellipse at 82% 110%,#132237,#101319 68%)}
