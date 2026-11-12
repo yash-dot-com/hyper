@@ -1,4 +1,6 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { useEffect, useRef } from "react";
 
 // Each digit is a palette index. Dots are transparent, including the background.
 export const portraits = {
@@ -75,33 +77,82 @@ type Props = {
 export function PixelCharacter({ shape = "wave", colors, speed = 1, size = 192, label = "Pixel character" }: Props) {
   const palette = colors?.length ? colors : palettes[defaultPalettes[shape]];
   const rate = Number.isFinite(speed) ? Math.max(0, speed) : 1;
-  const timing = {
-    width: size, height: "auto", maxWidth: "100%", display: "block",
-    "--pixel-beat": (4 / (rate || 1)) + "s",
-    "--pixel-play": rate ? "running" : "paused",
-  } as CSSProperties;
+  const root = useRef<SVGSVGElement>(null);
+  useEffect(() => {
+    const svg = root.current;
+    if (!svg || !rate) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const timers = new Set<number>();
+    const animations = new Set<Animation>();
+    const between = (min: number, max: number) => min + Math.random() * (max - min);
+
+    function later(callback: () => void, delay: number) {
+      const timer = window.setTimeout(() => {
+        timers.delete(timer);
+        callback();
+      }, delay / rate);
+      timers.add(timer);
+    }
+
+    function move(selector: string, poses: string[], duration: number) {
+      for (const part of svg!.querySelectorAll(selector)) {
+        const animation = part.animate(poses.map(transform => ({ transform })), {
+          duration: duration / rate, easing: "steps(2, end)",
+        });
+        animations.add(animation);
+        animation.onfinish = () => animations.delete(animation);
+      }
+    }
+
+    let previous = -1;
+    function gesture() {
+      // Choose a different gesture each time, then vary its reach and dwell.
+      const kind = (previous + 1 + Math.floor(between(0, previous < 0 ? 3 : 2))) % 3;
+      previous = kind;
+      const duration = between(560, 1300);
+      const tilt = between(4, 9) * (Math.random() < 0.5 ? -1 : 1);
+      const peak = kind === 0 ? `rotate(${tilt}deg)` :
+        kind === 1 ? "translateY(-.7px)" : `translateY(.35px) rotate(${tilt / 2}deg)`;
+      move(".px-pose", ["none", peak, peak, "none"], duration);
+      if (Math.random() < 0.75) move(".px-pupils", ["none", "translateX(1px)", "translateX(1px)", "none"], duration * 0.9);
+      if (Math.random() < 0.65) later(() => move(".px-fringe", ["none", "translateY(-1px)", "none"], 260), duration * 0.28);
+      later(gesture, duration + between(180, 1900));
+    }
+
+    function blink() {
+      const close = () => move(".px-eyes", ["none", "scaleY(.16)", "none"], 150);
+      close();
+      if (Math.random() < 0.18) later(close, 240);
+      later(blink, between(1900, 5600));
+    }
+
+    function stop() {
+      timers.forEach(timer => window.clearTimeout(timer));
+      timers.clear();
+      animations.forEach(animation => animation.cancel());
+      animations.clear();
+    }
+    function sync() {
+      stop();
+      if (reduced.matches || document.hidden) return;
+      later(gesture, between(120, 650));
+      later(blink, between(700, 2800));
+    }
+    sync();
+    reduced.addEventListener("change", sync);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      stop();
+      reduced.removeEventListener("change", sync);
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, [rate, shape]);
+
   return (
-    <svg viewBox="-2 -2 16 16" style={timing} role="img" aria-label={label} shapeRendering="crispEdges">
+    <svg ref={root} viewBox="-2 -2 16 16" style={{ width: size, height: "auto", maxWidth: "100%", display: "block" }} role="img" aria-label={label} shapeRendering="crispEdges">
       <style>{`
-        .px-pose, .px-fringe, .px-eyes, .px-pupils { animation: var(--pixel-beat) steps(1,end) infinite; animation-play-state:var(--pixel-play); }
-        .px-pose { animation-name:px-look; transform-box:fill-box; transform-origin:50% 85%; }
-        @keyframes px-look {
-          0%, 55%, 100% { transform:none; }
-          12% { transform:translateY(.25px) rotate(-3deg); }
-          22% { transform:translateY(-.5px) rotate(4deg); }
-          28% { transform:translateY(-.75px) rotate(8deg); }
-          45% { transform:translateY(-.25px) rotate(4deg); }
-          65% { transform:translateY(.5px) rotate(-2deg); }
-          74% { transform:translateY(-.25px) rotate(-6deg); }
-          90% { transform:rotate(-3deg); }
-        }
-        .px-fringe { animation-name:px-twitch; }
-        .px-eyes { animation-name:px-blink; transform-box:fill-box; transform-origin:center; }
-        .px-pupils { animation-name:px-glance; }
-        @keyframes px-twitch { 0%,40%,100% {transform:none} 32% {transform:translateY(-1px)} }
-        @keyframes px-blink { 0%,71%,100% {transform:none} 68% {transform:scaleY(.18)} }
-        @keyframes px-glance { 0%,58%,100% {transform:none} 24% {transform:translateX(1px)} }
-        @media (prefers-reduced-motion:reduce) { .px-pose,.px-fringe,.px-eyes,.px-pupils {animation:none} }
+        .px-pose { transform-box:fill-box; transform-origin:50% 85%; }
+        .px-eyes { transform-box:fill-box; transform-origin:center; }
       `}</style>
       <g className="px-pose">
         {portraits[shape].map((row, y) => [...row].map((index, x) => {
