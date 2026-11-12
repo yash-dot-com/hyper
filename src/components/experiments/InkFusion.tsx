@@ -6,6 +6,8 @@ export function InkFusion({ children, ink = "#1c1918", style, className = "", ..
   ComponentPropsWithoutRef<"div"> & { ink?: string }) {
   const filter = useId();
   const svg = useRef<SVGSVGElement>(null);
+  const previous=useRef<DOMPoint|null>(null);
+  const trailTimer=useRef<number|undefined>(undefined);
   const [grid,setGrid]=useState({width:160,height:150});
   useEffect(()=>{
     const node=svg.current!;
@@ -14,21 +16,40 @@ export function InkFusion({ children, ink = "#1c1918", style, className = "", ..
       if(width && height)setGrid({width,height});
     });
     observer.observe(node);
-    return ()=>observer.disconnect();
+    return ()=>{observer.disconnect();window.clearTimeout(trailTimer.current);};
   },[]);
   const columns=Math.ceil(grid.width/21)+1, rows=Math.ceil(grid.height/21)+1;
   function track(event: PointerEvent<HTMLDivElement>) {
     const matrix = svg.current?.getScreenCTM();
     if (!matrix || !svg.current) return;
     const point = new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse());
+    const start=previous.current ?? point;
+    previous.current=point;
+    const vx=point.x-start.x, vy=point.y-start.y;
+    const lengthSquared=vx*vx+vy*vy;
+    const swept: SVGCircleElement[]=[];
+    window.clearTimeout(trailTimer.current);
     for (const dot of svg.current.querySelectorAll("circle")) {
-      const dx = point.x-dot.cx.baseVal.value, dy = point.y-dot.cy.baseVal.value;
-      const falloff = Math.max(0,1-Math.hypot(dx,dy)/48);
-      const pull = falloff*falloff*(3-2*falloff);
-      dot.style.transform = `translate(${dx*.28*pull}px,${dy*.28*pull}px) scale(${1+1.65*pull})`;
+      const x=dot.cx.baseVal.value, y=dot.cy.baseVal.value;
+      let dx=point.x-x, dy=point.y-y;
+      if(Math.hypot(dx,dy)>42 && lengthSquared>0){
+        // Hit-test the stroke between events, including on low-rate pointers.
+        const along=Math.max(0,Math.min(1,((x-start.x)*vx+(y-start.y)*vy)/lengthSquared));
+        dx=start.x+along*vx-x; dy=start.y+along*vy-y;
+        if(Math.hypot(dx,dy)<52)swept.push(dot);
+      }
+      const falloff=Math.max(0,1-Math.hypot(dx,dy)/52);
+      if(!falloff){dot.style.removeProperty("transform");continue;}
+      const pull=falloff*falloff*(3-2*falloff);
+      dot.style.transform=`translate(${dx*.34*pull}px,${dy*.34*pull}px) scale(${1+1.9*pull})`;
     }
+    if(swept.length)trailTimer.current=window.setTimeout(()=>{
+      swept.forEach(dot=>dot.style.removeProperty("transform"));
+    },55);
   }
   function reset() {
+    previous.current=null;
+    window.clearTimeout(trailTimer.current);
     svg.current?.querySelectorAll("circle").forEach(dot=>dot.style.removeProperty("transform"));
   }
   return <div {...props}
@@ -52,7 +73,8 @@ export function InkFusion({ children, ink = "#1c1918", style, className = "", ..
     </svg>
     {children}
     <style>{`
-      .ink-fusion > .ink-fusion-field circle {transform-box:fill-box;transform-origin:center;transition:transform 110ms ease-out}
+      .ink-fusion > .ink-fusion-field circle {transform-box:fill-box;transform-origin:center;transition:transform 125ms ease-out}
+      .ink-fusion > .ink-fusion-field circle[style*="transform:"] {transition-duration:12ms}
       .ink-fusion:focus-visible > .ink-fusion-field circle:nth-child(3n) {transform:scale(2)}
       @media(prefers-reduced-motion:reduce){.ink-fusion > .ink-fusion-field circle {transition:none!important}}
     `}</style>
