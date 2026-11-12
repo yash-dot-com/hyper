@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hype — Visual directory",
+  title: "Hyper — Visual directory",
   description: "An open-source directory of small experiments in motion and interaction. Preview the details, copy the source, or hand the prompt to your coding agent.",
 };
 

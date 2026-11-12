@@ -49,26 +49,39 @@ const buttonGestures = {
   whileTap: { y: 0, scale: 0.97 },
 };
 
-function CopyAction({label,copied,onCopy}:{label:string;copied:boolean;onCopy:()=>void}){
+function ActionPill({label,copied,onCopy,href}:{label:string;copied:boolean;onCopy:()=>void;href?:string}){
   const reduced=useReducedMotion();
-  const diameter=32, restingWidth=label==="Copy prompt"?118:104;
+  const Element=href?motion.a:motion.button;
+  const Icon=href?(label==="Star on GitHub"?Star:ArrowUpRight):Copy;
+  const diameter=32, restingWidth=href?Math.max(86,label.length*7+36):label==="Copy prompt"?118:104;
   return <span style={{display:"flex",justifyContent:"flex-end",width:restingWidth,flexShrink:0}}>
-    <MotionButton className="prompt-action" aria-label={label} onClick={onCopy}
+    <Element {...(href?{href,target:"_blank",rel:"noopener noreferrer"}:{type:"button" as const})} className={buttonVariants()+" prompt-action"} aria-label={label} onClick={onCopy}
       style={{position:"relative",overflow:"hidden",height:diameter,padding:0}}
       initial={false} animate={{width:copied&&!reduced?diameter:restingWidth}}
       transition={{duration:reduced?0:.24,ease:[.32,0,.16,1]}}>
       <motion.span aria-hidden="true" initial={false} animate={{opacity:copied?0:1}}
         transition={{duration:reduced?0:.1,delay:copied||reduced?0:.12}}
         style={{display:"inline-flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
-        <Copy/>{label}
+        <Icon/>{label}
       </motion.span>
       <svg aria-hidden="true" viewBox="0 0 24 24" style={{position:"absolute",width:18,height:18,color:"#7ce4a0"}}>
         <motion.path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           initial={false} animate={{pathLength:copied?1:0,opacity:copied?1:0}}
           transition={{duration:reduced?0:copied?.19:.08,delay:copied&&!reduced?.24:0}}/>
       </svg>
-    </MotionButton>
+    </Element>
   </span>;
+}
+
+function ProfileLink({label,href}:{label:string;href:string}) {
+  const [active,setActive]=useState(false);
+  const timer=useRef<number|undefined>(undefined);
+  useEffect(()=>()=>window.clearTimeout(timer.current),[]);
+  return <ActionPill label={label} href={href} copied={active} onCopy={()=>{
+    window.clearTimeout(timer.current);
+    setActive(true);
+    timer.current=window.setTimeout(()=>setActive(false),1000);
+  }}/>;
 }
 
 function KineticVideo({ fullSize = false }: { fullSize?: boolean }) {
@@ -204,27 +217,27 @@ function shuffleScopeColors(){
 function PrismDriftSample(){return <PrismDrift style={{width:"100%",height:"100%"}}/>;}
 
 const collection = [
-  {title:"Digital Kaleidoscope",description:"Drag across the glass or use the arrow keys to turn the mirrored pattern.",slug:"digital-kaleidoscope", category:"Generative art",component:"DigitalKaleidoscope",icon:Grid2X2,preview:()=> <DigitalKaleidoscope/>},
+  {title:"Digital Kaleidoscope",description:"Drag across the glass or use the arrow keys to turn the mirrored pattern.",slug:"digital-kaleidoscope", category:"Procedural art",component:"DigitalKaleidoscope",icon:Grid2X2,preview:()=> <DigitalKaleidoscope/>},
   {title:"Breathing Bands",description:"A single ribbon of stepped color expands and settles in a slow rhythm.",slug:"breathing-bands", category:"Footers",component:"BreathingBandsFooter",icon:Layers2,preview:()=> <BreathingBandsFooter/>},
-  {title:"Prism Drift",description:"Uneven vertical slices carry a rising color wave from citrus and pink into turquoise and violet.",slug:"prism-drift", category:"Generative art",component:"PrismDrift",icon:Layers2,preview:PrismDriftSample},
+  {title:"Prism Drift",description:"Uneven vertical slices carry a rising color wave from citrus and pink into turquoise and violet.",slug:"prism-drift", category:"Procedural art",component:"PrismDrift",icon:Layers2,preview:PrismDriftSample},
   {title:"Cut Ink Footer",description:"Cut-paper letters overlap in four grainy inks. Change the word or mix your own palette.",slug:"cut-ink-footer", category:"Footers",component:"CutInkFooter",icon:Layers2,preview:()=> <CutInkFooter/>},
   {title:"Spectrum Type",description:"Turn the angle to cast a tapered spectrum from the letters. Depth sets how far the color travels.",slug:"spectrum-type", category:"Type & lettering",component:"SpectrumType",icon:Type,preview:()=> <SpectrumType/>},
   {title:"Magnetic Stickers",description:"Six paper cuts lean toward your pointer and spring back into place when you leave.",slug:"magnetic-stickers", category:"Icons & stickers",component:"MagneticSticker",icon:Layers2,preview:MagneticSheet},
   {title:"Afterglow Footer",description:"A soft horizon and fine guide lines frame a word edged in fluorescent light.",slug:"afterglow-footer", category:"Footers",component:"AfterglowFooter",icon:Layers2,preview:()=> <AfterglowFooter/>},
-  {title:"Halftone Butterfly",description:"Five butterflies glide on separate paths. Shuffle their wings for new palettes and dot patterns.",slug:"halftone-butterfly", category:"Generative art",component:"HalftoneButterfly",icon:Layers2,preview:()=> <HalftoneButterfly/>},
-  {title:"Butterfly Meadow",description:"Six butterflies roam independently, alternating quick wingbeats with short glides. Move close to one to change its course.",slug:"butterfly-meadow", category:"Generative art",component:"ButterflyMeadow",icon:Layers2,preview:()=> <ButterflyMeadow/>},
+  {title:"Halftone Butterfly",description:"Five butterflies glide on separate paths. Shuffle their wings for new palettes and dot patterns.",slug:"halftone-butterfly", category:"Procedural art",component:"HalftoneButterfly",icon:Layers2,preview:()=> <HalftoneButterfly/>},
+  {title:"Butterfly Meadow",description:"Six butterflies roam independently, alternating quick wingbeats with short glides. Move close to one to change its course.",slug:"butterfly-meadow", category:"Procedural art",component:"ButterflyMeadow",icon:Layers2,preview:()=> <ButterflyMeadow/>},
   {title:"Meadow Footer",description:"Scroll inside the landscape to reveal the river and farm beyond the fields.",slug:"meadow-footer", category:"Footers",component:"MeadowFooter",icon:Layers2,preview:MeadowSample},
   {title:"Paper Noticeboard",description:"Four die-cut paper pieces hold a short set of notices. Give each piece a heading, a detail, and an optional link.",slug:"paper-noticeboard", category:"Interface elements",component:"PaperNoticeboard",icon:Layers2,preview:NoticeboardSample},
   {title:"Momentum Loaders",description:"Three spinning studies in squares and dots. Wind them down to watch each pattern fold into a single frame and dot.",slug:"momentum-loaders", category:"Interface elements",component:"MomentumLoader",icon:Layers2,preview:MomentumSheet},
-  {title:"Ink Fusion",description:"Move the pointer across the print. Nearby dots draw together and fuse, then release as you pass.",slug:"ink-fusion", category:"Generative art",component:"InkFusion",icon:Layers2,preview:FusionSample},
+  {title:"Ink Fusion",description:"Move the pointer across the print. Nearby dots draw together and fuse, then release as you pass.",slug:"ink-fusion", category:"Procedural art",component:"InkFusion",icon:Layers2,preview:FusionSample},
   {title:"Parallax Ink Stickers",description:"Move across a sticker to slide its dot screen over the yellow print.",slug:"parallax-ink-stickers", category:"Icons & stickers",component:"HalftoneSticker",icon:Layers2,preview:InkStickerSheet},
   {title:"Halftone Voice Blob",description:"Speech stirs the colored ink dots. Pause and they swirl into a spinning ring before drifting back.",slug:"halftone-voice-blob", category:"Avatars & voice",component:"HalftoneVoiceBlob",icon:Layers2,preview:()=> <HalftoneVoiceBlob microphone={false} size={180}/>},
   {title:"Frosted Tile Footer",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-footer", category:"Footers",component:"FrostedTileFooter",icon:Layers2,preview:()=> <FrostedTileFooter/>},
   {title:"Voice Blob",description:"Pigments drift through a single blob. Louder syllables accelerate the color changes; vocal tone shifts the core. Enable the microphone to shape it with sound; audio stays in your browser.",slug:"voice-blob", category:"Avatars & voice",component:"VoiceBlob",icon:Layers2,preview:()=> <VoiceBlob microphone={false} size={175}/>},
-  {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade", category:"Generative art",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
+  {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade", category:"Procedural art",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
   {title:"Isometric Block Type",description:"Cube-built pieces tumble onto an isometric plane and assemble into your text.",slug:"isometric-block-type", category:"Type & lettering",component:"IsoBlockType",icon:Type,preview:()=> <IsoBlockType/>},
   {title:"Block Type",description:"Falling pieces turn and lock into letterforms. Change the text to build a new word.",slug:"block-type", category:"Type & lettering",component:"BlockType",icon:Type,preview:()=> <BlockType/>},
-  {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the branching depth or seed to grow another tree.",slug:"procedural-tree", category:"Generative art",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
+  {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the branching depth or seed to grow another tree.",slug:"procedural-tree", category:"Procedural art",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
   {title:"Luminous Surfaces", description:"A frosted rim surrounds a pool of color. Move across a surface to shift its light, or select a finish to copy it.",slug:"luminous-surfaces", category:"Interface elements",component:"LuminousSurface",icon:Layers2,preview:LightSheet},
   {title:"Glass Bubbles", description:"Frosted edges catch the light around a pool of blue. The corner turns toward the sender as the message grows.", slug:"glass-bubbles", category:"Interface elements", component:"GlassBubble", icon:Layers2, preview:GlassThumbnail},
   {title:"Jelly Avatar", description:"A translucent avatar flows from a blue scallop to a pink ripple and a mint clover. Its color moves with its silhouette.", slug:"jelly-avatar", category:"Avatars & voice",component:"JellyAvatar",icon:Layers2,preview:JellyThumbnail},
@@ -236,7 +249,7 @@ const collection = [
   {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", category:"Icons & stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},
   { title: "Kawaii Face Kit", description: "A blushing face for a conversation. Pick an expression, then mix the eyes, mouth, and cheek color.", slug: "kawaii-face-kit", category:"Avatars & voice", component: "KawaiiFace", icon: Grid2X2, preview: KawaiiThumbnail },
   { title: "Pixel Character", description: "A little portrait built from colored squares. It glances to one side, tilts its head, and bobs back into place.", slug: "pixel-character", category:"Avatars & voice", component: "PixelCharacter", icon: Grid2X2, preview: PixelThumbnail },
-  { title: "Motif Globe", description: "Continents turn across a field of shifting geometric marks. A band of teal, gold, and coral travels over the surface as the globe rotates.", slug: "motif-globe", category:"Generative art", component: "MotifGlobe", icon: Globe, preview: GlobeDemo },
+  { title: "Motif Globe", description: "Continents turn across a field of shifting geometric marks. A band of teal, gold, and coral travels over the surface as the globe rotates.", slug: "motif-globe", category:"Procedural art", component: "MotifGlobe", icon: Globe, preview: GlobeDemo },
   { title: "Image Ripple Loader", description: "A grid of tiny marks lights up in passing waves. Watch the rings travel outward in a disc, or follow a band of color across the full frame.", slug: "image-ripple-loader", category:"Interface elements", component: "ImageRippleLoader", icon: Layers2, preview: RippleThumbnail },
   { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Colored highlights mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", category:"Type & lettering", component: "KineticParagraph", icon: Type, preview: KineticVideo },
 ];
@@ -376,7 +389,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   return <>
     <header className="detail-head">
       <h1>{item.title}</h1>
-      <CopyAction label="Copy prompt" copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
+      <div className="detail-actions"><RepositoryAction/>
+        <ActionPill label="Copy prompt" copied={feedback==="prompt"} onCopy={()=>copy("prompt")}/>
+      </div>
     </header>
     <p className="component-description">{item.description}</p>
     {item.slug === "halftone-butterfly" && <div className="demo-modes">
@@ -462,7 +477,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     <section className="source-section" aria-labelledby="source-title">
       <div className="source-heading">
         <h2 id="source-title">{isSkill?"Skill":"Code"}</h2>
-        <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
+        <ActionPill label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
       </div>
       <div className="editor-frame">
         <pre className="editor" tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
@@ -489,7 +504,7 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
   return <MotionConfig reducedMotion="user" transition={{ type: "spring", stiffness: 460, damping: 32 }}>
     <div className="library">
     <aside className={open ? "rail open" : "rail"}>
-      <div className="rail-head"><motion.a whileHover={{ rotate: -2, scale: 1.035 }} whileTap={{ rotate: 0, scale: 0.97 }} className="wordmark" href="#home" onClick={() => setOpen(false)}>hype</motion.a>
+      <div className="rail-head"><motion.a whileHover={{ rotate: -2, scale: 1.035 }} whileTap={{ rotate: 0, scale: 0.97 }} className="wordmark" href="#home" onClick={() => setOpen(false)}>hyper</motion.a>
         <motion.button {...buttonGestures} className="menu-toggle" aria-expanded={open} aria-label="Component navigation" onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</motion.button>
       </div>
       <nav aria-label="Directory navigation" onClick={event => { if ((event.target as Element).closest("a")) setOpen(false); }}>
@@ -502,29 +517,25 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
       </nav>
     </aside>
     <main className="canvas" key={slug}>
-      {slug !== "about" && <RepositoryAction/>}
+      {slug !== "about" && index < 0 && <RepositoryAction/>}
       {slug === "about" ? <section className="author-profile" aria-labelledby="author-name">
         <header className="detail-head"><h1 id="author-name" className="author-block-name" aria-label="Yash Sonalekar"><BlockType text="yash sonalekar"/></h1></header>
         <div className="author-story">
           <p className="author-lead">I’m a software engineering student who likes building things for the web.</p>
-          <p className="component-description">Hype is my place to play with small details. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
+          <p className="component-description">Hyper is my place to play with small details. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
           <p className="component-description">Every experiment comes with its code so you can take it apart and make it yours.</p>
           <nav className="author-links" aria-label="Social profiles and project repository">
             {[
               ["GitHub", "https://github.com/yash-dot-com"],
               ["LinkedIn", "https://www.linkedin.com/in/yash-sonalekar/"],
               ["YouTube", "https://www.youtube.com/@Yashhh02"],
-            ].map(([label, href]) => <motion.a {...buttonGestures} className={buttonVariants()} key={label} href={href} target="_blank" rel="me noopener noreferrer">
-              {label}<ArrowUpRight size={15} aria-hidden="true"/>
-            </motion.a>)}
-            <motion.a {...buttonGestures} className={buttonVariants()} href={repositoryUrl} target="_blank" rel="noopener noreferrer">
-              <Star size={15} aria-hidden="true"/>Star on GitHub
-            </motion.a>
+              ["Star on GitHub", repositoryUrl],
+            ].map(([label, href]) => <ProfileLink key={href} label={label} href={href}/>)}
           </nav>
         </div>
       </section> : index < 0 ? <>
         <header className="directory-intro">
-          <p>Hype is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
+          <p>Hyper is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
         </header>
         {directorySections.map(({category, items}) => <section className="gallery-section" key={category}>
           <h2>{category}</h2>
