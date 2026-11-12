@@ -387,5 +387,10 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .repository-action {display:flex;justify-content:flex-end;margin-bottom:20px}
 .repository-action :is(a,button) {display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--edge);border-radius:999px;color:var(--quiet);font-size:13px;line-height:1.4}
 .repository-action a:hover {color:inherit;background:#252524}
-.about-author h1 {margin:0 0 24px}
-.about-author p {margin:0;max-width:58ch;color:var(--quiet);line-height:1.65}
+.author-profile {max-width:62ch;padding-block:clamp(12px,3vw,40px)}
+.author-label {margin:0 0 10px;color:var(--quiet);font-size:14px}
+.author-profile h1 {margin:0 0 clamp(20px,3vw,32px)}
+.author-bio {margin:0 0 14px;color:var(--quiet);line-height:1.65;text-wrap:pretty}
+.author-links {display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.author-links a {display:inline-flex;align-items:center;gap:9px;padding:7px 13px;border:1px solid var(--edge);border-radius:999px;font-size:14px}
+.author-links a:hover {background:#2b2b29}

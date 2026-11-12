@@ -502,9 +502,20 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
     </aside>
     <main className="canvas" key={slug}>
       <RepositoryAction/>
-      {slug === "about" ? <section className="about-author">
-          <h1>About me</h1>
-          <p>I made Hype to share the details I like to play with on the web. How a wing folds, how two inks overlap, how a button feels when you press it. I leave the code with each experiment so you can take it apart and make it yours.</p>
+      {slug === "about" ? <section className="author-profile" aria-labelledby="author-name">
+          <header>
+            <p className="author-label">About me</p>
+            <h1 id="author-name">Yash Sonalekar</h1>
+          </header>
+          <p className="author-bio">I’m a software engineering student who likes building things for the web. Hype is where I play with the small details of an interface. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
+          <p className="author-bio">I share the code with each experiment so you can take it apart and make it yours.</p>
+          <nav className="author-links" aria-label="Social profiles">
+            {[
+              ["GitHub", "https://github.com/yash-dot-com"],
+              ["LinkedIn", "https://www.linkedin.com/in/yash-sonalekar/"],
+              ["YouTube", "https://www.youtube.com/@Yashhh02"],
+            ].map(([label, href]) => <a key={label} href={href} target="_blank" rel="me noopener noreferrer">{label}<ArrowUpRight size={14} aria-hidden="true"/></a>)}
+          </nav>
         </section> : index < 0 ? <>
         <header className="directory-intro">
           <p>Hype is an open-source directory of small experiments in motion and interaction. Try a piece, take its code, or copy a prompt for your coding agent.</p>
