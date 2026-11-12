@@ -13,7 +13,8 @@ export function HalftoneButterfly() {
     if(!ctx)return;
     const wing=new Path2D(outline);
     // Batch dots by pigment phase so each frame needs only a few fill calls.
-    const bands=Array.from({length:64},()=>new Path2D());
+    type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number};
+    const bands=Array.from({length:64},(): Dot[]=>[]);
     for(let row=0;row<61;row++){
       const y=-80+row*2.5;
       for(let col=0;col<40;col++){
@@ -24,7 +25,10 @@ export function HalftoneButterfly() {
         const phase=distance*.007+.18*Math.sin(angle*3)+.12*veins+(y>6?.18:0);
         const band=bands[(Math.floor(phase*64)%64+64)%64];
         const radius=.84+.51*veins+.19*Math.sin(distance*.12);
-        band.moveTo(x+radius,y);band.arc(x,y,radius,0,Math.PI*2);
+        const span=Math.min(1,distance/118);
+        const lag=1.45*span+.65*(y+80)/140;
+        const drift=row*2.31+col*3.81;
+        band.push({x,y,radius,span,lag,drift});
       }
     }
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
@@ -41,10 +45,24 @@ export function HalftoneButterfly() {
         const phase=(i/bands.length+t*.082)*inks.length;
         const n=Math.floor(phase),f=phase-n,a=inks[n%inks.length],b=inks[(n+1)%inks.length];
         c.fillStyle=`rgb(${a.map((v,j)=>Math.round(v+(b[j]-v)*f)).join(",")})`;
-        for(const side of [-1,1]){
-          const fold=.79+.20*Math.cos(beat+side*.08);
-          c.save();c.transform(side*fold,-.12*(1-fold),0,1,0,0);c.fill(bands[i]);c.restore();
+        c.beginPath();
+        for(const dot of bands[i]){
+          // A traveling bend carries neighboring dots together; a smaller
+          // independent drift breaks up the rows without losing the silhouette.
+          const wave=beat-dot.lag;
+          const flow=Math.sin(t*1.6+dot.y*.064+dot.x*.032);
+          const dx=dot.span*(2.9*flow+.95*Math.sin(t*2.1+dot.drift));
+          const dy=dot.span*(2.2*Math.cos(t*1.45+dot.x*.058)+.85*Math.cos(t*1.8+dot.drift));
+          for(const side of [-1,1]){
+            const localBeat=wave+side*.10;
+            const fold=.78+.21*Math.cos(localBeat);
+            const x=side*(dot.x*fold+dx);
+            const y=dot.y+dy+9*dot.span*dot.span*Math.sin(localBeat);
+            const radius=dot.radius*(.83+.17*fold);
+            c.moveTo(x+radius,y);c.arc(x,y,radius,0,Math.PI*2);
+          }
         }
+        c.fill();
       }
       c.strokeStyle="#8ab8ef";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
       c.moveTo(1,-9);c.quadraticCurveTo(8,-25,16,-30);c.stroke();
