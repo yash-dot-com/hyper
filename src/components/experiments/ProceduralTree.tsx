@@ -116,7 +116,7 @@ function PaperPlant({design,width,height,depth,seed,animated}:TreeSettings & {de
       {flower && motif==="wheel" && <rect x="-1.6" y="-1.6" width="3.2" height="3.2" fill="#ffd342"/>}
     </g></g>;
   const pots=["M46 143h28l-3 5 3 9-7 6H53l-7-6 3-9Z","M41 143h38l-5 6 5 7-6 4 4 3H43l4-4-5-5 5-5Z","M47 143h26l3 4-2 12-5 4H51l-5-5-1-11Z","M32 141h56l-5 5 5 4-5 5 5 4-4 4H36l-4-4 5-4-5-5 5-4Z","M48 141h24v4l-3 2 8 10v6H43v-6l8-10-3-2Z","M46 142h28v21H46Z","M39 145l5-5h32l5 5v13l-7 5H47l-8-5Z","M39 146l8-7h26l8 7v11l-7 4 2 3H44l2-3-7-5Z","M35 140h50v6l-4 2-3 14H43l-3-15-5-1Z"];
-  return <svg viewBox="0 0 120 174" width={width} height={height} style={{maxWidth:"100%",maxHeight:"100%",background:"#fffcf2"}} role="img" aria-label={design+" potted plant"}>
+  return <svg viewBox="0 0 120 174" preserveAspectRatio="none" width={width} height={height} role="img" aria-label={design+" potted plant"}>
     <style>{`@keyframes paper-grow{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}@keyframes paper-unfold{from{transform:scale(.1);opacity:0}to{transform:scale(1);opacity:1}}@media(prefers-reduced-motion:reduce){.paper-stem,.paper-leaf{animation:none!important}}`}</style>
     <g key={design+seed+":"+depth}>{[-1,0,1].map((axis,j)=>{
       let x=60+(habit==="stalk"?axis*15:axis*3),y=145;
@@ -151,15 +151,18 @@ export function ProceduralTree({width=460,height=380,depth=3,seed,animated=true,
   useEffect(()=>{if(seed===undefined)setRandomSeed(Math.floor(Math.random()*0xffffffff));},[seed]);
   const actualSeed=seed??randomSeed;
   const {stems,unit}=useMemo(()=>grow({width:w,height:h,depth:levels,seed:actualSeed}),[w,h,levels,actualSeed]);
-  if(design!=="Original") return <PaperPlant design={design} width={w} height={h} depth={levels} seed={actualSeed} animated={animated}/>;
   const flowerScale=Math.min(unit*.8,w/(2**levels*11));
-  return <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} role="img" aria-label="Procedurally grown flowering tree"
-    style={{display:"block",maxWidth:"100%",maxHeight:"100%",background:"#101311"}}>
+  return <svg viewBox="0 0 1200 1200" preserveAspectRatio="none" width="100%" height="100%" role="img" aria-label={design==="Original"?"Procedurally grown flowering tree":design+" potted plant"}
+    style={{display:"block",background:design==="Original"?"#101311":"#fffcf2"}}>
+    <g transform={`translate(${(1200-w)/2} ${1200-h})`}>
+    {design!=="Original" ? <PaperPlant design={design} width={w} height={h} depth={levels} seed={actualSeed} animated={animated}/> : <>
     <style>{`@keyframes tree-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}@keyframes tree-bloom{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:scale(1)}}@media(prefers-reduced-motion:reduce){.tree-stem,.tree-bloom{animation:none!important}}`}</style>
     <g key={`${w}-${h}-${levels}-${actualSeed}`}>{stems.map(({d,color,start,duration,tip,weight,flower},i)=><g key={i}>
       <path className="tree-stem" d={d} stroke={color} strokeWidth={weight} strokeLinecap="round" strokeLinejoin="round" fill="none" pathLength="1" strokeDasharray="1 1"
         style={{animation:animated?`tree-draw ${duration}s linear ${start}s both`:undefined}}/>
       {flower>=0 && <g transform={`translate(${tip}) scale(${flowerScale})`}><g className="tree-bloom" style={{animation:animated?`tree-bloom .32s ease-out ${start+duration}s both`:undefined}}><Bloom kind={flower}/></g></g>}
     </g>)}</g>
+    </>}
+    </g>
   </svg>;
 }

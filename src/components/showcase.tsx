@@ -148,7 +148,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
     </LuminousSurface>)}
   </div>;
 }
-function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
+function TreeThumbnail() {return <ProceduralTree width={1200} height={1200} seed={19}/>;}
 function InkStickerSheet() {
   return <div className="ink-sticker-sheet">{(["disc","arrow","spark","bow","vase","cube"] as const).map(shape=><HalftoneSticker key={shape} shape={shape}/>)}</div>;
 }
@@ -287,7 +287,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [drop,replayDrop]=useState(0);
   const isTree = item.slug === "procedural-tree";
   const [design,setDesign]=useState<TreeDesign>("Original");
-  const [tree,setTree] = useState<TreeSettings>({width:460,height:380,depth:3,seed:19});
+  const [tree,setTree] = useState<TreeSettings>({width:1200,height:1200,depth:3,seed:19});
   useEffect(()=>{if(isTree)setTree(t=>({...t,seed:Math.floor(Math.random()*1000)}));},[isTree]);
   const [growth,regrow] = useState(0);
   const isLight = item.slug === "luminous-surfaces";
@@ -445,7 +445,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
       <DirectorySelect label="Design" value={design} options={treeDesigns} onChange={setDesign}/>
-      {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
+      {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:1200} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
       <div className="control-pair">
       <Button variant="outline" onClick={()=>setTree(t=>({...t,seed:(t.seed+1+Math.floor(Math.random()*999))%1000}))}>New tree</Button>
       <Button variant="outline" onClick={()=>regrow(n=>n+1)}>Replay growth</Button>
