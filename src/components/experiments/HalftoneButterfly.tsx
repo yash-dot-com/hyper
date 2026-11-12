@@ -141,7 +141,7 @@ function ButterflyLayer({seed,patternSeed,shapeSeed,index}:{seed:number;patternS
       // so the two pairs roam at different heights without influencing one another.
       const right=index%2===1, lower=index===0 || index===3;
       const splitX=width*.5,splitY=height*(right?.55:.45);
-      const scale=Math.min(.34*unit,Math.min(splitX,height*.45)/480);
+      const scale=Math.min(.4*unit,Math.min(splitX,height*.45)/410);
       const inset=scale*160+unit;
       const spanX=splitX-2*inset;
       const spanY=(lower?height-splitY:splitY)-2*inset;

@@ -288,7 +288,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   }, [draftWord, word]);
   const [drop,replayDrop]=useState(0);
   const isTree = item.slug === "procedural-tree";
-  const [design,setDesign]=useState<TreeDesign>("Original");
+  const [design,setDesign]=useState<TreeDesign>("Indigo pinwheel");
   const [tree,setTree] = useState({depth:3,seed:19});
   useEffect(()=>{if(isTree)setTree(t=>({...t,seed:Math.floor(Math.random()*1000)}));},[isTree]);
   const [growth,regrow] = useState(0);

@@ -96,7 +96,7 @@ const prints = {
   "Stacked succulent": ["#789345","#497b39","#c83c29","#cd452b","#37434a","stalk","stack"],
 } as const;
 export type TreeDesign = "Original" | keyof typeof prints;
-export const treeDesigns: TreeDesign[] = ["Original", ...Object.keys(prints) as (keyof typeof prints)[]];
+export const treeDesigns: TreeDesign[] = Object.keys(prints) as (keyof typeof prints)[];
 
 function PaperPlant({design,width,height,depth,seed,animated}:TreeSettings & {design:keyof typeof prints;animated:boolean}) {
   const [ink,green,accent,clay,glaze,habit,motif]=prints[design];
@@ -144,7 +144,7 @@ function PaperPlant({design,width,height,depth,seed,animated}:TreeSettings & {de
     </svg>
   </svg>;
 }
-export function ProceduralTree({width=460,height=380,depth=3,seed,animated=true,design="Original"}: Partial<TreeSettings>&{animated?:boolean;design?:TreeDesign}) {
+export function ProceduralTree({width=460,height=380,depth=3,seed,animated=true,design="Indigo pinwheel"}: Partial<TreeSettings>&{animated?:boolean;design?:TreeDesign}) {
   const w=limit(width,160,1200,460),h=limit(height,160,1200,380);
   const levels=Math.round(limit(depth,1,5,3));
   const [randomSeed,setRandomSeed]=useState(19);
