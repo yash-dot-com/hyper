@@ -55,13 +55,51 @@ function Pencil({ x, y }: { x: number; y: number }) {
   </g>;
 }
 
-// Stamp square pixels along a segment so the forearm stays attached to the elbow.
+// Masks share a wrist anchor; the grip leaves the pencil visible between fingers.
+const hands = {
+  chin: [
+    ".....oo...", "....ohso..", "...ohso...", "..ohsoooo.", ".ohssshhso",
+    ".ossssooo.", ".osssshso.", ".ossssdo..", "..dssdo...", "..oddo....",
+  ],
+  grip: [
+    "....oooo..", "...ohhhso.", "..ohso.oso", ".ohso..oso", ".osssodsso",
+    ".ossshhso.", ".ossssso..", "..dssdo...", "..oddo....", "..ooo.....",
+  ],
+  relaxed: [
+    "..........", "....oo....", "...ohsoo..", "..ohsshso.", "..ossssso.",
+    "..ossshso.", "..osssdo..", "..osddo...", "..oddo....", "..ooo.....",
+  ],
+} as const;
+
+function Hand({ kind, skin, shade, highlight }: {
+  kind: keyof typeof hands; skin: string; shade: string; highlight: string;
+}) {
+  const colors: Record<string, string> = { o: "#553c42", s: skin, h: highlight, d: shade };
+  return <g transform="translate(-5 -4)">{hands[kind].map((row, y) =>
+    [...row].map((pixel, x) => pixel === "." ? null :
+      <rect key={10*y+x} x={x} y={y} width="1" height="1" fill={colors[pixel]}/>))}</g>;
+}
+
+// A broad elbow narrows toward the cuff. Round vertices onto the sprite grid.
 function sleeve(x: number, y: number, wristX: number, wristY: number) {
-  const steps = Math.max(1, Math.abs(wristX-x), Math.abs(wristY-y));
-  return Array.from({ length: steps + 1 }, (_, i) => {
-    const px = Math.round(x + (wristX-x)*i/steps), py = Math.round(y + (wristY-y)*i/steps);
-    return `M${px-2} ${py-2}h5v5h-5z`;
-  }).join(" ");
+  const dx = wristX-x, dy = wristY-y, length = Math.hypot(dx, dy) || 1;
+  const point = (t: number, w: number) =>
+    [Math.round(x+t*dx-w*dy/length), Math.round(y+t*dy+w*dx/length)];
+  const vertices = [point(0,-3),point(.3,-3),point(1,-2),point(1,2),point(.25,4),point(0,3)];
+  const rows: string[] = [];
+  for (let y = Math.min(...vertices.map(p => p[1])); y < Math.max(...vertices.map(p => p[1])); y++) {
+    const hits: number[] = [];
+    vertices.forEach(([ax, ay], i) => {
+      const [bx, by] = vertices[(i+1) % vertices.length];
+      const mid = y + 0.5;
+      if ((ay > mid) !== (by > mid)) hits.push(ax + (mid-ay)*(bx-ax)/(by-ay));
+    });
+    if (hits.length >= 2) {
+      const left = Math.round(Math.min(...hits)), right = Math.round(Math.max(...hits));
+      rows.push(`M${left} ${y}H${right}v1H${left}z`);
+    }
+  }
+  return rows.join(" ");
 }
 const rest = { blink: false, gaze: 0, bob: 0, hair: 0, frame: 0 };
 
@@ -116,16 +154,16 @@ export function AgentPortrait({ character = "girl", state = "idle", size = 240 }
   const pose = useIdleMotion(state);
   const face = expressions[state];
   const girl = character === "girl";
-  const ink = "#191b2a", skin = girl ? "#efa4b7" : "#abdccc", shade = girl ? "#cf7897" : "#78afa9";
-  const highlight = girl ? "#ffcfce" : "#d6efd5";
+  const ink = "#191b2a", skin = girl ? "#efa4b7" : "#dfa47c", shade = girl ? "#cf7897" : "#b97959";
+  const highlight = girl ? "#ffcfce" : "#f8c9a3";
   const gaze = Math.max(-1, Math.min(1, face.look + pose.gaze));
   const working = state === "working", thinking = state === "thinking";
-  const [handX, handY, parked] = working ? workFrames[pose.frame] : [25, 36, false] as const;
+  const [handX, handY, parked] = working ? workFrames[pose.frame] : [24, 38, false] as const;
   const eyeY = 22 + (state === "reading" || (working && handY > 38 && !parked) ? 1 : 0);
   const jacket = girl ? "#679773" : "#537899";
   const headX = working || thinking ? 0 : pose.bob;
   const headY = thinking ? 1 : working && handY < 34 ? 0 : face.lift;
-  const arm = sleeve(thinking ? 15 : 11, thinking ? 47 : 46, handX - 2, handY + 2);
+  const arm = sleeve(thinking ? 15 : Math.round(10 + (handX-10)*.25), thinking ? 49 : Math.min(50, handY + 15), handX - 2, handY + 4);
   return <svg viewBox="0 0 48 52" width={48} height={52} role="img" aria-label={`${girl ? "Girl" : "Guy"} agent, ${state}`} shapeRendering="crispEdges" style={{display:"block",width:size,maxWidth:"100%",height:"auto"}}>
     {/* Jacket, collar and neck stay anchored while the head shifts. */}
     <path fill={ink} d="M5 48v-3h3v-3h5v-2h6v-8h12v7h4v2h6v2h3v2h2v3z"/>
@@ -145,11 +183,11 @@ export function AgentPortrait({ character = "girl", state = "idle", size = 240 }
         <g transform={`translate(${pose.hair} 0)`}><path fill={ink} d="M16 13h6v3h-3v3h-2v4h-2v-6h1z M34 11h3v4h2v5h-2v-4h-3z"/><path fill="#91afcb" d="M18 13h3v1h-3z M34 12h2v1h-2z"/></g>
       </> : <>
         <path fill={ink} d="M9 20v-8h2V8h4V5h10V4h7v2h4v3h2v3h3v4h-3v1H25v-2h-4v2h-5v3h-3v-2h-2v2z"/>
-        <path fill="#3d4056" d="M12 13v-3h4V8h5v1h-3v2h-3v2z M25 7h6v1h-6z"/>
-        <g transform={`translate(${pose.hair} 0)`}><path fill={ink} d="M19 11h9v3h-3v3h-3v1h-2v-4h-2z"/><path fill="#738d9b" d="M20 11h5v1h-5z"/></g>
-        <path fill="#557d77" d="M18 31h1v1h-1z M20 33h1v1h-1z M23 34h1v1h-1z M31 33h1v1h-1z"/>
+        <path fill="#504149" d="M12 13v-3h4V8h5v1h-3v2h-3v2z M25 7h6v1h-6z"/>
+        <g transform={`translate(${pose.hair} 0)`}><path fill={ink} d="M19 11h9v3h-3v3h-3v1h-2v-4h-2z"/><path fill="#927966" d="M20 11h5v1h-5z"/></g>
+        <path fill="#996348" d="M18 31h1v1h-1z M20 33h1v1h-1z M23 34h1v1h-1z M31 33h1v1h-1z"/>
       </>}
-      <path fill={girl ? "#69445b" : "#476466"} d={brows[face.brow]}/>
+      <path fill={girl ? "#69445b" : "#63463e"} d={brows[face.brow]}/>
       {[20,31].map(x => <g key={x} transform={`translate(${x} ${eyeY})`}>
         {pose.blink || state === "done" ? <path fill={ink} d="M0 1h1V0h3v1h1v1H4V1H1v1H0z"/> :
           <g transform={`translate(${gaze} 0)`}>
@@ -168,14 +206,11 @@ export function AgentPortrait({ character = "girl", state = "idle", size = 240 }
     </g>}
     {(thinking || working) && <g>
       <path fill={ink} d={thinking ? "M7 48v-5h2v-3h4v-2h3v3h2v8z" : "M6 49v-5h2v-3h5v2h3v6z"}/>
-      <path d={arm} stroke={ink} strokeWidth="2" strokeLinejoin="round" fill={jacket}/>
-      <path d={arm} fill={jacket}/>
+      <path fill={jacket} d={thinking ? "M8 48v-4h2v-3h4v-1h1v4h2v4z" : "M7 48v-3h2v-3h3v2h3v4z"}/>
+      <path d={arm} stroke={ink} strokeWidth="2"/><path d={arm} fill={jacket}/>
       {working && !parked && <Pencil x={handX} y={handY}/>}
       <g transform={`translate(${handX} ${handY})`}>
-        <path fill={ink} d="M-3 3v-4h1v-2h3v1h2v3H2v2H0v1h-3z"/>
-        <path fill={skin} d="M-2 2v-3h1v-1h2v1h1v2H1v1z"/>
-        <path fill={highlight} d="M-1-2h2v1h-2z"/>
-        <path fill={shade} d="M0 0h2v1H0z"/>
+        <Hand kind={thinking ? "chin" : parked ? "relaxed" : "grip"} skin={skin} shade={shade} highlight={highlight}/>
       </g>
     </g>}
   </svg>;
