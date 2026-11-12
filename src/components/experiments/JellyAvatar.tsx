@@ -63,8 +63,8 @@ export function JellyAvatar({size=240,animated=true,cycleSeconds=12}:{size?:numb
         {animated&&!still && <animateTransform attributeName="transform" type="translate" dur="6.7s" repeatCount="indefinite"
           values="0 0;0 0;5 -3;5 -3;2 -2;2 -2;-4 2;-4 2;0 0" keyTimes="0;.18;.21;.39;.42;.57;.61;.82;1"/>}
         {[0,1].map(i => {
-          // The same cubic spine stretches into a curious look, then curls into a smile.
-          const poses = ["M0-6 C0-3 0 3 0 6", i ? "M0-10 C-1-5 0 3 1 8" : "M-2-4 C-1-3 0 1 1 3", "M-5 2 C-3-5 3-5 5 2"];
+          // The same cubic spine softens into a shallow arch, then curls into a smile.
+          const poses = ["M0-6 C0-3 0 3 0 6", i ? "M-4 1 C-3-3 2-4 4 0" : "M-4 1 C-2-3 2-3 4 1", "M-5 2 C-3-5 3-5 5 2"];
           return <g key={i} transform={`translate(${89+20*i} 96)`}>
             <g>
               {animated&&!still && <animateTransform attributeName="transform" type="scale" begin={i?"0.035s":"0s"} dur="5.3s" repeatCount="indefinite"
