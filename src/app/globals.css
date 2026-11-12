@@ -385,7 +385,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .art-breathing-bands .mini canvas {height:100% !important;min-height:0 !important;object-fit:cover}
 
 .canvas > .repository-action {display:flex;width:max-content;margin:0 0 20px auto}
-.repository-action {display:inline-flex;height:32px;box-sizing:border-box;white-space:nowrap;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--edge);border-radius:999px;color:var(--quiet);font-size:13px;line-height:1.4}
 .repository-action:hover {color:inherit;background:#252524}
 .author-profile .detail-head {margin-bottom:clamp(20px,3vw,36px)}
 .author-block-name {position:relative;width:min(100%,540px);aspect-ratio:5.5;overflow:hidden;margin:0}

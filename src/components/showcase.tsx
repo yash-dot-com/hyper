@@ -479,7 +479,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
 const repositoryUrl = process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/yash-dot-com/hyper";
 
 function RepositoryAction() {
-  return <a className="repository-action" href={repositoryUrl} target="_blank" rel="noopener noreferrer"><Star size={15} aria-hidden="true"/>Star on GitHub</a>;
+  return <a className={buttonVariants({className:"repository-action prompt-action"})} href={repositoryUrl} target="_blank" rel="noopener noreferrer"><Star size={15} aria-hidden="true"/>Star on GitHub</a>;
 }
 
 export function Showcase({ sources, highlighted, composition }: { composition: string; sources: string[]; highlighted: Token[][][] }) {
