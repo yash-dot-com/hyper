@@ -120,7 +120,7 @@ function FusionSample({fullSize=false}: {fullSize?:boolean} = {}) {
   return <InkFusion className="fusion-sample" style={{width:fullSize?320:168,maxWidth:"100%",aspectRatio:"16 / 15",background:"#c9cec3"}} role="img" aria-label="Interactive ink dot pattern" tabIndex={0}/>;
 }
 const collection = [
-  {title:"Ink Fusion",description:"Hover or focus the print to let neighboring dots pool into branching shapes. Move away to release them.",slug:"ink-fusion",component:"InkFusion",icon:Layers2,preview:FusionSample},
+  {title:"Ink Fusion",description:"Move the pointer across the print. Nearby dots draw together and fuse, then release as you pass.",slug:"ink-fusion",component:"InkFusion",icon:Layers2,preview:FusionSample},
   {title:"Parallax Ink Stickers",description:"Move across a sticker to slide its dot screen over the yellow print.",slug:"parallax-ink-stickers",component:"HalftoneSticker",icon:Layers2,preview:InkStickerSheet},
   {title:"Halftone Voice Blob",description:"Speech stirs the colored ink dots. Pause and they swirl into a spinning ring before drifting back.",slug:"halftone-voice-blob",component:"HalftoneVoiceBlob",icon:Layers2,preview:()=> <HalftoneVoiceBlob microphone={false} size={180}/>},
   {title:"Frosted Tile Footer",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-footer",component:"FrostedTileFooter",icon:Layers2,preview:()=> <FrostedTileFooter/>},
