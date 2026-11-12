@@ -27,7 +27,6 @@ import { CardCascade } from "./experiments/CardCascade";
 import { BlockType, IsoBlockType } from "./experiments/BlockType";
 import { ProceduralTree, treeDesigns, type TreeDesign, type TreeSettings } from "./experiments/ProceduralTree";
 import { LuminousSurface, lightFinishes, type LightFinish } from "./experiments/LuminousSurface";
-import { MetalEmblem, emblemMarks, type EmblemMark } from "./experiments/MetalEmblem";
 import { GlassBubble } from "./experiments/GlassBubble";
 import { JellyAvatar } from "./experiments/JellyAvatar";
 import { EmbossedBadge, badgeFinishes, type BadgeFinish } from "./experiments/EmbossedBadge";
@@ -140,7 +139,6 @@ function GlassConversation({compact=false}:{compact?:boolean}) {
   </div>;
 }
 function GlassThumbnail() { return <GlassConversation compact/>; }
-function ChromeThumbnail() { return <MetalEmblem mark="Glacier I" size="84%"/>; }
 function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
   return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",width:"86%",maxWidth:450,gap:8,fontSize:choose?16:10,textAlign:"center"}}>
     {lightFinishes.map(finish=><LuminousSurface key={finish} finish={finish} style={{padding:0}}>
@@ -228,7 +226,6 @@ const collection = [
   {title:"Block Type",description:"Falling pieces turn and lock into letterforms. Change the text to build a new word.",slug:"block-type", category:"Type & lettering",component:"BlockType",icon:Type,preview:()=> <BlockType/>},
   {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the dimensions, branching depth, or seed to grow another tree.",slug:"procedural-tree", category:"Generative art",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
   {title:"Luminous Surfaces", description:"A frosted rim surrounds a pool of color. Move across a surface to shift its light, or select a finish to copy it.",slug:"luminous-surfaces", category:"Interface elements",component:"LuminousSurface",icon:Layers2,preview:LightSheet},
-  {title:"Chrome Emblems", description:"Six marks from the HVNTER 2020 specimen sheet, finished with mirrored bands and polished bevels.", slug:"chrome-emblems", category:"Icons & stickers", component:"MetalEmblem", icon:Layers2, preview:ChromeThumbnail},
   {title:"Glass Bubbles", description:"Frosted edges catch the light around a pool of blue. The corner turns toward the sender as the message grows.", slug:"glass-bubbles", category:"Interface elements", component:"GlassBubble", icon:Layers2, preview:GlassThumbnail},
   {title:"Jelly Avatar", description:"A translucent avatar flows from a blue scallop to a pink ripple and a mint clover. Its color moves with its silhouette.", slug:"jelly-avatar", category:"Avatars & voice",component:"JellyAvatar",icon:Layers2,preview:JellyThumbnail},
   {title:"Embossed Badges", description:"Three softly beveled labels with engraved marks. Select a finish to copy its usage.", slug:"embossed-badges", category:"Interface elements", component:"EmbossedBadge", icon:Layers2, preview:EmbossedSheet},
@@ -297,8 +294,6 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [growth,regrow] = useState(0);
   const isLight = item.slug === "luminous-surfaces";
   const [light,setLight] = useState<LightFinish>("bloom");
-  const isChrome = item.slug === "chrome-emblems";
-  const [mark,setMark] = useState<EmblemMark>("Glacier I");
   const isGlass = item.slug === "glass-bubbles";
   const isJelly = item.slug === "jelly-avatar";
   const isEmbossed = item.slug === "embossed-badges";
@@ -335,9 +330,6 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       "```tsx", source, "```",
     ].join("\n\n") : isLight ? [
       `Use the named LuminousSurface React export in a client boundary. Wrap your content with <LuminousSurface finish="${light}">…</LuminousSurface>. Preserve the frosted rim, pointer lighting, focus feedback, and reduced-motion fallback.`, "```tsx", source, "```",
-    ].join("\n\n") : isChrome ? [
-      `Use the supplied MetalEmblem React SVG component with mark="${mark}". Preserve its cutouts, layered extrusion, chrome reflections, and reduced-motion handling. The source artwork is credited to HVNTER 2020.`,
-      "```tsx", source, "```",
     ].join("\n\n") : isGlass ? [
       'Use the supplied GlassBubble React component in a column flex container. Render <GlassBubble side="incoming">Incoming message</GlassBubble> or <GlassBubble side="outgoing">Outgoing message</GlassBubble>. Preserve its layered radial gradients, shaded rim, readable text, and responsive wrapping. It requires only React.',
       "```tsx", source, "```",
@@ -394,7 +386,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {item.slug === "digital-kaleidoscope" ? <DigitalKaleidoscope {...scope}/> : item.slug === "breathing-bands" ? <BreathingBandsFooter palette={bandPalette}/> : item.slug === "prism-drift" ? <PrismDrift speed={driftSpeed} palettes={driftColors} style={{width:"100%",height:"100%"}}/> : item.slug === "cut-ink-footer" ? <CutInkFooter word={printWord} inks={pigments}/> : item.slug === "spectrum-type" ? <SpectrumType text={prismText} angle={prismAngle} depth={prismDepth}/> : item.slug === "afterglow-footer" ? <AfterglowFooter word={glowWord} colors={glowColors}/> : item.slug === "halftone-butterfly" ? <HalftoneButterfly seed={wingSeed} patternSeed={patternSeed}/> : item.slug === "halftone-voice-blob" ? <HalftoneVoiceBlob size="min(64vw, 260px)"/> : isFrost ? <FrostedTileFooter label={tileLabel} colors={tileColors}/> : isVoice ? <VoiceBlob size="min(63vw, 280px)"/> : isCascade ? <CardCascade paused={paused} replay={deal}/> : isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {item.slug === "digital-kaleidoscope" ? <DigitalKaleidoscope {...scope}/> : item.slug === "breathing-bands" ? <BreathingBandsFooter palette={bandPalette}/> : item.slug === "prism-drift" ? <PrismDrift speed={driftSpeed} palettes={driftColors} style={{width:"100%",height:"100%"}}/> : item.slug === "cut-ink-footer" ? <CutInkFooter word={printWord} inks={pigments}/> : item.slug === "spectrum-type" ? <SpectrumType text={prismText} angle={prismAngle} depth={prismDepth}/> : item.slug === "afterglow-footer" ? <AfterglowFooter word={glowWord} colors={glowColors}/> : item.slug === "halftone-butterfly" ? <HalftoneButterfly seed={wingSeed} patternSeed={patternSeed}/> : item.slug === "halftone-voice-blob" ? <HalftoneVoiceBlob size="min(64vw, 260px)"/> : isFrost ? <FrostedTileFooter label={tileLabel} colors={tileColors}/> : isVoice ? <VoiceBlob size="min(63vw, 280px)"/> : isCascade ? <CardCascade paused={paused} replay={deal}/> : isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {item.slug === "afterglow-footer" && <div className="pixel-controls afterglow-controls">
       <label>Word<input value={glowWord} onChange={e=>setGlowWord(e.target.value)}/></label>
@@ -458,7 +450,6 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       </div>
     </div>}
     {isLight && <p role="status" style={{marginTop:12}}>Selected finish: {light}</p>}
-    {isChrome && <div className="pixel-controls"><DirectorySelect label="Mark" value={mark} options={emblemMarks} onChange={setMark}/></div>}
     {isEmbossed && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected finish: {finish}</p>}
     {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
     {isFolder && <div className="demo-modes" role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}

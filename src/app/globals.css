@@ -138,7 +138,12 @@ button,a {cursor:pointer} :focus-visible {outline:2px solid #e4cb94;outline-offs
 .menu-toggle {display:none}
 .rail nav {margin-top:52px;min-height:0;overflow-y:auto;overscroll-behavior-y:contain}
 .rail nav a {display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:999px;color:#b6b6b0;font-size:14px}
-.rail nav a:is(:hover,:focus-visible,[aria-current="page"]) {background:#2b2b29;color:#fff}
+@media (hover:hover) {
+  .rail nav a:not([aria-current="page"]):hover {background:#252524;color:#efefea}
+}
+.rail nav a[aria-current="page"] {background:#353532;color:#fff;font-weight:550}
+.rail nav a[aria-current="page"]::after {content:"";margin-inline-start:auto;width:6px;height:6px;flex:none;border-radius:50%;background:currentColor}
+.rail nav a:focus-visible {outline-offset:-2px}
 .rail svg,.source-heading svg {width:16px;height:16px;stroke-width:1.65}
 .rail h2 {color:#90908a;font-size:12px;font-weight:500;margin:34px 12px 9px}
 .canvas {width:100%;max-width:1300px;margin-inline:auto;padding:clamp(40px,6vw,92px) clamp(24px,5vw,80px);min-width:0}
