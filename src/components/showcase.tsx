@@ -141,7 +141,7 @@ function MeadowSample({fullSize=false}: {fullSize?:boolean} = {}) {
   </div>;
 }
 const collection = [
-  {title:"Halftone Butterfly",description:"Cyan, magenta, and yellow ripple through dotted wings as their edges fold and open.",slug:"halftone-butterfly",component:"HalftoneButterfly",icon:Layers2,preview:()=> <HalftoneButterfly/>},
+  {title:"Halftone Butterfly",description:"A halftone butterfly banks through open space, folding its wings between brief glides.",slug:"halftone-butterfly",component:"HalftoneButterfly",icon:Layers2,preview:()=> <HalftoneButterfly/>},
   {title:"Butterfly Meadow",description:"Three butterflies roam independently, alternating quick wingbeats with short glides. Move close to one to change its course.",slug:"butterfly-meadow",component:"ButterflyMeadow",icon:Layers2,preview:()=> <ButterflyMeadow/>},
   {title:"Meadow Footer",description:"Scroll inside the landscape to reveal the river and farm beyond the fields.",slug:"meadow-footer",component:"MeadowFooter",icon:Layers2,preview:MeadowSample},
   {title:"Paper Noticeboard",description:"Four die-cut paper pieces hold a short set of notices. Give each piece a heading, a detail, and an optional link.",slug:"paper-noticeboard",component:"PaperNoticeboard",icon:Layers2,preview:NoticeboardSample},

@@ -43,14 +43,36 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
     }
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
     let visible=false, frame=0, last=0, t=0;
+    // Overlapping spline spans preserve velocity through each new destination.
+    const route=[[62,100],[91,112],[155,72],[196,104]];
+    let travel=0, heading=.55, bank=0, wingPhase=0;
     function paint(now:number){
-      if(!reduce.matches)t+=Math.max(0,Math.min(.05,(now-last)/1000));
+      const dt=reduce.matches?0:Math.max(0,Math.min(.05,(now-last)/1000));
+      t+=dt;
       last=now;
       const c=ctx!;
       c.setTransform(3,0,0,3,0,0);c.clearRect(0,0,260,180);
-      c.translate(130,99+2*Math.sin(t*1.1));
-      c.rotate(.035*Math.sin(t*.85));
-      const beat=t*4.8+.65*Math.sin(t*1.7);
+      const glide=Math.max(0,Math.sin(t*1.35+.7*Math.sin(t*.63)))**5;
+      travel+=dt*(.72+.22*Math.sin(t*.87)-.18*glide);
+      if(travel>=1){
+        travel-=1;
+        const tail=route[3];
+        const x=tail[0]>130?58+Math.random()*60:143+Math.random()*58;
+        route.shift();route.push([x,63+Math.random()*54]);
+      }
+      const u=travel,v=1-u;
+      const weights=[v**3,3*u**3-6*u*u+4,-3*u**3+3*u*u+3*u+1,u**3];
+      const tangent=[-3*v*v,9*u*u-12*u,-9*u*u+6*u+3,3*u*u];
+      const sum=(axis:number,coeff:number[])=>route.reduce((n,p,i)=>n+p[axis]*coeff[i]/6,0);
+      const target=Math.atan2(sum(1,tangent),sum(0,tangent))+Math.PI/2;
+      const turn=Math.atan2(Math.sin(target-heading),Math.cos(target-heading));
+      heading+=turn*(1-Math.exp(-dt*7));
+      bank+=(Math.max(-.45,Math.min(.45,turn))-bank)*(1-Math.exp(-dt*4));
+      wingPhase+=dt*(13+2*Math.sin(t*1.7))*(1-.8*glide);
+      c.translate(sum(0,weights),sum(1,weights)+1.3*Math.sin(wingPhase));
+      c.rotate(heading);
+      c.scale(.47,.47);
+      const beat=wingPhase;
       for(let i=0;i<bands.length;i++){
         const phase=(i/bands.length+t*.082)*inks.length;
         const n=Math.floor(phase),f=phase-n,a=inks[n%inks.length],b=inks[(n+1)%inks.length];
@@ -65,8 +87,8 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
           const dy=dot.freedom*dot.span*(2.2*Math.cos(t*1.45+dot.x*.058)+.85*Math.cos(t*1.8+dot.drift));
           for(const side of [-1,1]){
             const localBeat=wave+side*.10;
-            const fold=.78+.21*Math.cos(localBeat);
-            const x=side*(dot.x*fold+dx);
+            const fold=(.78+.21*Math.cos(localBeat))*(1-glide)+.94*glide;
+            const x=side*(dot.x*fold*(1+side*bank*.22)+dx);
             const y=dot.y+dy+9*dot.span*dot.span*Math.sin(localBeat);
             const radius=dot.radius*(.83+.17*fold);
             c.moveTo(x+radius,y);c.arc(x,y,radius,0,Math.PI*2);
