@@ -169,10 +169,11 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .editor-frame::after {
   content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
   -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
-  mask-image:linear-gradient(to bottom,#000,transparent 28px,transparent calc(100% - 28px),#000),
-    linear-gradient(to right,#000,transparent 18px,transparent calc(100% - 18px),#000);
+  mask-image:linear-gradient(to bottom,#000,transparent 48px,transparent calc(100% - 48px),#000),
+    linear-gradient(to right,#000,transparent 32px,transparent calc(100% - 32px),#000);
 }
 .editor-frame:focus-within::after {opacity:0}
+@media (hover:hover) {.editor-frame:hover::after {opacity:0}}
 .editor code {font-family:inherit}
 .editor {margin:0;background:#151515;font:13px/1.65 "JetBrains Mono",monospace;letter-spacing:0}
 .source-section {display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-block-start:clamp(24px,3vw,36px)}
