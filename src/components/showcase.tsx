@@ -46,10 +46,10 @@ function KawaiiThumbnail() { return <KawaiiFace size={180} expression="pleased"/
 function StickerThumbnail() { return <VoxelSticker size={186}/>; }
 
 function SkillExamples() {
-  return <figure className="skill-examples" aria-label="Axonometric icon examples">
-    <img src="/skills/axonometric-icons/examples/turntable.svg" alt="Isometric turntable"/>
+  return <figure style={{display:"grid",gridTemplateColumns:"repeat(3, minmax(0, 1fr))",alignItems:"center",gap:"3%",width:"92%",margin:"0 auto"}} aria-label="Axonometric icon examples">
+    <img style={{display:"block",width:"100%",height:"auto"}} src="/skills/axonometric-icons/examples/turntable.svg" alt="Isometric turntable"/>
     <PocketSampler size="100%"/>
-    <img src="/skills/axonometric-icons/examples/camera.svg" alt="Dimetric film camera"/>
+    <img style={{display:"block",width:"100%",height:"auto"}} src="/skills/axonometric-icons/examples/camera.svg" alt="Dimetric film camera"/>
   </figure>;
 }
 const collection = [
@@ -139,7 +139,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     )}</div>}
     {isKawaii && <KawaiiControls value={face} change={setFace}/>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
-    {isSkill && <a className="skill-download" href="/skills/axonometric-icons.zip" download>Download skill and SVG examples ↓</a>}
+    {isSkill && <div style={{paddingTop:20,marginBottom:-22,paddingBottom:20}}><a className="skill-download" style={{display:"inline-flex",alignItems:"center",padding:"8px 0",margin:0}} href="/skills/axonometric-icons.zip" download>Download skill and SVG examples ↓</a></div>}
     <section className="editor" aria-label="Component source">
       <header><span><Code2/>{item.component}.{isSkill ? "md" : "tsx"}</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : isSkill ? "Copy skill" : "Copy code"}</motion.button></header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
