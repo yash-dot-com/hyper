@@ -229,3 +229,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .art-gradient-folder .mini,.stage.art-gradient-folder {background:#f7f3ec}
 
 .art-gradient-objects .mini,.stage.art-gradient-objects {background:#f7f3ec}
+
+.art-motion-badges .mini,.stage.art-motion-badges {background:#eeedeb}
+.stage.art-motion-badges {min-height:360px}

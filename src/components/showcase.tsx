@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { MotionBadge, badgeKinds, type BadgeKind } from "./experiments/MotionBadge";
 import { FolderSticker } from "./experiments/GradientObjects";
 import { GradientFolder, folderColors, type FolderColor } from "./experiments/GradientFolder";
 import { PocketSampler } from "./experiments/PocketSampler";
@@ -67,7 +68,13 @@ function GradientObjectsDemo() {
     <FolderSticker kind="scripts" size="min(96%, 49cqh)"/><FolderSticker kind="files" size="min(96%, 49cqh)"/>
   </div>;
 }
+function BadgeSheet({choose}:{choose?:(kind:BadgeKind)=>void}) {
+  return <div style={{display:"grid",gap:14,justifyItems:"start",gridTemplateColumns:choose?"1fr":"repeat(2,auto)"}}>
+    {badgeKinds.map(kind=><MotionBadge key={kind} kind={kind} onClick={choose?()=>choose(kind):undefined}/>)}
+  </div>;
+}
 const collection = [
+  {title:"Motion Badges", description:"Six pastel badges with a gesture for each icon. Select a badge to use it in your prompt.", slug:"motion-badges", component:"MotionBadge", icon:Layers2, preview:BadgeSheet},
   {title:"Gradient Stickers", description:"Four folder stickers for projects, receipts, scripts, and documents. Hover to peek inside, or tap to pin one open.", slug:"gradient-objects", component:"SKILL", icon:Layers2, preview:GradientObjectsDemo},
   {title:"Gradient Folder", description:"Hover to fan the pages, or click to pin the folder open.", slug:"gradient-folder", component:"GradientFolder", icon:Layers2, preview:() => <GradientFolder size={195}/>},
   {title:"Axonometric Icons", description:"A reusable skill for drawing isometric and dimetric SVG objects. Copy the instructions into your agent, then describe the object you want.", slug:"axonometric-icons", component:"SKILL", icon:Layers2, preview:SkillExamples},
@@ -91,6 +98,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const Preview = item.preview;
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
+  const isBadge = item.slug === "motion-badges";
+  const [badge,setBadge] = useState<BadgeKind>("Digital");
   const isGradientSkill = item.slug === "gradient-objects";
   const isSkill = isGradientSkill || item.slug === "axonometric-icons";
   const isVoxel = item.slug === "voxel-stickers";
@@ -108,7 +117,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isFolder ? [
+    const text = kind === "code" ? source : isBadge ? [
+      `Integrate the named MotionBadge React export below using motion/react. Render <MotionBadge kind="${badge}" />. Pass label to customize the text or onClick for an actionable badge. Preserve reduced-motion support.`,
+      "```tsx", source, "```",
+    ].join("\n\n") : isFolder ? [
       `Integrate the supplied GradientFolder named React export with motion/react from the motion package. Use a client boundary. Render <GradientFolder color="${folderColor}" label="Field notes" />. Preserve its layered gradients, staggered springs, keyboard focus and touch interaction, and reduced-motion handling.`,
       "GradientFolder.tsx (complete source):", "```tsx", source, "```",
     ].join("\n\n") : isGradientSkill ? "Use this skill to design a gradient object. Ask which object and palette if unspecified.\n\n" + source : isSkill ? "Create an isometric or dimetric SVG icon using the skill below. If I have not named the object yet, ask which object to draw.\n\n" + source : isVoxel ? [
@@ -148,8 +160,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isBadge && <p role="status" style={{marginTop:12,color:"var(--quiet)",fontSize:13}}>Selected badge: {badge}</p>}
     {isFolder && <div className="demo-modes" style={{marginTop:14}} role="group" aria-label="Folder palette">{(Object.keys(folderColors) as FolderColor[]).map(color=><Button key={color} variant="outline" aria-pressed={folderColor===color} onClick={()=>setFolderColor(color)}>{color[0].toUpperCase()+color.slice(1)}</Button>)}</div>}
     {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
       <button key={name} aria-label={name} aria-pressed={name===sticker} onClick={()=>setSticker(name)}><span aria-hidden="true"><VoxelSticker name={name} size={56}/></span>{name}</button>
