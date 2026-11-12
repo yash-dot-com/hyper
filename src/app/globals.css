@@ -202,7 +202,10 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
   line-height: 1.6;
   text-wrap: pretty;
 }
-.directory-intro + .gallery { margin-top: 0; }
+.gallery-section + .gallery-section { margin-top: clamp(32px, 5vw, 56px); }
+.gallery-section h2 { margin: 0 0 14px; font-size: clamp(18px, 2vw, 24px); font-weight: 550; letter-spacing: -.035em; }
+.gallery-section .gallery { margin: 0; gap: 12px; border: 0; border-radius: 0; overflow: visible; }
+.gallery-section .gallery .tile { border: 1px solid var(--edge); border-radius: 16px; overflow: hidden; }
 
 .art-kinetic-paragraph .mini video { width: 100%; height: 100%; object-fit: contain; background: #fff; }
 .stage.art-kinetic-paragraph { display: block; height: auto; background: #fff; }
