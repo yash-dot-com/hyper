@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 export type EyeStyle = "dot" | "beam" | "droop" | "wide" | "squint" | "sleep" | "sparkle" | "spiral" | "half" | "wink";
 export type MouthStyle = "smile" | "grin" | "o" | "frown" | "pout" | "wobble" | "flat" | "tongue" | "gasp" | "cat";
@@ -47,25 +47,38 @@ export const kawaiiExpressions = {
 export type KawaiiExpression = keyof typeof kawaiiExpressions;
 
 function Eye({ kind, gaze }: { kind: EyeStyle; gaze: number }) {
-  if (kind === "beam" || kind === "wink") return <path d="M-7 2 Q0 -10 7 2" fill="none"/>;
-  if (kind === "sleep") return <path d="M-7 -1 Q0 7 7 -1" fill="none"/>;
-  if (kind === "squint") return <path d="M-6 -4 L5 0 -6 4" fill="none"/>;
-  if (kind === "spiral") return <path d="M0 0q3-3 4 1t-6 3q-6-3-2-9t11 1" fill="none"/>;
-  if (kind === "dot") return <ellipse cx={gaze*2} rx="3.5" ry="5" stroke="none"/>;
-  const sleepy = kind === "half" || kind === "droop";
+  const clip = useId();
+  if (kind === "beam" || kind === "wink")
+    return <path stroke="none" d="M-14 7Q-10-5-2-13L1-14Q8-6 13 7L10 8Q4-2 0-6Q-6-1-11 8Z"/>;
+  if (kind === "sleep") return <path stroke="none" d="M-13-2Q0 10 13-3Q5 15-5 10Q-12 7-13-2Z"/>;
+  if (kind === "squint") return <path stroke="none" d="M-14-8L13 0 12 3-13 10-10 6 4 1-12-4Z"/>;
+  if (kind === "spiral") return <path d="M0 0q4-4 6 1t-8 5q-9-4-4-12t16 1" fill="none"/>;
+
+  const low = kind === "half" || kind === "droop";
+  const contour = kind === "half" ? "M-14-6L13-5Q14 9 4 12Q-11 15-14 2Z" :
+    kind === "droop" ? "M-14-3Q-5-4 9-12L13-9Q15 10 4 13Q-12 14-14 3Z" :
+    "M-14 2Q-14-11-4-14Q8-18 13-6Q18 7 8 12Q-6 19-13 9Z";
+  const radius = kind === "wide" ? 3 : kind === "sparkle" ? 10 : 6;
   return <>
-    <path d={sleepy ? "M-9-2Q0-1 9-3C9 9-9 11-9-2Z" : "M-9 1C-9-12 8-13 9 0C10 12-9 13-9 1Z"} fill="#fffdf8" strokeWidth="1.7"/>
-    <ellipse cx={gaze*2} cy={sleepy ? 1 : 0} rx={kind==="wide"?2.5:sleepy?3.4:6.3} ry={kind==="wide"?3:sleepy?3:7} stroke="none"/>
-    {kind==="sparkle" && <path fill="#fffdf8" stroke="none" d="M-1-6l1.1 2.5L3-2.5.1-1.4-1 1l-.9-2.4L-5-2.5l3.1-1z"/>}
+    <defs><clipPath id={clip}><path d={contour}/></clipPath></defs>
+    <path d={contour} fill="#fffefa" strokeWidth="1.8"/>
+    <g clipPath={`url(#${clip})`} stroke="none">
+      <g transform={`translate(${gaze*3} ${low ? -1 : 0})`}>
+        <ellipse rx={radius} ry={radius*1.3}/>
+        {kind !== "wide" && <ellipse cx={-radius*.37} cy={-radius*.65} rx={radius*.25} ry={radius*.32} fill="#fffefa"/>}
+        {kind === "sparkle" && <path fill="#fffefa" d="m4 1 1.2 3L8 5l-2.8 1L4 9 3 6 .2 5 3 4Z"/>}
+      </g>
+    </g>
+    {low && <path d={kind==="half"?"M-14-6 13-5":"M-14-3Q-5-4 9-12"} fill="none" strokeWidth="3"/>}
   </>;
 }
 
 const mouths: Record<MouthStyle,string> = {
-  smile:"M-5 0Q0 5 5 0", grin:"M-7-2Q0 0 7-2Q6 7 0 7T-7-2Z",
-  o:"M-3 2a3 4 0 1 0 6 0a3 4 0 1 0-6 0Z", frown:"M-5 3Q0-3 5 3",
-  pout:"M-3-1q8-1 4 2q4 2-4 3", wobble:"M-6 2q1-5 4-2t4 0t4 1",
-  flat:"M-4 1h8", tongue:"M-6-1q6 4 12-1q0 9-5 7q-3 0-3-4",
-  gasp:"M-5 4q0-9 5-9t5 9q-5-2-10 0Z", cat:"M-6 0q2 5 6 0q4 5 6 0",
+  smile:"M-7-1Q0 7 7-2", grin:"M-9-3Q-1 0 8-5L10-1Q8 7 2 8Q-7 9-9 2Z",
+  o:"M-4-2 2-4 5-1 3 6-3 5Z", frown:"M-6 3-2-1Q1-3 6 2",
+  pout:"M-5-2 3-2 5 0 1 2 4 4-4 4", wobble:"M-8 3-5-2-1 0 2-2 7 1 8 4",
+  flat:"M-5 1 5 0", tongue:"M-8-2Q-1 2 7-3L7 3Q6 9 1 7L-2 3-5 2Z",
+  gasp:"M-7 6-5-4-1-7 4-6 7-2 6 8Q0 5-7 6Z", cat:"M-7-1Q-4 5 0 0Q4 5 7-2",
 };
 const accents: Record<Accent,ReactNode> = {
   none:null, spark:<path fill="#e7a839" d="m0-8 2 6 5 2-5 2-2 6-2-6-5-2 5-2z"/>,
@@ -92,14 +105,15 @@ export function KawaiiFace({ expression="happy", eyes, mouth, brows, accent, blu
       @keyframes kf-float{50%{transform:translateY(-1.4px)}}
       @media(prefers-reduced-motion:reduce){.kf-live .kf-blink,.kf-live .kf-float{animation:none}}
     `}</style>}
+    <rect x="13" y="7" width="74" height="74" fill="#fffefa" stroke="#272325" strokeWidth="1.8"/>
     <g className="kf-float"><g transform={`rotate(${tilt} 50 46)`}>
-      <path fill="#fff6eb" stroke="#42343d" strokeWidth="2" d="M15 45C15 25 28 13 49 13C71 12 85 25 86 46C89 62 77 73 60 74C50 75 37 75 28 72C15 70 10 60 15 45Z"/>
-      {blush && [25,75].map(x=><g key={x} transform={`translate(${x} 53)`}><ellipse rx="7" ry="3.8" fill={blush} opacity=".68"/><path d="m-3 1 1-2m2 2 1-2" stroke={blush} strokeWidth="1.4" strokeLinecap="round"/></g>)}
-      {[35,65].map((x,i)=><g key={x} transform={`translate(${x} 42)`} stroke="#362c35" fill="#362c35" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-        {brow!=="none" && <path fill="none" transform={`scale(${i?-1:1} 1)`} strokeWidth="1.8" d={brow==="one"&&i?"M-4-12q4-4 9-2":brow==="knit"?"M-5-11l10 3":brow==="worried"?"M-5-9q6 0 9-4":"M-4-13q4-3 8-1"}/>}
+      {blush && [21,79].map(x=><path key={x} transform={`translate(${x} 54)`} d="m-6 2 3-5 -1 6 5-7 -1 6 5-5" fill="none" stroke={blush} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>)}
+      {[34,66].map((x,i)=><g key={x} transform={`translate(${x} 43)`} stroke="#241f23" fill="#241f23" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        {brow!=="none" && <path fill="none" transform={`scale(${i?-1:1} 1)`} strokeWidth="1.8" d={brow==="one"&&i?"M-6-19q5-4 12-2":brow==="knit"?"M-8-16l14 5":brow==="worried"?"M-7-15q7 0 12-6":"M-6-19q6-4 12-1"}/>}
         <g transform={eye==="squint"&&i?"scale(-1 1)":undefined}><g className="kf-blink"><Eye kind={eye==="wink"&&i===0?"dot":eye} gaze={gaze}/></g></g>
       </g>)}
-      <path transform="translate(50 55)" d={mouths[lip]} fill={["grin","tongue","o","gasp"].includes(lip)?"#e998a5":"none"} stroke="#42343d" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+      <path transform="translate(50 64)" d={mouths[lip]} fill={["grin","tongue","o","gasp"].includes(lip)?(lip==="grin"?"#fffefa":"#d98797"):"none"} stroke="#42343d" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+      {lip==="grin" && <path transform="translate(50 64)" d="M-3-1q-1 3 1 6M4-2q2 3 1 5" fill="none" stroke="#382b33" strokeWidth="1.4"/>}
       <g transform={mark==="tear"?"translate(28 51)":"translate(80 23)"}>{accents[mark]}</g>
     </g></g>{children}
   </svg>;
