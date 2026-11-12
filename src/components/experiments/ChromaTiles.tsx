@@ -29,8 +29,8 @@ const forms={
 };
 export function ChromaCard({finish="lagoon",shape="arch",children,style,...props}:HTMLAttributes<HTMLElement>&{finish?:ChromaFinish;shape?:keyof typeof forms}){
   const id=useId(),[base,edge,light]=finishes[finish],path=forms[shape];
-  return <article {...props} style={{...surface(finish),position:"relative",overflow:"hidden",isolation:"isolate",borderRadius:14,minWidth:0,padding:"18px",display:"flex",flexDirection:"column",justifyContent:"flex-end",...style}}>
-    <svg aria-hidden="true" viewBox="0 0 100 148" preserveAspectRatio="xMidYMid meet" style={{position:"absolute",right:"-4%",top:"-7%",height:"115%",width:"74%",zIndex:-2,pointerEvents:"none"}}>
+  return <article {...props} style={{...surface(finish),color:`color-mix(in srgb, ${edge} 58%, #f3e7d6)`,position:"relative",overflow:"hidden",isolation:"isolate",borderRadius:14,minWidth:0,padding:"18px",display:"flex",flexDirection:"column",justifyContent:"flex-end",...style}}>
+    <svg aria-hidden="true" viewBox="0 0 100 148" preserveAspectRatio="xMidYMid meet" style={{position:"absolute",right:"7%",top:"6%",height:"73%",width:"57%",zIndex:-2,pointerEvents:"none"}}>
       <defs><clipPath id={id+"cut"}><path d={path}/></clipPath><filter id={id+"soft"} x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter></defs>
       <path d={path} fill={base}/>
       <g clipPath={`url(#${id}cut)`} fill="none"><path d={path} stroke={edge} strokeWidth="21" filter={`url(#${id}soft)`}/><path d={path} stroke={light} strokeWidth="3.5"/></g>

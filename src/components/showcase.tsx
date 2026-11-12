@@ -5,7 +5,7 @@ import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, 
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { BreathingBandsFooter, type BandPalette } from "./experiments/BreathingBandsFooter";
-import { ChromaCard, ChromaBadge, ChromaButton } from "./experiments/ChromaTiles";
+import { ChromaCard } from "./experiments/ChromaTiles";
 import { PrismDrift, driftPalettes } from "./experiments/PrismDrift";
 import { CutInkFooter, printInks } from "./experiments/CutInkFooter";
 import { SpectrumType } from "./experiments/SpectrumType";
@@ -173,25 +173,16 @@ function shuffleDriftPalettes():typeof driftPalettes {
   };
 }
 function PrismDriftSample(){return <PrismDrift style={{width:"100%",height:"100%"}}/>;}
-function ChromaSheet({fullSize=false}: {fullSize?:boolean} = {}){
-  const [saved,setSaved]=useState(false);
-  return <div className="chroma-display">
-    {fullSize && <div className="chroma-actions">
-      <ChromaButton aria-pressed={saved} onClick={()=>setSaved(!saved)}>{saved?"Saved":"Save study"}</ChromaButton>
-      <ChromaBadge finish="ember">Collection</ChromaBadge>
-    </div>}
-    <div className="chroma-sheet">
-    <ChromaCard finish="dusk" shape="arch" style={{gridRow:"span 2",alignItems:"flex-start",gap:8}}>
-      <strong>Light studies</strong>
-    </ChromaCard>
-    <ChromaCard shape="diamond"><strong>Refraction</strong></ChromaCard>
+function ChromaSheet(){
+  return <div className="chroma-sheet">
+    <ChromaCard finish="dusk" shape="arch"><strong>Light studies</strong></ChromaCard>
+    <ChromaCard finish="lagoon" shape="diamond"><strong>Refraction</strong></ChromaCard>
     <ChromaCard finish="iris" shape="steps"><strong>Afterimage</strong></ChromaCard>
-    </div>
   </div>;
 }
 const collection = [
   {title:"Breathing Bands",description:"A single ribbon of stepped color expands and settles in a slow rhythm.",slug:"breathing-bands",component:"BreathingBandsFooter",icon:Layers2,preview:()=> <BreathingBandsFooter/>},
-  {title:"Chroma Tiles",description:"Saturated ink gathers along the edges of buttons, badges, and geometric bento cards.",slug:"chroma-tiles",component:"ChromaTiles",icon:Grid2X2,preview:ChromaSheet},
+  {title:"Chroma Tiles",description:"Three geometric studies in glowing edges and tinted type.",slug:"chroma-tiles",component:"ChromaTiles",icon:Grid2X2,preview:ChromaSheet},
   {title:"Prism Drift",description:"Uneven vertical slices carry a rising color wave from citrus and pink into turquoise and violet.",slug:"prism-drift",component:"PrismDrift",icon:Layers2,preview:PrismDriftSample},
   {title:"Cut Ink Footer",description:"Cut-paper letters overlap in four grainy inks. Change the word or mix your own palette.",slug:"cut-ink-footer",component:"CutInkFooter",icon:Layers2,preview:()=> <CutInkFooter/>},
   {title:"Spectrum Type",description:"Turn the angle to cast a tapered spectrum from the letters. Depth sets how far the color travels.",slug:"spectrum-type",component:"SpectrumType",icon:Type,preview:()=> <SpectrumType/>},
