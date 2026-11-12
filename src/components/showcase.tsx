@@ -95,7 +95,6 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <header><span><Code2/>{isVideo ? "KineticParagraph" : item.slug}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
     </section>
-    {isVideo && <a className="composition-file" href="/kinetic-paragraph/Root.tsx" download>Download composition TSX</a>}
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}
     <span className="sr-only" role="status">{feedback && feedback + " copied"}</span>
   </>;
