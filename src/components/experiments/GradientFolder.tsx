@@ -37,8 +37,11 @@ export function GradientFolder({ color="persimmon", label="Field notes", size=24
         <radialGradient id={uid+"-shadow"}><stop stopColor={shade} stopOpacity=".29"/><stop offset="1" stopColor={shade} stopOpacity="0"/></radialGradient>
       </defs>
       <ellipse cx="132" cy="208" rx="99" ry="12" fill={paint("shadow")}/>
-      <motion.g animate={{y:open?-3:0,scale:open?1.025:1}} transition={spring} style={{transformOrigin:"130px 202px"}}>
-        <path d="M38 75Q38 64 50 64H88Q94 64 100 70L106 76Q109 79 116 79H208Q220 79 220 92V189Q220 202 207 202H51Q38 202 38 188Z" fill={paint("back")}/>
+      <g>
+        <motion.path initial={false} animate={{d: open
+          ? "M39 81Q39 70 51 70H93Q99 70 105 76L112 82Q115 85 122 85H215Q227 85 227 98L220 189Q220 202 207 202H51Q38 202 38 188Z"
+          : "M38 75Q38 64 50 64H88Q94 64 100 70L106 76Q109 79 116 79H208Q220 79 220 92L220 189Q220 202 207 202H51Q38 202 38 188Z"}}
+          transition={spring} fill={paint("back")}/>
         {[0,1,2].map((i)=><motion.g key={i}
           style={{transformOrigin:"130px 175px"}}
           animate={{y:open?[-27,-19,-12][i]:0,rotate:open?[-10,2,10][i]:[-4,1,4][i],x:open?(i-1)*5:0}}
@@ -48,13 +51,13 @@ export function GradientFolder({ color="persimmon", label="Field notes", size=24
             <rect width="28" height="3" rx="1.5" opacity=".65"/><path d="M0 11h87m-87 6h72m-72 6h83" fill="none" stroke="currentColor" color="#c8c2bb" strokeWidth="2"/>
           </g>
         </motion.g>)}
-        <motion.g style={{transformOrigin:"130px 204px"}} animate={{scaleY:open?.9:1,scaleX:open?1.045:1}} transition={spring}>
+        <g>
           <path d={pocket} fill={paint("front")}/><path d={pocket} fill={paint("glaze")} stroke={glow} strokeOpacity=".46" strokeWidth="1"/>
           <path d="M47 194q1 5 7 5h151" fill="none" stroke={shade} strokeOpacity=".13"/>
           <text x="53" y="183" fontFamily="system-ui,sans-serif" fontSize="12" fontWeight="600" fill={shade}>{label}</text>
           <g fill={shade} opacity=".75">{[0,1,2].map(i=><circle key={i} cx="203" cy={175+i*3.4} r="1.1"/>)}</g>
-        </motion.g>
-      </motion.g>
+        </g>
+      </g>
     </svg>
   </button>;
 }
