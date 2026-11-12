@@ -5,10 +5,37 @@ import { useEffect, useRef } from "react";
 // A single wing in local coordinates, with the thorax at the origin.
 const outline = "M2 -7 C18 -35 53 -65 83 -76 C106 -86 103 -57 99 -40 C96 -21 87 -5 75 0 Q63 6 47 5 C68 12 83 33 71 46 Q67 53 60 51 Q55 63 46 57 Q36 66 28 55 C12 50 6 27 2 12 Z";
 // RGB equivalents of the voice blob’s resting CMYK-inspired ink stops.
-const inks = [[0,196,250],[250,0,133],[250,225,0],[250,0,133],[22,25,44],[0,196,250]];
+const originalInks = [[0,196,250],[250,0,133],[250,225,0],[250,0,133],[22,25,44],[0,196,250]];
 
-export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
+function generator(seed:number) {
+  let state=seed>>>0;
+  return ()=>{
+    state=(state+0x6d2b79f5)>>>0;
+    let v=Math.imul(state^(state>>>15),state|1);
+    v^=v+Math.imul(v^(v>>>7),v|61);
+    return ((v^(v>>>14))>>>0)/4294967296;
+  };
+}
+
+function pigment(hue:number,saturation:number,light:number) {
+  return [0,8,4].map(offset=>{
+    const k=(offset+hue/30)%12;
+    return Math.round(255*(light-saturation*Math.min(light,1-light)*Math.max(-1,Math.min(k-3,9-k,1))));
+  });
+}
+
+export function HalftoneButterfly({ hue=0, seed=0 }: {hue?:number;seed?:number} = {}) {
+  return <div role="img" aria-label="Two flying butterflies with distinct color-shifting halftone wings"
+    style={{position:"relative",width:"100%",height:"100%",background:"#09090d",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
+    <ButterflyLayer seed={seed} companion={false}/>
+    <ButterflyLayer seed={seed} companion/>
+  </div>;
+}
+
+function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
+  const flight=useRef({t:companion?3.4:0,travel:0,heading:companion?-1.5:.55,bank:0,pitch:0,wingPhase:companion?2:0,destination:companion?2:0,
+    route:companion?[[.96,.23,18],[.91,.63,30],[.24,.82,-42],[.05,.68,-23]]:[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]]});
   useEffect(()=>{
     const node=canvas.current!,ctx=node.getContext("2d");
     if(!ctx)return;
@@ -16,15 +43,25 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
     const wing=new Path2D(outline);
     // Batch dots by pigment phase so each frame needs only a few fill calls.
     type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number;freedom:number};
+    const pair=generator(seed);
+    const base=(seed===0?195:pair()*360)+(companion?150+pair()*60:0);
+    const random=generator(seed^(companion?0x6271dac3:0x15f389bd));
+    const classic=!companion&&seed===0;
+    const inks=classic?originalInks:Array.from({length:4+Math.floor(random()*4)},()=>
+      pigment((base+(random()-.5)*116+360)%360,.68+random()*.31,.38+random()*.38));
+    const frequency=.006+random()*.022, stripes=2+random()*6;
+    const spotX=20+random()*50,spotY=-48+random()*70, twist=random()*5;
+    const spacing=2.55+random()*.9;
     const bands=Array.from({length:64},(): Dot[]=>[]);
-    for(let row=0;row<61;row++){
-      const y=-80+row*2.5;
-      for(let col=0;col<40;col++){
-        const x=col*2.9+(row%2)*1.45;
+    for(let row=0;row<Math.ceil(148/(classic?2.5:spacing*.86));row++){
+      const y=-80+row*(classic?2.5:spacing*.86);
+      for(let col=0;col<42;col++){
+        const x=(col+(row%2)*.5)*(classic?2.9:spacing);
         if(!ctx.isPointInPath(wing,x,y))continue;
         const distance=Math.hypot(x,y),angle=Math.atan2(y,x);
         const veins=Math.pow(.5+.5*Math.cos(angle*29+distance*.045),7);
-        const phase=distance*.007+.18*Math.sin(angle*3)+.12*veins+(y>6?.18:0);
+        const phase=classic?distance*.007+.18*Math.sin(angle*3)+.12*veins+(y>6?.18:0)
+          : Math.hypot(x-spotX,y-spotY)*frequency+.24*Math.sin(angle*stripes+twist+distance*.035)+.16*veins;
         const band=bands[(Math.floor(phase*64)%64+64)%64];
         const radius=.84+.51*veins+.19*Math.sin(distance*.12);
         const span=Math.min(1,distance/118);
@@ -42,12 +79,11 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
       }
     }
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
-    let visible=false, frame=0, last=0, t=0;
+    let visible=false, frame=0, last=0;
     // Overlapping spline spans preserve velocity through each new destination.
     // Pairs of destinations at each side produce broad passes and sweeping turns.
-    const route=[[.04,.72,-42],[.08,.45,-48],[.76,.19,24],[.96,.31,34]];
-    let destination=0;
-    let travel=0, heading=.55, bank=0, pitch=0, wingPhase=0;
+    const route=flight.current.route;
+    let {t,destination,travel,heading,bank,pitch,wingPhase}=flight.current;
     function paint(now:number){
       const dt=reduce.matches?0:Math.max(0,Math.min(.05,(now-last)/1000));
       t+=dt;
@@ -129,7 +165,7 @@ export function HalftoneButterfly({ hue = 0 }: { hue?: number } = {}) {
     function sync(){cancelAnimationFrame(frame);last=performance.now();if(visible&&!document.hidden)paint(last)}
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync()});
     observer.observe(node);reduce.addEventListener("change",sync);document.addEventListener("visibilitychange",sync);
-    return ()=>{observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
-  },[]);
-  return <canvas ref={canvas} width={780} height={540} role="img" aria-label="Butterfly with fluttering wings made of color-shifting halftone dots" style={{display:"block",width:"100%",height:"100%",minHeight:0,filter:`hue-rotate(${hue}deg)`,background:"#09090d"}}/>;
+    return ()=>{Object.assign(flight.current,{t,destination,travel,heading,bank,pitch,wingPhase});observer.disconnect();cancelAnimationFrame(frame);reduce.removeEventListener("change",sync);document.removeEventListener("visibilitychange",sync)};
+  },[seed,companion]);
+  return <canvas ref={canvas} width={780} height={540} aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>;
 }
