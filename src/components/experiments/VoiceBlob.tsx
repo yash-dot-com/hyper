@@ -2,6 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// Each row pairs an outer rim and wash with a contrasting core and ribbon.
+const pigments = [
+  [0x55afc9,0x69b6a6,0xfc5356,0xff9267],
+  [0xffa68b,0xf75877,0xff8b08,0xffcc34],
+  [0xf4dc36,0xffb126,0xf42e71,0xff799b],
+  [0xf5a6ac,0xed658c,0xc62e8b,0x8d6ab6],
+  [0xec8dba,0x9875bd,0x327fbb,0x49b5c4],
+  [0x80cbb3,0x4aa8a5,0x155a73,0x399caf],
+  [0x61aa74,0x92c24b,0xf37330,0xf5c829],
+  [0x6ab6af,0xc9d58b,0xe93975,0xff7da4],
+];
+function pigment(phase:number, layer:number, alpha=1) {
+  const n=Math.floor(phase), f=phase-n, mix=f*f*(3-2*f);
+  const a=pigments[n%pigments.length][layer], b=pigments[(n+1)%pigments.length][layer];
+  const rgb=[16,8,0].map(shift=>{const from=(a>>shift)&255;return Math.round(from+(((b>>shift)&255)-from)*mix);});
+  return `rgba(${rgb.join(",")},${alpha})`;
+}
+
 export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;size?:number|string}) {
   const canvas=useRef<HTMLCanvasElement>(null);
   const [enabled,setEnabled]=useState(false),[status,setStatus]=useState("");
@@ -33,7 +51,7 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
     const node=canvas.current!,ctx=node.getContext("2d");if(!ctx)return;
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
     const samples=new Float32Array(1024),bins=new Uint8Array(512);
-    let raf=0,last=0,time=0,energy=0,bright=0,visible=true;
+    let raf=0,last=0,time=0,energy=0,phase=0,bright=0,visible=true;
     function draw(now:number){
       raf=requestAnimationFrame(draw);
       if(now-last<(reduce.matches?100:32))return;
@@ -44,12 +62,19 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
         for(const v of samples)rms+=v*v;
         rms=Math.min(1,Math.max(0,Math.sqrt(rms/samples.length)-.006)*8);
         audio.current.getByteFrequencyData(bins);
-        for(let i=12;i<84;i++)band+=bins[i];
-        band/=72*255;
+        let power=0;
+        const hzPerBin=audio.current.context.sampleRate/audio.current.fftSize;
+        for(let i=1;i<bins.length && i*hzPerBin<5000;i++){
+          const magnitude=bins[i]**2;
+          power+=magnitude; band+=magnitude*i*hzPerBin;
+        }
+        band=power?Math.min(1,band/power/2300):0;
       }
       energy+=(rms-energy)*(1-Math.exp(-dt*(rms>energy?18:5)));
       bright+=(band-bright)*(1-Math.exp(-dt*7));
       if(!reduce.matches)time+=dt*(.6+energy);
+      phase=(phase+dt*(.22+energy*(.9+bright*1.4))*(reduce.matches?.25:1))%pigments.length;
+      const rimPhase=phase+energy*.38, corePhase=phase+bright*energy*1.6;
       const c=ctx!, t=time, e=reduce.matches?0:energy;
       c.setTransform(node.width/240,0,0,node.height/240,0,0);c.clearRect(0,0,240,240);
       const outline=new Path2D();
@@ -61,16 +86,16 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
       }
       outline.closePath();c.save();c.clip(outline);
       const wash=c.createLinearGradient(62,50,166,192);
-      wash.addColorStop(0,"#55afc9");wash.addColorStop(.37,"#69b6a6");wash.addColorStop(.61,"#dab28f");wash.addColorStop(1,"#55afc9");
+      wash.addColorStop(0,pigment(rimPhase,0));wash.addColorStop(.37,pigment(phase,1));wash.addColorStop(.68,pigment(corePhase,3));wash.addColorStop(1,pigment(rimPhase,0));
       c.fillStyle=wash;c.fillRect(20,20,200,200);
       c.save();c.translate(120,120);c.rotate(-.5+Math.sin(t*.7)*.28);c.scale(1,.76);
       const offset=12*Math.sin(t)+e*12;
       const core=c.createRadialGradient(offset,17,3,offset,18,81);
-      core.addColorStop(0,`rgb(253,${Math.round(70+bright*85)},67)`);core.addColorStop(.52,"#fc5356");core.addColorStop(.75,"#ff9267");core.addColorStop(1,"rgba(250,159,117,0)");
+      core.addColorStop(0,pigment(corePhase,2));core.addColorStop(.52,pigment(corePhase+.12,2));core.addColorStop(.75,pigment(corePhase,3));core.addColorStop(1,pigment(corePhase,3,0));
       c.fillStyle=core;c.fillRect(-122,-150,244,300);c.restore();
-      c.save();c.filter="blur(9px)";c.strokeStyle="rgba(255,183,121,.64)";c.lineWidth=13;
+      c.save();c.filter="blur(9px)";c.strokeStyle=pigment(corePhase,3,.7);c.lineWidth=13;
       c.beginPath();c.moveTo(61,112);c.bezierCurveTo(68,157+offset,109,180,162,129-offset*.4);c.stroke();c.restore();
-      c.strokeStyle="rgba(177,237,213,.46)";c.lineWidth=4;c.filter="blur(2px)";c.stroke(outline);c.restore();
+      c.strokeStyle=pigment(rimPhase,1,.6);c.lineWidth=4;c.filter="blur(2px)";c.stroke(outline);c.restore();
     }
     function sync(){cancelAnimationFrame(raf);if(visible&&!document.hidden){last=performance.now()-110;draw(performance.now());}}
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync();});observer.observe(node);

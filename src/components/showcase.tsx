@@ -110,7 +110,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
 const collection = [
-  {title:"Voice Blob",description:"A single pool of coral and turquoise responds to your voice. Enable the microphone to shape it with sound; audio stays in your browser.",slug:"voice-blob",component:"VoiceBlob",icon:Layers2,preview:()=> <VoiceBlob microphone={false} size={175}/>},
+  {title:"Voice Blob",description:"Pigments drift through a single blob. Louder syllables accelerate the color changes; vocal tone shifts the core. Enable the microphone to shape it with sound; audio stays in your browser.",slug:"voice-blob",component:"VoiceBlob",icon:Layers2,preview:()=> <VoiceBlob microphone={false} size={175}/>},
   {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
   {title:"Isometric Block Type",description:"Cube-built pieces tumble onto an isometric plane and assemble into your text.",slug:"isometric-block-type",component:"IsoBlockType",icon:Type,preview:()=> <IsoBlockType/>},
   {title:"Block Type",description:"Falling pieces turn and lock into letterforms. Change the text to build a new word.",slug:"block-type",component:"BlockType",icon:Type,preview:()=> <BlockType/>},
