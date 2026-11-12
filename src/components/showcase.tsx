@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { MomentumLoader } from "./experiments/MomentumLoader";
 import { InkFusion } from "./experiments/InkFusion";
 import { HalftoneSticker } from "./experiments/HalftoneSticker";
 import { HalftoneVoiceBlob } from "./experiments/HalftoneVoiceBlob";
@@ -119,7 +120,17 @@ function InkStickerSheet() {
 function FusionSample({fullSize=false}: {fullSize?:boolean} = {}) {
   return <InkFusion className="fusion-sample" style={{width:fullSize?320:168,maxWidth:"100%",aspectRatio:"16 / 15",background:"#c9cec3"}} role="img" aria-label="Interactive ink dot pattern" tabIndex={0}/>;
 }
+function MomentumSheet({fullSize=false}: {fullSize?:boolean} = {}) {
+  const [running,setRunning]=useState(true);
+  return <div style={{display:"grid",justifyItems:"center",gap:18,width:"100%"}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",width:fullSize?"min(96%,560px)":"min(96%,300px)"}}>
+      {(["lattice","relay","bloom"] as const).map(variant=><MomentumLoader key={variant} variant={variant} active={running} size="100%"/>)}
+    </div>
+    {fullSize && <Button variant="outline" onClick={()=>setRunning(!running)}>{running?"Wind down":"Spin again"}</Button>}
+  </div>;
+}
 const collection = [
+  {title:"Momentum Loaders",description:"Three spinning studies in squares and dots. Wind them down to watch each pattern fold into a single frame and dot.",slug:"momentum-loaders",component:"MomentumLoader",icon:Layers2,preview:MomentumSheet},
   {title:"Ink Fusion",description:"Move the pointer across the print. Nearby dots draw together and fuse, then release as you pass.",slug:"ink-fusion",component:"InkFusion",icon:Layers2,preview:FusionSample},
   {title:"Parallax Ink Stickers",description:"Move across a sticker to slide its dot screen over the yellow print.",slug:"parallax-ink-stickers",component:"HalftoneSticker",icon:Layers2,preview:InkStickerSheet},
   {title:"Halftone Voice Blob",description:"Speech stirs the colored ink dots. Pause and they swirl into a spinning ring before drifting back.",slug:"halftone-voice-blob",component:"HalftoneVoiceBlob",icon:Layers2,preview:()=> <HalftoneVoiceBlob microphone={false} size={180}/>},
@@ -208,7 +219,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : item.slug === "ink-fusion" ? ["Use the supplied InkFusion wrapper around your component. Give the wrapper dimensions or let its children size it. Set ink to customize the dot color. Keep the decorative layer behind content; transparent surfaces reveal it. Retain hover, focus and reduced-motion behavior.", "```tsx", source, "```"].join("\n\n") : item.slug === "parallax-ink-stickers" ? ["Use the supplied HalftoneSticker React component inside a sized container. Choose spark, disc, cube, bow, arrow or vase with the shape prop. Set base and ink colors as needed. Preserve pointer parallax on the ink layer and reduced-motion support.", "```tsx", source, "```"].join("\n\n") : item.slug === "halftone-voice-blob" ? ["Render the supplied HalftoneVoiceBlob with opt-in microphone input. Set microphone={false} for an ambient thumbnail. Preserve local voice analysis and microphone cleanup.", "```tsx", source, "```"].join("\n\n") : isFrost ? [
+    const text = kind === "code" ? source : item.slug === "momentum-loaders" ? ["Use the named MomentumLoader component below. Bind active to the actual loading state and keep the loader mounted as active becomes false so its momentum can decay. Choose lattice, relay or bloom as the variant.", "```tsx", source, "```"].join("\n\n") : item.slug === "ink-fusion" ? ["Use the supplied InkFusion wrapper around your component. Give the wrapper dimensions or let its children size it. Set ink to customize the dot color. Keep the decorative layer behind content; transparent surfaces reveal it. Retain hover, focus and reduced-motion behavior.", "```tsx", source, "```"].join("\n\n") : item.slug === "parallax-ink-stickers" ? ["Use the supplied HalftoneSticker React component inside a sized container. Choose spark, disc, cube, bow, arrow or vase with the shape prop. Set base and ink colors as needed. Preserve pointer parallax on the ink layer and reduced-motion support.", "```tsx", source, "```"].join("\n\n") : item.slug === "halftone-voice-blob" ? ["Render the supplied HalftoneVoiceBlob with opt-in microphone input. Set microphone={false} for an ambient thumbnail. Preserve local voice analysis and microphone cleanup.", "```tsx", source, "```"].join("\n\n") : isFrost ? [
       `Integrate the supplied FrostedTileFooter. Render <FrostedTileFooter label={${JSON.stringify(tileLabel)}} colors={${JSON.stringify(tileColors)}} /> at the bottom of the page. Pass footer links or secondary content as children if needed.`, "```tsx", source, "```",
     ].join("\n\n") : isVoice ? [
       "Use the named VoiceBlob client component below. Render <VoiceBlob /> to offer opt-in microphone input, or <VoiceBlob microphone={false}/> for an ambient preview. Keep processing local, handle denied permission, and release the stream on stop or unmount.", "```tsx", source, "```",
