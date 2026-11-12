@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { CardCascade } from "./experiments/CardCascade";
 import { BlockType, IsoBlockType } from "./experiments/BlockType";
 import { ProceduralTree, treeDesigns, type TreeDesign, type TreeSettings } from "./experiments/ProceduralTree";
 import { LuminousSurface, lightFinishes, type LightFinish } from "./experiments/LuminousSurface";
@@ -108,6 +109,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
 const collection = [
+  {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
   {title:"Isometric Block Type",description:"Cube-built pieces tumble onto an isometric plane and assemble into your text.",slug:"isometric-block-type",component:"IsoBlockType",icon:Type,preview:()=> <IsoBlockType/>},
   {title:"Block Type",description:"Falling pieces turn and lock into letterforms. Change the text to build a new word.",slug:"block-type",component:"BlockType",icon:Type,preview:()=> <BlockType/>},
   {title:"Procedural Tree", description:"Angular stems grow from a single root. Change the dimensions, branching depth, or seed to grow another tree.",slug:"procedural-tree",component:"ProceduralTree",icon:Layers2,preview:TreeThumbnail},
@@ -141,6 +143,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
   const isoBlock = item.slug === "isometric-block-type";
+  const isCascade = item.slug === "card-cascade";
+  const [paused,setPaused]=useState(false);
+  const [deal,setDeal]=useState(0);
   const isBlock = isoBlock || item.slug === "block-type";
   const TextDemo = isoBlock ? IsoBlockType : BlockType;
   const [word,setWord]=useState("Hype");
@@ -183,7 +188,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isBlock ? [
+    const text = kind === "code" ? source : isCascade ? [
+      "Use the supplied CardCascade React canvas component in a client boundary. Render <CardCascade/>. Toggle paused to pause or resume and increment replay to clear the trails. Preserve the reduced-motion still and offscreen pause.", "```tsx", source, "```",
+    ].join("\n\n") : isBlock ? [
       `Integrate the named ${item.component} React component in a client boundary. Render <${item.component} text={${JSON.stringify(word)}} />. Increment its replay prop to restart the drop. Keep the reduced-motion still and accessible text label.`, "```tsx", source, "```",
     ].join("\n\n") : isTree ? [
       `Use the named ProceduralTree export in a React project. Render <ProceduralTree design="${design}" width={${tree.width}} height={${tree.height}} depth={${tree.depth}} seed={${tree.seed}} />. Keep seeded geometry, parent-before-child animation and reduced-motion behavior. In Next.js import from a client boundary.`,
@@ -244,8 +251,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isCascade ? <CardCascade paused={paused} replay={deal}/> : isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isCascade && <div className="demo-modes" style={{marginTop:14}}><Button variant="outline" onClick={()=>setPaused(p=>!p)}>{paused?"Resume":"Pause"}</Button><Button variant="outline" onClick={()=>{setPaused(false);setDeal(n=>n+1)}}>Replay cascade</Button></div>}
     {isBlock && <div className="pixel-controls"><label>Text<input maxLength={24} value={draftWord} onChange={e=>setDraftWord(e.target.value)} style={{border:"1px solid var(--edge)",borderRadius:6,padding:"6px 10px",color:"var(--foreground)"}}/></label><Button variant="outline" onClick={()=>{setWord(draftWord); replayDrop(n=>n+1)}}>Replay drop</Button></div>}
     {isTree && <div className="pixel-controls">
       <label>Design<select value={design} onChange={e=>setDesign(e.target.value as TreeDesign)}>{treeDesigns.map(d=><option key={d}>{d}</option>)}</select></label>

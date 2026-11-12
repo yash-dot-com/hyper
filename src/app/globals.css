@@ -244,3 +244,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .stage.art-block-type,.art-block-type .mini {background:#070708;grid-template:minmax(0,1fr)/minmax(0,1fr)}
 
 .stage.art-isometric-block-type,.art-isometric-block-type .mini {background:#090b11;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+
+.stage.art-card-cascade {height:auto;display:block}.art-card-cascade .mini {background:#0d624c}
