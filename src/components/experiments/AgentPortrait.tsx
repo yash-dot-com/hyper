@@ -1,6 +1,6 @@
 import { useId, type CSSProperties } from "react";
 
-export const avatarShapes = ["square", "triangle", "circle", "cloud"] as const;
+export const avatarShapes = ["square", "circle", "cloud"] as const;
 export type AvatarShape = typeof avatarShapes[number];
 
 export const agentStates = ["idle", "listening", "thinking", "reading", "planning", "working", "checking", "waiting", "blocked", "done"] as const;
@@ -68,10 +68,9 @@ export function AgentPortrait({ state = "idle", shape = "square", size = 240 }: 
     <g fill="#f6dca3" stroke={ink} strokeWidth="3" strokeLinejoin="round">
       {shape === "square" && <rect x="3" y="-12" width="154" height="154" rx="29"/>}
       {shape === "circle" && <circle cx="80" cy="65" r="77"/>}
-      {shape === "triangle" && <path d="M70 2Q80-15 90 2L154 121Q163 139 143 139H17Q-3 139 6 121Z"/>}
       {shape === "cloud" && <path d="M35 120C15 120 3 105 3 87C3 70 12 57 27 53C23 31 43 15 63 22C75-5 116-3 126 29C143 29 156 43 152 62C169 83 152 118 129 118C118 133 98 136 81 125C64 138 44 134 35 120Z"/>}
     </g>
-    <g transform={shape === "triangle" ? "translate(29 45) scale(.64)" : shape === "cloud" ? "translate(12 16) scale(.85)" : undefined}>
+    <g transform={shape === "cloud" ? "translate(12 16) scale(.85)" : undefined}>
     <g className="ae-pose" style={{transform:`rotate(${f.tilt}deg)`}}>
       <g className={`ae-body ${f.rhythm}`}>
         {f.eyes.map((shape,i) => {
