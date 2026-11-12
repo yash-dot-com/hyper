@@ -18,11 +18,11 @@ npm start
 
 ## The collection
 
-- **Orbit** — an animated SVG orbital study.
-- **Chromatic** — translucent CSS planes in a continuous loop.
-- **Card stack** — interactive cards with keyboard support.
+- Motif Globe
+- Image Ripple Loader
+- Kinetic Paragraph
 
-All three are self-contained React + CSS examples, with no animation dependencies. The gallery includes preview/code tabs, playback and restart controls, preview backgrounds, source copying, usage examples, and a full coding-agent prompt. Animations respect reduced-motion preferences. Component links use URL hashes.
+Each entry includes a rendered preview, copyable source, and a coding-agent prompt.
 
 ## Add an experiment
 
@@ -31,5 +31,3 @@ All three are self-contained React + CSS examples, with no animation dependencie
 3. Import it and add its metadata in `src/components/showcase.tsx`, in the same order.
 
 The server reads the real component files into a cached, prerendered page. Source snippets and agent prompts therefore use the same implementation as the preview. No API keys or backend services are required.
-
-This initial collection uses React/CSS; a Remotion player and compositions are not installed yet.

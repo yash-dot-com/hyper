@@ -139,7 +139,7 @@ button,a {cursor:pointer} :focus-visible {outline:2px solid #e4cb94;outline-offs
 .rail nav {margin-top:52px}
 .rail nav a {display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:8px;color:#b6b6b0;font-size:14px}
 .rail nav a:hover,.rail nav a[aria-current] {background:#2b2b29;color:#fff}
-.rail svg,.editor svg,.playback svg {width:16px;height:16px;stroke-width:1.65}
+.rail svg,.editor svg {width:16px;height:16px;stroke-width:1.65}
 .rail h2 {color:#90908a;font-size:12px;font-weight:500;margin:34px 12px 9px}
 .canvas {width:100%;max-width:1300px;margin-inline:auto;padding:clamp(40px,6vw,92px) clamp(24px,5vw,80px);min-width:0}
 h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-height:1.05}
@@ -149,22 +149,15 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .tile+.tile {border-left:1px solid var(--edge)}
 .mini,.stage {display:grid;place-items:center}
 .mini {height:clamp(185px,19vw,290px);overflow:hidden;position:relative}
-.mini > div {position:absolute;width:360px;max-width:none;scale:.56}
-.mini .stack-study {width:240px;scale:.52}
-.mini .chromatic-study {width:310px;scale:.56}
-.art-orbit .orbit-study {color:#e2ddcc}
 .tile a {display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-top:1px solid var(--edge);font-size:17px}
 .tile a::after {content:"";position:absolute;inset:0}
 .tile:focus-within,.tile:hover {background:#252523}
 .tile a svg {width:16px;color:var(--quiet)}
-.detail-head,.editor header,.editor header span,.editor button,.playback {display:flex;align-items:center}
+.detail-head,.editor header,.editor header span,.editor button {display:flex;align-items:center}
 .detail-head {justify-content:space-between;gap:16px;margin-bottom:16px}
 .prompt-action {background:#eeeDE8;color:#222;border-radius:100px;height:37px;padding:0 15px}
 .prompt-action:hover {background:white}
 .stage {position:relative;height:clamp(310px,40vw,465px);background:#20201f}
-.piece {display:grid;place-items:center;width:min(100%,510px);padding:15px}
-.playback {position:absolute;bottom:15px;right:15px;border:1px solid #484844;border-radius:20px;background:#252524}
-.playback button {padding:8px 11px;color:#d4d4cc}
 .editor {margin-top:22px;background:#111212;font:13px/1.65 var(--font-geist-mono),monospace;letter-spacing:0}
 .editor header {padding:12px 18px;justify-content:space-between;background:#212120;border-bottom:1px solid var(--edge)}
 .editor header span,.editor button {gap:9px}
@@ -174,7 +167,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .line i {position:sticky;left:0;display:inline-block;background:#111212;text-align:right;padding:0 15px 0 8px;width:52px;color:#777a77;font-style:normal;user-select:none}
 .tok-keyword {color:#c4a9f7}.tok-string {color:#b1cf9b}.tok-tag {color:#efa693}.tok-attr {color:#a7c4ed}.tok-comment {color:#94988e}.tok-fn {color:#ecd193}.tok-number,.tok-type {color:#91d4d0}
 .manual {display:grid;gap:8px;margin-top:16px}.manual textarea {width:100%;min-height:120px;padding:12px;border:1px solid var(--edge)}
-@media(max-width:900px) and (min-width:701px){.library{grid-template-columns:168px minmax(0,1fr)}.canvas{padding-inline:26px}.mini > div{scale:.45}.mini .chromatic-study,.mini .stack-study{scale:.44}}
+@media(max-width:900px) and (min-width:701px){.library{grid-template-columns:168px minmax(0,1fr)}.canvas{padding-inline:26px}}
 @media(max-width:700px){.library{display:block}.rail{height:auto;z-index:2;border-right:0;border-bottom:1px solid var(--edge);padding:14px}.wordmark{font-size:23px}.menu-toggle{display:grid;place-items:center;width:36px;height:36px}.rail nav{display:none;margin-top:18px}.rail.open nav{display:block}.rail h2{margin-top:15px}.canvas{padding:34px 20px}.gallery{grid-template-columns:1fr;margin-top:24px}.tile+.tile{border-left:0;border-top:1px solid var(--edge)}.mini{height:200px}.detail-head{margin-bottom:14px}.editor{font-size:12px}.line i{width:36px;padding-right:9px}}
 
 .component-description { max-width: 54ch; margin: 0; padding-block-end: 24px; text-align: start; text-wrap: pretty; color: var(--quiet); font-size: 16px; line-height: 1.6; letter-spacing: -.015em; }
