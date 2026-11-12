@@ -495,7 +495,6 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
       {slug === "about" ? <section className="author-profile" aria-labelledby="author-name">
         <header className="detail-head"><h1 id="author-name" className="author-block-name" aria-label="Yash Sonalekar"><BlockType text="yash sonalekar"/></h1></header>
         <div className="author-story">
-          <p className="author-lead">I draw with code. Even my name up there is a pile of falling blocks.</p>
           <p className="component-description">Hyper is my place to play with small details. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
           <p className="component-description">Every experiment comes with its code so you can take it apart and make it yours.</p>
           <nav className="author-links" aria-label="Social profiles and project repository">
