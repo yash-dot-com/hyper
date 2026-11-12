@@ -132,11 +132,11 @@
 body {font-family:"GT Standard L",var(--font-geist),Arial,sans-serif;letter-spacing:-.025em}
 button,a {cursor:pointer} :focus-visible {outline:2px solid #e4cb94;outline-offset:3px}
 .library {display:grid;grid-template-columns:214px minmax(0,1fr);min-height:100svh}
-.rail {position:sticky;top:0;align-self:start;height:100svh;border-right:1px solid var(--edge);background:#151515;padding:32px 17px}
-.rail-head {display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.rail {display:flex;flex-direction:column;max-height:100dvh;position:sticky;top:0;align-self:start;height:100svh;border-right:1px solid var(--edge);background:#151515;padding:32px 17px}
+.rail-head {flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
 .wordmark {font-size:27px;line-height:1;font-weight:650;letter-spacing:-.085em;border:2px solid currentColor;border-radius:100px;padding:1px 12px 5px}
 .menu-toggle {display:none}
-.rail nav {margin-top:52px}
+.rail nav {margin-top:52px;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin}
 .rail nav a {display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:8px;color:#b6b6b0;font-size:14px}
 .rail nav a:hover,.rail nav a[aria-current] {background:#2b2b29;color:#fff}
 .rail svg,.editor svg {width:16px;height:16px;stroke-width:1.65}
