@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { AgentPortrait, agentStates, type AgentState } from "./experiments/AgentPortrait";
+import { AgentPortrait, agentStates, avatarShapes, type AvatarShape, type AgentState } from "./experiments/AgentPortrait";
 import { PixelCharacter } from "./experiments/PixelCharacter";
 import { PixelControls, defaultPixel, pixelPrompt } from "./pixel-settings";
 import { DemoVideo } from "./demo-video";
@@ -58,6 +58,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const item = collection[index];
   const Preview = item.preview;
   const isAgent = item.slug === "agent-portrait";
+  const [avatarShape, setAvatarShape] = useState<AvatarShape>("square");
   const [agentState, setAgentState] = useState<AgentState>("thinking");
   const isPixel = item.slug === "pixel-character";
   const [pixel, setPixel] = useState(defaultPixel);
@@ -73,7 +74,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     const text = kind === "code" ? source : isAgent ? [
       "Use the named AgentPortrait React component below in a client boundary. Map the agent's real lifecycle events to its state prop. Preserve the animated SVG eyes, per-instance clip paths, and reduced-motion behavior.",
       "Supported states: " + agentStates.join(", ") + ".",
-      `Selected usage:\n\`\`\`tsx\nimport { AgentPortrait } from "./AgentPortrait";\n\nexport function Avatar() {\n  return <AgentPortrait state="${agentState}" size={240} />;\n}\n\`\`\``,
+      `Selected usage:\n\`\`\`tsx\nimport { AgentPortrait } from "./AgentPortrait";\n\nexport function Avatar() {\n  return <AgentPortrait shape="${avatarShape}" state="${agentState}" size={240} />;\n}\n\`\`\``,
       "AgentPortrait.tsx (complete source):", "```tsx", source, "```",
     ].join("\n\n") : isPixel ? pixelPrompt(pixel, source) : isGlobe ? [
       "Integrate the named React export MotifGlobe using the complete component below. Save it as MotifGlobe.tsx in a client boundary. It imports three, including when using its software renderer. Use the project's package manager to provide three and matching TypeScript declarations if needed.",
@@ -108,9 +109,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isAgent ? <AgentPortrait state={agentState} size="min(85%, 336px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isAgent ? <AgentPortrait shape={avatarShape} state={agentState} size="min(85%, 336px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {isAgent && <div className="pixel-controls">
+      <label>Shape<select value={avatarShape} onChange={e => setAvatarShape(e.target.value as AvatarShape)}>{avatarShapes.map(shape => <option key={shape}>{shape}</option>)}</select></label>
       <label>Agent state<select value={agentState} onChange={e => setAgentState(e.target.value as AgentState)}>{agentStates.map(value => <option key={value}>{value}</option>)}</select></label>
     </div>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}

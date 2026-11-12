@@ -1,5 +1,8 @@
 import { useId, type CSSProperties } from "react";
 
+export const avatarShapes = ["square", "triangle", "circle", "cloud"] as const;
+export type AvatarShape = typeof avatarShapes[number];
+
 export const agentStates = ["idle", "listening", "thinking", "reading", "planning", "working", "checking", "waiting", "blocked", "done"] as const;
 export type AgentState = typeof agentStates[number];
 /** Retained for callers using the original portrait API. */
@@ -27,8 +30,8 @@ const faces: Record<AgentState, Expression> = {
   done: {eyes:["soft","soft"], tilt:-3, gaze:[2,0], pupil:14, mouth:"M69 96q12 17 25-2", rhythm:"bounce"},
 };
 
-export function AgentPortrait({ state = "idle", size = 240 }: {
-  state?: AgentState; size?: number | string; character?: AgentCharacter;
+export function AgentPortrait({ state = "idle", shape = "square", size = 240 }: {
+  state?: AgentState; shape?: AvatarShape; size?: number | string; character?: AgentCharacter;
 }) {
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const f = faces[state];
@@ -62,7 +65,13 @@ export function AgentPortrait({ state = "idle", size = 240 }: {
       @keyframes ae-bounce {12%{transform:scale(1.04,.95)}24%{transform:translateY(-5px)}38%{transform:scale(1.02,.98)}49%,100%{transform:none}}
       @media(prefers-reduced-motion:reduce){.agent-eyes * {animation:none!important;transition:none!important}}
     `}</style>
-    <rect x="3" y="-12" width="154" height="154" rx="29" fill="#f6dca3" stroke={ink} strokeWidth="3"/>
+    <g fill="#f6dca3" stroke={ink} strokeWidth="3" strokeLinejoin="round">
+      {shape === "square" && <rect x="3" y="-12" width="154" height="154" rx="29"/>}
+      {shape === "circle" && <circle cx="80" cy="65" r="77"/>}
+      {shape === "triangle" && <path d="M70 2Q80-15 90 2L154 121Q163 139 143 139H17Q-3 139 6 121Z"/>}
+      {shape === "cloud" && <path d="M35 120C15 120 3 105 3 87C3 70 12 57 27 53C23 31 43 15 63 22C75-5 116-3 126 29C143 29 156 43 152 62C169 83 152 118 129 118C118 133 98 136 81 125C64 138 44 134 35 120Z"/>}
+    </g>
+    <g transform={shape === "triangle" ? "translate(29 45) scale(.64)" : shape === "cloud" ? "translate(12 16) scale(.85)" : undefined}>
     <g className="ae-pose" style={{transform:`rotate(${f.tilt}deg)`}}>
       <g className={`ae-body ${f.rhythm}`}>
         {f.eyes.map((shape,i) => {
@@ -82,6 +91,7 @@ export function AgentPortrait({ state = "idle", size = 240 }: {
         <g stroke={ink} fill="none" strokeWidth="2.8" strokeLinecap="round"><path d={f.mouth}/>{f.brows && <path d={f.brows}/>}</g>
         {state==="done" && <path fill="#e99a45" d="m135 36 2-6 2 6 5 2-5 2-2 6-2-6-5-2z"/>}
       </g>
+    </g>
     </g>
   </svg>;
 }
