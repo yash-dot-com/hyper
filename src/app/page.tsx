@@ -12,6 +12,6 @@ export default async function Home() {
   const [component, composition] = await Promise.all(
     ["KineticParagraph.tsx", "Root.tsx"].map(file => readFile(path.join(directory, file), "utf8"))
   );
-  sources.unshift(component);
+  sources.unshift(await readFile(path.join(process.cwd(), "src/components/experiments/ImageRippleLoader.tsx"), "utf8"), component);
   return <Showcase composition={composition} sources={sources} highlighted={sources.map(highlight)} />;
 }

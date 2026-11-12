@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Orbit } from "@/components/experiments/orbit";
 import { Chromatic } from "@/components/experiments/chromatic";
 import { CardStack } from "@/components/experiments/card-stack";
+import { RippleDemo, ripplePrompt, type RippleDemoMode } from "@/components/ripple-demo";
 import type { Token } from "@/lib/highlight";
 
 const MotionButton = motion.create(Button);
@@ -24,6 +25,7 @@ function KineticVideo() {
 }
 
 const collection = [
+  { title: "Image Ripple Loader", description: "A grid of tiny marks lights up in passing waves. Watch the rings travel outward in a disc, or follow a band of color across the full frame.", slug: "image-ripple-loader", component: "ImageRippleLoader", icon: Layers2, preview: RippleDemo },
   { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Colored highlights mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", component: "KineticParagraph", icon: Type, preview: KineticVideo },
   { title: "Orbit", description: "Three satellites trace intersecting ellipses around an amber sun. Each follows its own path through the same twelve-second loop.", slug: "orbit", component: "Orbit", icon: OrbitIcon, preview: Orbit },
   { title: "Chromatic", description: "Translucent planes fan out, then fold back together. Lilac and coral overlap to form deeper shades as the angles change.", slug: "chromatic", component: "Chromatic", icon: Sparkles, preview: Chromatic },
@@ -40,6 +42,8 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isRipple = item.slug === "image-ripple-loader";
+  const [mode, setMode] = useState<RippleDemoMode>("disc");
   const isVideo = item.slug === "kinetic-paragraph";
   const [playing, setPlaying] = useState(true);
   const [version, restart] = useState(0);
@@ -49,7 +53,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isVideo ? [
+    const text = kind === "code" ? source : isRipple ? ripplePrompt(mode, source) : isVideo ? [
       "Use the named export KineticParagraph from the full component below in a Remotion composition. Keep its existing animation. Return ready-to-use TSX for the composition.",
       "The example uses an original paragraph beginning with a word that stands alone. Pass it through text. Set background for the canvas, ink for text and outlines, and blue and yellow for the two highlights. Keep these prop names. If adapting the palette, keep ink legible on all three surfaces.",
       "Use one complete 5.6-second cycle with durationInFrames={Math.round(fps * durationSeconds)}. Register the composition in the project's Remotion root.",
@@ -78,8 +82,11 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       <MotionButton {...buttonGestures} className="prompt-action" onClick={() => copy("prompt")}>{feedback === "prompt" ? <Check/> : <Copy/>}{feedback === "prompt" ? "Prompt copied" : "Copy prompt"}</MotionButton>
     </header>
     <p className="component-description">{item.description}</p>
-    <section className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isVideo ? (
+    {isRipple && <div className="demo-modes" role="group" aria-label="Preview style">
+      {(["disc", "frame"] as const).map(value => <button key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</button>)}
+    </div>}
+    <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
+      {isRipple ? <RippleDemo mode={mode}/> : isVideo ? (
         <KineticVideo/>
       ) : <>
       <div className="piece" key={version}><Preview playing={playing}/></div>
@@ -90,7 +97,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       </>}
     </section>
     <section className="editor" aria-label="Component source">
-      <header><span><Code2/>{isVideo ? "KineticParagraph" : item.slug}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
+      <header><span><Code2/>{isRipple || isVideo ? item.component : item.slug}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
     </section>
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}
