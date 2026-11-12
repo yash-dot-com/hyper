@@ -52,6 +52,7 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
     });
     const flares: {angle:number; start:number; reach:number; speed:number; travel:number; radius:number; hue:number}[]=[];
     let raf=0,last=0,time=0,energy=0,visible=true;
+    let heardSpeech=false, quiet=0, cycle=3, gather=0, rotation=0;
     function draw(now:number) {
       raf=requestAnimationFrame(draw);
       if(now-last<(reduce.matches?100:33))return;
@@ -64,6 +65,18 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
       }
       energy+=(rms-energy)*(1-Math.exp(-dt*(rms>energy?17:4)));
       if(!reduce.matches)time+=dt*(.35+energy);
+      if(audio.current && energy>.085){
+        heardSpeech=true; quiet=0; cycle=3;
+      } else if(heardSpeech && energy<.045){
+        quiet+=dt;
+        if(quiet>.38){ cycle=0; heardSpeech=false; }
+      }
+      cycle=Math.min(3,cycle+dt);
+      const gathering=cycle<2.05 && !reduce.matches && !!audio.current;
+      gather=Math.max(0,Math.min(1,gather+(gathering?1.5:-1.35)*dt));
+      const ring=gather*gather*(3-2*gather);
+      if(gather===0)rotation=0;
+      else rotation+=dt*3.6*ring;
       const c=ctx!;
       c.setTransform(node.width/240,0,0,node.height/240,0,0);
       c.globalCompositeOperation="source-over";
@@ -87,10 +100,20 @@ export function HalftoneVoiceBlob({ microphone=true, size=320 }: {microphone?:bo
           const emerge=Math.min(1,Math.max(0,(density-site.threshold)*10));
           if(!emerge)continue;
           if(amount<=.015)continue;
-          const radius=Math.min(4.3,4.15*Math.sqrt(amount)*Math.min(1,amount*5)*emerge*(k===3?.68:1));
-          // A shared rolling current keeps the four screens moving as one body.
-          const x=120+site.x*cos-site.y*sin+3*Math.sin(site.y/34+time);
-          const y=120+site.x*sin+site.y*cos+2.5*Math.cos(site.x/38-time*.9);
+          const radius=Math.min(4.3,3.55*Math.sqrt(amount)*Math.min(1,amount*5)*emerge*(k===3?.68:1));
+          const drift=site.threshold*2*Math.PI;
+          let x=site.x*cos-site.y*sin+(1.6+energy*3)*Math.sin(time*1.7+drift);
+          let y=site.x*sin+site.y*cos+(1.6+energy*3)*Math.cos(time*1.3+drift);
+          if(ring>0){
+            // Surround each plate's lobe with its own arc so rotation reads in color.
+            const start=Math.atan2(y,x);
+            const dest=k*Math.PI/2+(site.threshold-.5)*1.85;
+            const turn=Math.atan2(Math.sin(dest-start),Math.cos(dest-start));
+            const angle=start+turn*ring+rotation*ring+ring*(1-ring)*1.8;
+            const r=Math.hypot(x,y)*(1-ring)+(59+site.distance*.22)*ring;
+            x=Math.cos(angle)*r; y=Math.sin(angle)*r;
+          }
+          x+=120; y+=120;
           c.moveTo(x+radius,y);
           c.arc(x,y,radius,0,Math.PI*2);
         }
