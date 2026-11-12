@@ -7,7 +7,7 @@ export function RippleDemo({ mode = "disc", fullSize = false }: { mode?: RippleD
   const base = `/image-ripple-loader/${mode}${fullSize ? "-hd" : ""}`;
   const label = mode === "disc" ? "Green rings moving outward across a disc of marks" : "A band of colored marks sweeping across a dark slate field";
   const size = mode === "disc" ? { width: 480, height: 480 } : { width: 768, height: 432 };
-  return <DemoVideo {...size} base={base} label={label}/>;
+  return <DemoVideo fillThumbnail={!fullSize && mode === "frame"} {...size} base={base} label={label}/>;
 }
 
 export function ripplePrompt(mode: RippleDemoMode, source: string) {
