@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowUpRight, Check, Code2, Copy, Home, Layers2, Menu, Orbit as OrbitIcon, Pause, Play, RotateCcw, Sparkles, Type, X } from "lucide-react";
+import { ArrowUpRight, Check, Code2, Copy, Globe, Home, Layers2, Menu, Orbit as OrbitIcon, Pause, Play, RotateCcw, Sparkles, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Orbit } from "@/components/experiments/orbit";
 import { Chromatic } from "@/components/experiments/chromatic";
 import { CardStack } from "@/components/experiments/card-stack";
+import { DemoVideo } from "./demo-video";
 import { RippleDemo, ripplePrompt, type RippleDemoMode } from "@/components/ripple-demo";
 import type { Token } from "@/lib/highlight";
 
@@ -25,7 +26,13 @@ function KineticVideo({ fullSize = false }: { fullSize?: boolean }) {
   );
 }
 
+function GlobeDemo({ fullSize = false }: { fullSize?: boolean }) {
+  const base = "/motif-globe/preview" + (fullSize ? "-hd" : "");
+  return <DemoVideo base={base} width={1440} height={1440} label="Rotating globe of morphing geometric marks"/>;
+}
+
 const collection = [
+  { title: "Motif Globe", description: "Continents turn across a field of shifting geometric marks. A band of teal, gold, and coral travels over the surface as the globe rotates.", slug: "motif-globe", component: "MotifGlobe", icon: Globe, preview: GlobeDemo },
   { title: "Image Ripple Loader", description: "A grid of tiny marks lights up in passing waves. Watch the rings travel outward in a disc, or follow a band of color across the full frame.", slug: "image-ripple-loader", component: "ImageRippleLoader", icon: Layers2, preview: RippleDemo },
   { title: "Kinetic paragraph", description: "A single word opens into a paragraph. Colored highlights mark the rhythm as the words move across the page.", slug: "kinetic-paragraph", component: "KineticParagraph", icon: Type, preview: KineticVideo },
   { title: "Orbit", description: "Three satellites trace intersecting ellipses around an amber sun. Each follows its own path through the same twelve-second loop.", slug: "orbit", component: "Orbit", icon: OrbitIcon, preview: Orbit },
@@ -43,6 +50,7 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isGlobe = item.slug === "motif-globe";
   const isRipple = item.slug === "image-ripple-loader";
   const [mode, setMode] = useState<RippleDemoMode>("disc");
   const isVideo = item.slug === "kinetic-paragraph";
@@ -54,7 +62,12 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isRipple ? ripplePrompt(mode, source) : isVideo ? [
+    const text = kind === "code" ? source : isGlobe ? [
+      "Integrate the named React export MotifGlobe using the complete component below. Save it as MotifGlobe.tsx in a client boundary. It imports three, including when using its software renderer. Use the project's package manager to provide three and matching TypeScript declarations if needed.",
+      "Mount the globe in a responsive square. Preserve the built-in geographic mask, reduced-motion still, offscreen pause, and cleanup. Leave phase unset for animation; choose a fixed phase in [0,1) only for a still. Use a descriptive label for meaningful content or decorative for a purely decorative placement.",
+      'Example usage:\n```tsx\nimport { MotifGlobe } from "./MotifGlobe";\n\nexport function Preview() {\n  return <MotifGlobe aspectRatio={1} period={5} renderer="software" background="#0B1011" colors={["#5EA79D", "#EFD38E", "#FFB49F"]} outline="#75928A" idleColor="#1E302F" label="Rotating motif globe" />;\n}\n```',
+      "MotifGlobe.tsx (complete source):", "```tsx", source, "```",
+    ].join("\n\n") : isRipple ? ripplePrompt(mode, source) : isVideo ? [
       "Use the named export KineticParagraph from the full component below in a Remotion composition. Keep its existing animation. Return ready-to-use TSX for the composition.",
       "The example uses an original paragraph beginning with a word that stands alone. Pass it through text. Set background for the canvas, ink for text and outlines, and blue and yellow for the two highlights. Keep these prop names. If adapting the palette, keep ink legible on all three surfaces.",
       "Use one complete 5.6-second cycle with durationInFrames={Math.round(fps * durationSeconds)}. Register the composition in the project's Remotion root.",
@@ -87,7 +100,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isRipple ? <RippleDemo mode={mode} fullSize/> : isVideo ? (
+      {isGlobe ? <GlobeDemo fullSize/> : isRipple ? <RippleDemo mode={mode} fullSize/> : isVideo ? (
         <KineticVideo fullSize/>
       ) : <>
       <div className="piece" key={version}><Preview playing={playing}/></div>
@@ -98,7 +111,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       </>}
     </section>
     <section className="editor" aria-label="Component source">
-      <header><span><Code2/>{isRipple || isVideo ? item.component : item.slug}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
+      <header><span><Code2/>{isGlobe || isRipple || isVideo ? item.component : item.slug}.tsx</span><motion.button {...buttonGestures} onClick={() => copy("code")}>{feedback === "code" ? <Check/> : <Copy/>}{feedback === "code" ? "Copied" : "Copy code"}</motion.button></header>
       <pre tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
     </section>
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}

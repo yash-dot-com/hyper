@@ -1,22 +1,13 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { DemoVideo } from "./demo-video";
 
 export type RippleDemoMode = "disc" | "frame";
-const mediaQuery = "(prefers-reduced-motion: reduce)";
-function subscribe(change: () => void) {
-  const query = window.matchMedia(mediaQuery);
-  query.addEventListener("change", change);
-  return () => query.removeEventListener("change", change);
-}
-
 export function RippleDemo({ mode = "disc", fullSize = false }: { mode?: RippleDemoMode; fullSize?: boolean }) {
-  const still = useSyncExternalStore(subscribe, () => window.matchMedia(mediaQuery).matches, () => true);
   const base = `/image-ripple-loader/${mode}${fullSize ? "-hd" : ""}`;
   const label = mode === "disc" ? "Green rings moving outward across a disc of marks" : "A band of colored marks sweeping across a dark slate field";
   const size = mode === "disc" ? { width: 480, height: 480 } : { width: 768, height: 432 };
-  if (still) return <img {...size} src={base + ".webp"} alt={label}/>;
-  return <video key={mode} {...size} muted playsInline loop autoPlay poster={base + ".webp"} src={base + ".mp4"} aria-label={label}/>;
+  return <DemoVideo {...size} base={base} label={label}/>;
 }
 
 export function ripplePrompt(mode: RippleDemoMode, source: string) {
