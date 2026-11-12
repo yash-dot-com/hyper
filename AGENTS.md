@@ -9,3 +9,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 <!-- END:nextjs-agent-rules -->
 
 For each prompt that changes this project, check Git status before editing and commit the prompt's changes separately. Preserve unrelated work. Use the recorded diff when reverting a prompt.
+
+Showcase videos should autoplay muted, loop inline, and omit native player controls on both Home and detail pages.

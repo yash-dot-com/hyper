@@ -15,9 +15,9 @@ const buttonGestures = {
   whileTap: { y: 0, scale: 0.97 },
 };
 
-function KineticVideo({ controls = false }: { controls?: boolean }) {
+function KineticVideo() {
   return (
-    <video autoPlay muted loop playsInline controls={controls} width={720} height={720}
+    <video autoPlay muted loop playsInline width={720} height={720}
       src="/kinetic-paragraph/preview.mp4" poster="/kinetic-paragraph/poster.webp"
       aria-label="Kinetic paragraph animation" />
   );
@@ -82,7 +82,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     <p className="component-description">{item.description}</p>
     <section className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
       {isVideo ? (
-        <KineticVideo controls/>
+        <KineticVideo/>
       ) : <>
       <div className="piece" key={version}><Preview playing={playing}/></div>
       <div className="playback">
