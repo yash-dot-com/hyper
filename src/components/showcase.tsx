@@ -474,10 +474,11 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   </>;
 }
 
+const repositoryUrl = process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/yash-dot-com/hyper";
+
 function RepositoryAction() {
-  const url = process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/yash-dot-com/hyper";
   return <div className="repository-action">
-    <a href={url} target="_blank" rel="noopener noreferrer"><Star size={15} aria-hidden="true"/>Star on GitHub</a>
+    <a href={repositoryUrl} target="_blank" rel="noopener noreferrer"><Star size={15} aria-hidden="true"/>Star on GitHub</a>
   </div>;
 }
 
@@ -501,14 +502,14 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
       </nav>
     </aside>
     <main className="canvas" key={slug}>
-      <RepositoryAction/>
+      {slug !== "about" && <RepositoryAction/>}
       {slug === "about" ? <section className="author-profile" aria-labelledby="author-name">
         <header className="detail-head"><h1 id="author-name" className="author-block-name" aria-label="Yash Sonalekar"><BlockType text="yash sonalekar"/></h1></header>
         <div className="author-story">
           <p className="author-lead">I’m a software engineering student who likes building things for the web.</p>
           <p className="component-description">Hype is my place to play with small details. I’ll spend an afternoon on the way a butterfly banks, two inks overlap, or a button settles after a click.</p>
           <p className="component-description">Every experiment comes with its code so you can take it apart and make it yours.</p>
-          <nav className="author-links" aria-label="Social profiles">
+          <nav className="author-links" aria-label="Social profiles and project repository">
             {[
               ["GitHub", "https://github.com/yash-dot-com"],
               ["LinkedIn", "https://www.linkedin.com/in/yash-sonalekar/"],
@@ -516,6 +517,9 @@ export function Showcase({ sources, highlighted, composition }: { composition: s
             ].map(([label, href]) => <motion.a {...buttonGestures} className={buttonVariants()} key={label} href={href} target="_blank" rel="me noopener noreferrer">
               {label}<ArrowUpRight size={15} aria-hidden="true"/>
             </motion.a>)}
+            <motion.a {...buttonGestures} className={buttonVariants()} href={repositoryUrl} target="_blank" rel="noopener noreferrer">
+              <Star size={15} aria-hidden="true"/>Star on GitHub
+            </motion.a>
           </nav>
         </div>
       </section> : index < 0 ? <>
