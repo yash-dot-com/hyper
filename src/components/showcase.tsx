@@ -154,6 +154,22 @@ function MagneticSheet(){
     {magneticSheet.map(([cut,left,top,width,angle])=><div key={cut} style={{position:"absolute",left:left+"%",top:top+"%",width:width+"%",transform:`rotate(${angle}deg)`}}><MagneticSticker cut={cut}/></div>)}
   </div>;
 }
+function shuffleDriftPalettes():typeof driftPalettes {
+  const warm=325+Math.random()*40, cool=162+Math.random()*36;
+  const step=13+Math.random()*8, saturation=.72+Math.random()*.22;
+  function ink(hue:number,light:number) {
+    const channels=[0,8,4].map(offset=>{
+      const k=(offset+hue/30)%12;
+      const channel=light-saturation*Math.min(light,1-light)*Math.max(-1,Math.min(k-3,9-k,1));
+      return Math.round(channel*255).toString(16).padStart(2,"0");
+    });
+    return "#"+channels.join("");
+  }
+  return {
+    warm:[ink(warm+3*step,.72),ink(warm+2*step,.59),ink(warm,.50),ink(warm+step,.38),ink(warm+4*step,.62)],
+    cool:[ink(cool,.74),ink(cool+step,.57),ink(cool+2*step,.46),ink(cool+4*step,.34),ink(cool+3*step,.50)],
+  };
+}
 function PrismDriftSample(){return <PrismDrift style={{width:"100%",height:"100%"}}/>;}
 const collection = [
   {title:"Prism Drift",description:"Uneven vertical slices carry a rising color wave from citrus and pink into turquoise and violet.",slug:"prism-drift",component:"PrismDrift",icon:Layers2,preview:PrismDriftSample},
@@ -358,6 +374,8 @@ function Detail({ index, source, lines, composition }: { composition: string; in
           setDriftColors({...driftColors,[group]:next});
         }}/>)}
       </fieldset>)}
+      <Button variant="outline" onClick={()=>setDriftColors(shuffleDriftPalettes())}>Shuffle colors</Button>
+      <Button variant="outline" onClick={()=>setDriftColors(driftPalettes)}>Reset colors</Button>
       <label>Speed · {driftSpeed}×<input type="range" min="0" max="3" step=".1" value={driftSpeed} onChange={e=>setDriftSpeed(e.target.valueAsNumber)}/></label>
     </div>}
     {isFrost && <div className="pixel-controls">
