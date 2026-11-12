@@ -252,6 +252,18 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .stage.art-frosted-tile-footer,.art-frosted-tile-footer .mini {background:#f0f1ed;align-items:end;grid-template-columns:1fr}
 .art-frosted-tile-footer .mini .frosted-tile-footer {min-height:65%;font-size:12px}
 .stage.art-halftone-voice-blob,.art-halftone-voice-blob .mini {background:#fffcf5}
-.stage.art-parallax-ink-stickers,.art-parallax-ink-stickers .mini {background:#00af62}
-.ink-sticker-sheet {width:min(88%,510px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3%}
-.art-parallax-ink-stickers .mini .ink-sticker-sheet {width:min(85%,230px)}
+/* Give the six stickers bounded cells in both the detail stage and gallery. */
+.stage.art-parallax-ink-stickers,.art-parallax-ink-stickers .mini {
+  background:#00af62;
+  grid-template:minmax(0,1fr)/minmax(0,1fr);
+}
+.ink-sticker-sheet {
+  display:grid;
+  width:min(100%,560px);
+  height:100%;
+  padding:clamp(12px,3vw,32px);
+  grid-template:repeat(2,minmax(0,1fr))/repeat(3,minmax(0,1fr));
+  gap:clamp(6px,1vw,16px);
+}
+.ink-sticker-sheet > svg {height:100%;min-width:0;min-height:0}
+.art-parallax-ink-stickers .mini .ink-sticker-sheet {max-width:310px;padding:12px;gap:6px}
