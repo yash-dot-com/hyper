@@ -11,7 +11,7 @@ export default async function Home() {
     ["KineticParagraph.tsx", "Root.tsx"].map(file => readFile(path.join(directory, file), "utf8"))
   );
   const [frost, voice, cascade, blockType, tree, light, chrome, glass, jelly, embossed, badge, gradientSkill, folder, skill, voxel, kawaii, pixel, globe, ripple] = await Promise.all([
-    readFile(path.join(process.cwd(), "src/components/experiments/FrostedTileButton.tsx"), "utf8"),
+    readFile(path.join(process.cwd(), "src/components/experiments/FrostedTileFooter.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/VoiceBlob.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/CardCascade.tsx"), "utf8"),
     readFile(path.join(process.cwd(), "src/components/experiments/BlockType.tsx"), "utf8"),

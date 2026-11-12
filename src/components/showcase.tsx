@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { FrostedTileButton } from "./experiments/FrostedTileButton";
+import { FrostedTileFooter } from "./experiments/FrostedTileFooter";
 import { VoiceBlob } from "./experiments/VoiceBlob";
 import { CardCascade } from "./experiments/CardCascade";
 import { BlockType, IsoBlockType } from "./experiments/BlockType";
@@ -111,7 +111,7 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
 const collection = [
-  {title:"Frosted Tile Button",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-button",component:"FrostedTileButton",icon:Layers2,preview:()=> <FrostedTileButton size={146} tabIndex={-1} inert/>},
+  {title:"Frosted Tile Footer",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-footer",component:"FrostedTileFooter",icon:Layers2,preview:()=> <FrostedTileFooter/>},
   {title:"Voice Blob",description:"Pigments drift through a single blob. Louder syllables accelerate the color changes; vocal tone shifts the core. Enable the microphone to shape it with sound; audio stays in your browser.",slug:"voice-blob",component:"VoiceBlob",icon:Layers2,preview:()=> <VoiceBlob microphone={false} size={175}/>},
   {title:"Card Cascade",description:"Cards bounce across the felt, leaving a trail of frozen frames. Replay to clear the table.",slug:"card-cascade",component:"CardCascade",icon:Layers2,preview:()=> <CardCascade/>},
   {title:"Isometric Block Type",description:"Cube-built pieces tumble onto an isometric plane and assemble into your text.",slug:"isometric-block-type",component:"IsoBlockType",icon:Type,preview:()=> <IsoBlockType/>},
@@ -138,7 +138,7 @@ function subscribe(listener: () => void) {
   window.addEventListener("hashchange", listener);
   return () => window.removeEventListener("hashchange", listener);
 }
-const snapshot = () => window.location.hash === "#agent-portrait" ? "kawaii-face-kit" : window.location.hash.slice(1);
+const snapshot = () => window.location.hash === "#agent-portrait" ? "kawaii-face-kit" : window.location.hash === "#frosted-tile-button" ? "frosted-tile-footer" : window.location.hash.slice(1);
 const home = () => "";
 
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
@@ -147,7 +147,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const isFolder = item.slug === "gradient-folder";
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
   const isoBlock = item.slug === "isometric-block-type";
-  const isFrost = item.slug === "frosted-tile-button";
+  const isFrost = item.slug === "frosted-tile-footer";
   const [tileLabel,setTileLabel]=useState("Bloom");
   const [tileColors,setTileColors]=useState<[string,string,string]>(["#287940","#65db13","#d4ee16"]);
   const isVoice = item.slug === "voice-blob";
@@ -197,7 +197,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
 
   async function copy(kind: "code" | "prompt") {
     const text = kind === "code" ? source : isFrost ? [
-      `Integrate the supplied FrostedTileButton. Render <FrostedTileButton label={${JSON.stringify(tileLabel || "Bloom")}} colors={${JSON.stringify(tileColors)}} /> and connect onClick to the intended action.`, "```tsx", source, "```",
+      `Integrate the supplied FrostedTileFooter. Render <FrostedTileFooter label={${JSON.stringify(tileLabel)}} colors={${JSON.stringify(tileColors)}} /> at the bottom of the page. Pass footer links or secondary content as children if needed.`, "```tsx", source, "```",
     ].join("\n\n") : isVoice ? [
       "Use the named VoiceBlob client component below. Render <VoiceBlob /> to offer opt-in microphone input, or <VoiceBlob microphone={false}/> for an ambient preview. Keep processing local, handle denied permission, and release the stream on stop or unmount.", "```tsx", source, "```",
     ].join("\n\n") : isCascade ? [
@@ -263,10 +263,10 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isFrost ? <FrostedTileButton label={tileLabel} colors={tileColors}/> : isVoice ? <VoiceBlob size="min(63vw, 280px)"/> : isCascade ? <CardCascade paused={paused} replay={deal}/> : isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isFrost ? <FrostedTileFooter label={tileLabel} colors={tileColors}/> : isVoice ? <VoiceBlob size="min(63vw, 280px)"/> : isCascade ? <CardCascade paused={paused} replay={deal}/> : isBlock ? <TextDemo text={word} replay={drop}/> : isTree ? <ProceduralTree key={growth} design={design} {...tree}/> : isLight ? <LightSheet choose={setLight}/> : isChrome ? <MetalEmblem mark={mark} size="84%"/> : isGlass ? <GlassConversation/> : isJelly ? <JellyAvatar size="min(85%, 360px)"/> : isEmbossed ? <EmbossedSheet choose={setFinish}/> : isBadge ? <BadgeSheet choose={setBadge}/> : isFolder ? <GradientFolder color={folderColor} size="min(85%, 360px)"/> : isGradientSkill ? <GradientObjectsDemo/> : isSkill ? <SkillExamples/> : isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
     {isFrost && <div className="pixel-controls">
-      <label>Button text<input value={tileLabel} maxLength={48} placeholder="Bloom" onChange={e=>setTileLabel(e.target.value)}/></label>
+      <label>Footer text<input value={tileLabel} maxLength={48} placeholder="Bloom" onChange={e=>setTileLabel(e.target.value)}/></label>
       {["Base","Midtone","Highlight"].map((name,i)=><label key={name}>{name}<input type="color" value={tileColors[i]} onChange={e=>{
         const next: typeof tileColors=[...tileColors]; next[i]=e.target.value; setTileColors(next);
       }}/></label>)}
