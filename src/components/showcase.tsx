@@ -83,7 +83,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     </header>
     <p className="component-description">{item.description}</p>
     {isRipple && <div className="demo-modes" role="group" aria-label="Preview style">
-      {(["disc", "frame"] as const).map(value => <button key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</button>)}
+      {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
       {isRipple ? <RippleDemo mode={mode}/> : isVideo ? (
