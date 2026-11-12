@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { HalftoneSticker } from "./experiments/HalftoneSticker";
 import { HalftoneVoiceBlob } from "./experiments/HalftoneVoiceBlob";
 import { FrostedTileFooter } from "./experiments/FrostedTileFooter";
 import { VoiceBlob } from "./experiments/VoiceBlob";
@@ -111,7 +112,11 @@ function LightSheet({choose}:{choose?:(finish:LightFinish)=>void}) {
   </div>;
 }
 function TreeThumbnail() {return <ProceduralTree width={300} height={200} seed={19}/>;}
+function InkStickerSheet() {
+  return <div className="ink-sticker-sheet">{(["disc","arrow","spark","bow","vase","cube"] as const).map(shape=><HalftoneSticker key={shape} shape={shape}/>)}</div>;
+}
 const collection = [
+  {title:"Parallax Ink Stickers",description:"Move across a sticker to slide its dot screen over the yellow print.",slug:"parallax-ink-stickers",component:"HalftoneSticker",icon:Layers2,preview:InkStickerSheet},
   {title:"Halftone Voice Blob",description:"Speech stirs the colored ink dots. Pause and they swirl into a spinning ring before drifting back.",slug:"halftone-voice-blob",component:"HalftoneVoiceBlob",icon:Layers2,preview:()=> <HalftoneVoiceBlob microphone={false} size={180}/>},
   {title:"Frosted Tile Footer",description:"A single wash of color passes through two rows of straight-edged glass tiles.",slug:"frosted-tile-footer",component:"FrostedTileFooter",icon:Layers2,preview:()=> <FrostedTileFooter/>},
   {title:"Voice Blob",description:"Pigments drift through a single blob. Louder syllables accelerate the color changes; vocal tone shifts the core. Enable the microphone to shape it with sound; audio stays in your browser.",slug:"voice-blob",component:"VoiceBlob",icon:Layers2,preview:()=> <VoiceBlob microphone={false} size={175}/>},
@@ -198,7 +203,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : item.slug === "halftone-voice-blob" ? ["Render the supplied HalftoneVoiceBlob with opt-in microphone input. Set microphone={false} for an ambient thumbnail. Preserve local voice analysis and microphone cleanup.", "```tsx", source, "```"].join("\n\n") : isFrost ? [
+    const text = kind === "code" ? source : item.slug === "parallax-ink-stickers" ? ["Use the supplied HalftoneSticker React component inside a sized container. Choose spark, disc, cube, bow, arrow or vase with the shape prop. Set base and ink colors as needed. Preserve pointer parallax on the ink layer and reduced-motion support.", "```tsx", source, "```"].join("\n\n") : item.slug === "halftone-voice-blob" ? ["Render the supplied HalftoneVoiceBlob with opt-in microphone input. Set microphone={false} for an ambient thumbnail. Preserve local voice analysis and microphone cleanup.", "```tsx", source, "```"].join("\n\n") : isFrost ? [
       `Integrate the supplied FrostedTileFooter. Render <FrostedTileFooter label={${JSON.stringify(tileLabel)}} colors={${JSON.stringify(tileColors)}} /> at the bottom of the page. Pass footer links or secondary content as children if needed.`, "```tsx", source, "```",
     ].join("\n\n") : isVoice ? [
       "Use the named VoiceBlob client component below. Render <VoiceBlob /> to offer opt-in microphone input, or <VoiceBlob microphone={false}/> for an ambient preview. Keep processing local, handle denied permission, and release the stream on stop or unmount.", "```tsx", source, "```",
