@@ -52,6 +52,7 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
     const reduce=matchMedia("(prefers-reduced-motion: reduce)");
     const samples=new Float32Array(1024),bins=new Uint8Array(512);
     let raf=0,last=0,time=0,energy=0,phase=0,bright=0,visible=true;
+    let flow=0, currentAngle=0;
     function draw(now:number){
       raf=requestAnimationFrame(draw);
       if(now-last<(reduce.matches?100:32))return;
@@ -85,13 +86,18 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
         if(i)outline.lineTo(x,y);else outline.moveTo(x,y);
       }
       outline.closePath();c.save();c.clip(outline);
-      const wash=c.createLinearGradient(62,50,166,192);
+      // Pigment gathers momentum on a syllable and relaxes between phrases.
+      flow+=(e-flow)*(1-Math.exp(-dt*(e>flow?8:1.5)));
+      currentAngle+=dt*flow*(1.2+bright);
+      const pull=Math.min(1,flow*1.8);
+      const drift=22*pull*Math.sin(currentAngle);
+      const wash=c.createLinearGradient(62+drift,50,166-drift,192);
       wash.addColorStop(0,pigment(rimPhase,0));wash.addColorStop(.37,pigment(phase,1));wash.addColorStop(.68,pigment(corePhase,3));wash.addColorStop(1,pigment(rimPhase,0));
       c.fillStyle=wash;c.fillRect(20,20,200,200);
       const offset=12*Math.sin(t)+e*12;
       c.save();
       c.translate(120+9*Math.sin(t*.61),125+6*Math.sin(t*.83));
-      c.rotate(-.35+.28*Math.sin(t*.7));
+      c.rotate(-.35+.28*Math.sin(t*.7)+currentAngle);
       // Independent harmonics change the pigment's silhouette, not just its position.
       const pool=new Path2D(), voiceTone=reduce.matches?0:bright*e;
       for(let i=0;i<=96;i++){
@@ -99,15 +105,30 @@ export function VoiceBlob({ microphone=true, size=320 }: {microphone?:boolean;si
         const radius=44+(10+7*e)*Math.cos(2*a+t*.97)
           +(8+5*voiceTone)*Math.sin(3*a-t*1.21+voiceTone*2)
           +4*Math.cos(4*a+t*.56);
-        const x=radius*Math.cos(a)*1.13;
-        const y=radius*Math.sin(a)*.91+8*Math.sin(x/29+t*.81);
+        const x=radius*Math.cos(a)*(1.13+.52*pull);
+        const bend=Math.sin(x/27+t*.81);
+        const y=radius*Math.sin(a)*(.91-.46*pull)+(8+19*pull)*bend;
         if(i)pool.lineTo(x,y);else pool.moveTo(x,y);
       }
       pool.closePath();
       const core=c.createLinearGradient(-49,-29,42,39);
-      core.addColorStop(0,pigment(corePhase,3));core.addColorStop(.39,pigment(corePhase,2));
-      core.addColorStop(.73,pigment(corePhase+.22,2));core.addColorStop(1,pigment(corePhase,3));
-      c.filter="blur(6px)";c.fillStyle=core;c.fill(pool);c.restore();
+      core.addColorStop(0,pigment(corePhase,3,.55));core.addColorStop(.39,pigment(corePhase,2));
+      core.addColorStop(.73,pigment(corePhase+.22,2));core.addColorStop(1,pigment(corePhase,3,.45));
+      c.filter="blur(6px)";c.fillStyle=core;c.fill(pool);
+      if(pull>.01){
+        // Carry a lighter filament along the same curved current as the dark pigment.
+        c.beginPath();
+        for(let x=-72;x<=72;x+=3){
+          const y=(8+19*pull)*Math.sin(x/27+t*.81)-10;
+          if(x===-72)c.moveTo(x,y);else c.lineTo(x,y);
+        }
+        const filament=c.createLinearGradient(-72,0,72,0);
+        filament.addColorStop(0,pigment(rimPhase,1,0));
+        filament.addColorStop(.54,pigment(rimPhase,1,.65*pull));
+        filament.addColorStop(1,pigment(corePhase,3,0));
+        c.strokeStyle=filament;c.lineWidth=9+8*pull;c.stroke();
+      }
+      c.restore();
       c.save();c.filter="blur(9px)";c.strokeStyle=pigment(corePhase,3,.7);c.lineWidth=13;
       c.beginPath();c.moveTo(61,112);c.bezierCurveTo(68,157+offset,109,180,162,129-offset*.4);c.stroke();c.restore();
       c.strokeStyle=pigment(rimPhase,1,.6);c.lineWidth=4;c.filter="blur(2px)";c.stroke(outline);c.restore();
