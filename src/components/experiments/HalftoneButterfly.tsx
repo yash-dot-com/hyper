@@ -41,6 +41,13 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
     if(!ctx)return;
     ctx.resetTransform();
     const wing=new Path2D(outline);
+    const contour=document.createElementNS("http://www.w3.org/2000/svg","path");
+    contour.setAttribute("d",outline);
+    const length=contour.getTotalLength(), count=Math.ceil(length/2);
+    const rim=Array.from({length:count},(_,i)=>{
+      const {x,y}=contour.getPointAtLength(i*length/count);
+      return {x,y,lag:1.45*Math.min(1,Math.hypot(x,y)/118)+.65*(y+80)/140};
+    });
     // Batch dots by pigment phase so each frame needs only a few fill calls.
     type Dot={x:number;y:number;radius:number;span:number;lag:number;drift:number;freedom:number};
     const pair=generator(seed);
@@ -124,7 +131,13 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
       c.translate(margin+sum(0,weights)*(width-2*margin),margin+sum(1,weights)*(height-2*margin)+unit*Math.sin(wingPhase));
       c.rotate(heading);
       c.scale(.40*unit*perspective,.40*unit*perspective);
-      const beat=wingPhase;
+      function project(span:number,fore:number,lag:number,side:number){
+        const flap=(.47-.68*Math.cos(wingPhase-lag+side*.10))*(1-glide)+.18*glide;
+        const lateral=side*span*Math.cos(flap),lift=span*Math.sin(flap);
+        const rolledZ=lateral*sb+lift*cb;
+        const projection=depth/(depth-.47*(rolledZ*cp-fore*sp));
+        return {x:(lateral*cb-lift*sb)*projection,y:(fore*cp+rolledZ*sp)*projection,projection};
+      }
       for(let i=0;i<bands.length;i++){
         const phase=(i/bands.length+t*.082)*inks.length;
         const n=Math.floor(phase),f=phase-n,a=inks[n%inks.length],b=inks[(n+1)%inks.length];
@@ -133,27 +146,29 @@ function ButterflyLayer({seed,companion}:{seed:number;companion:boolean}) {
         for(const dot of bands[i]){
           // A traveling bend carries neighboring dots together; a smaller
           // independent drift breaks up the rows without losing the silhouette.
-          const wave=beat-dot.lag;
           const flow=Math.sin(t*1.6+dot.y*.064+dot.x*.032);
           const dx=dot.freedom*dot.span*(2.9*flow+.95*Math.sin(t*2.1+dot.drift));
           const dy=dot.freedom*dot.span*(2.2*Math.cos(t*1.45+dot.x*.058)+.85*Math.cos(t*1.8+dot.drift));
           for(const side of [-1,1]){
-            const localBeat=wave+side*.10;
-            // Hinge the membrane at the thorax, then roll and pitch it into camera space.
-            const flap=(.47-.68*Math.cos(localBeat))*(1-glide)+.18*glide;
-            const span=dot.x+dx, lateral=side*span*Math.cos(flap), lift=span*Math.sin(flap);
-            const fore=dot.y+dy;
-            const rolledZ=lateral*sb+lift*cb;
-            const localZ=rolledZ*cp-fore*sp;
-            const projection=depth/(depth-.47*localZ);
-            const x=(lateral*cb-lift*sb)*projection;
-            const y=(fore*cp+rolledZ*sp)*projection;
+            const {x,y,projection}=project(dot.x+dx,dot.y+dy,dot.lag,side);
             const radius=dot.radius*projection;
             c.moveTo(x+radius,y);c.arc(x,y,radius,0,Math.PI*2);
           }
         }
         c.fill();
       }
+      c.strokeStyle=`rgba(${inks[0].map(channel=>Math.round(channel*.48)).join(",")},.78)`;
+      c.lineWidth=1.35;
+      c.lineJoin="round";
+      c.beginPath();
+      for(const side of [-1,1]){
+        rim.forEach((point,i)=>{
+          const {x,y}=project(point.x,point.y,point.lag,side);
+          if(i===0)c.moveTo(x,y);else c.lineTo(x,y);
+        });
+        c.closePath();
+      }
+      c.stroke();
       c.scale(cb,cp);
       c.strokeStyle="#00c4fa";c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9);c.quadraticCurveTo(-7,-24,-16,-30);
       c.moveTo(1,-9);c.quadraticCurveTo(8,-25,16,-30);c.stroke();
