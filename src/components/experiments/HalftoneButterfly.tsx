@@ -26,7 +26,7 @@ function pigment(hue:number,saturation:number,light:number) {
 
 export function HalftoneButterfly({ hue=0, seed=0 }: {hue?:number;seed?:number} = {}) {
   return <div role="img" aria-label="Two flying butterflies with distinct color-shifting halftone wings"
-    style={{position:"relative",width:"100%",height:"100%",background:"#09090d",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
+    style={{position:"relative",width:"100%",height:"100%",background:"#fff",overflow:"hidden",filter:hue?`hue-rotate(${hue}deg)`:undefined}}>
     <ButterflyLayer seed={seed} companion={false}/>
     <ButterflyLayer seed={seed} companion/>
   </div>;

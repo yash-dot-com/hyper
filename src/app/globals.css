@@ -312,7 +312,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .meadow-runway {min-height:195%;position:relative}
 .meadow-runway .meadow-footer {position:sticky;top:0;min-height:clamp(320px,48vw,510px)}
 .stage.art-butterfly-meadow,.art-butterfly-meadow .mini {background:#f5f0df;grid-template-columns:minmax(0,1fr)}
-.stage.art-halftone-butterfly,.art-halftone-butterfly .mini {background:#09090d;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.stage.art-halftone-butterfly,.art-halftone-butterfly .mini {background:#fff;grid-template:minmax(0,1fr)/minmax(0,1fr)}
 .stage.art-afterglow-footer,.art-afterglow-footer .mini {grid-template-columns:minmax(0,1fr);background:#8784ef}.stage.art-afterglow-footer{height:auto}.afterglow-controls label{text-transform:capitalize}.afterglow-controls input:not([type=color]){max-width:14em;border:1px solid var(--edge);border-radius:6px;padding:5px 8px}
 .stage.art-magnetic-stickers,.art-magnetic-stickers .mini {background:#10100f;grid-template-columns:minmax(0,1fr)}.art-magnetic-stickers .mini>div{max-width:300px}
 .stage.art-spectrum-type,.art-spectrum-type .mini {background:#fffdf8;grid-template:minmax(0,1fr)/minmax(0,1fr);padding:12px}.art-spectrum-type h1 {height:100%;min-height:0}
@@ -333,12 +333,6 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
     overscroll-behavior:contain;
   }
 }
-.art-chroma-tiles .mini,.stage.art-chroma-tiles{background:#181422;grid-template:minmax(0,1fr)/minmax(0,1fr)}
-.chroma-sheet{width:min(88%,660px);height:min(78%,322px);display:grid;grid-template:repeat(2,minmax(0,1fr))/1.06fr 1fr;gap:clamp(10px,1.5vw,20px)}
-.chroma-sheet article:first-child{grid-row:span 2}
-.chroma-sheet strong{position:relative;font-weight:520;font-size:clamp(15px,1.8vw,24px);letter-spacing:-.035em;line-height:1.16}
-.art-chroma-tiles .mini .chroma-sheet{width:min(88%,340px);gap:8px}.art-chroma-tiles .mini strong{font-size:13px}
-@media(max-width:500px){.chroma-sheet{width:92%;height:82%;gap:9px}}
 
 
 .stage.art-breathing-bands,.art-breathing-bands .mini{background:#fff9ee;grid-template-columns:minmax(0,1fr)}.stage.art-breathing-bands{height:auto}
