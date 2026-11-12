@@ -220,3 +220,5 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .face-sheet button {display:grid;justify-items:center;padding:6px 2px 9px;background:#212020;border:1px solid var(--edge);border-radius:10px;font-size:11px;text-transform:capitalize}
 .face-sheet button:hover {background:#30292c}
 .face-sheet button[aria-pressed=true] {border-color:#edaac0;background:#352a30}
+
+.stage.art-voxel-stickers,.art-voxel-stickers .mini { background: #eeeae3; }

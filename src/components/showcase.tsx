@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check, Code2, Copy, Globe, Grid2X2, Home, Layers2, Menu, Type, X } from "lucide-react";
 import { motion, MotionConfig } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { VoxelSticker, stickerNames, type StickerName } from "./experiments/VoxelSticker";
 import { KawaiiFace } from "./experiments/KawaiiFace";
 import { KawaiiControls, initialFace, kawaiiPrompt } from "./kawaii-kit";
 import { PixelCharacter } from "./experiments/PixelCharacter";
@@ -39,7 +40,10 @@ function PixelThumbnail() {
 
 function KawaiiThumbnail() { return <KawaiiFace size={180} expression="pleased"/>; }
 
+function StickerThumbnail() { return <VoxelSticker size={186}/>; }
+
 const collection = [
+  {title:"Voxel Stickers", description:"Ten miniature objects built from colored blocks. Pick a sticker to see its raised details and copy its source.", slug:"voxel-stickers", component:"VoxelSticker", icon:Layers2, preview:StickerThumbnail},
   { title: "Kawaii Face Kit", description: "A blushing face for a conversation. Pick an expression, then mix the eyes, mouth, and cheek color.", slug: "kawaii-face-kit", component: "KawaiiFace", icon: Grid2X2, preview: KawaiiThumbnail },
   { title: "Pixel Character", description: "A little portrait built from colored squares. It glances to one side, tilts its head, and bobs back into place.", slug: "pixel-character", component: "PixelCharacter", icon: Grid2X2, preview: PixelThumbnail },
   { title: "Motif Globe", description: "Continents turn across a field of shifting geometric marks. A band of teal, gold, and coral travels over the surface as the globe rotates.", slug: "motif-globe", component: "MotifGlobe", icon: Globe, preview: GlobeDemo },
@@ -57,6 +61,8 @@ const home = () => "";
 function Detail({ index, source, lines, composition }: { composition: string; index: number; source: string; lines: Token[][] }) {
   const item = collection[index];
   const Preview = item.preview;
+  const isVoxel = item.slug === "voxel-stickers";
+  const [sticker,setSticker] = useState<StickerName>("Globe");
   const isKawaii = item.slug === "kawaii-face-kit";
   const [face, setFace] = useState(initialFace);
   const isPixel = item.slug === "pixel-character";
@@ -70,7 +76,11 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
   async function copy(kind: "code" | "prompt") {
-    const text = kind === "code" ? source : isKawaii ? kawaiiPrompt(face, source) : isGlobe ? [
+    const text = kind === "code" ? source : isVoxel ? [
+      "Use the named React export VoxelSticker from the complete source below. Preserve its transparent background, block geometry, and shading. It needs React only.",
+      `Save as VoxelSticker.tsx, import { VoxelSticker } from "./VoxelSticker", and render <VoxelSticker name="${sticker}" size={240} />.`,
+      "```tsx", source, "```",
+    ].join("\n\n") : isKawaii ? kawaiiPrompt(face, source) : isGlobe ? [
       "Integrate the named React export MotifGlobe using the complete component below. Save it as MotifGlobe.tsx in a client boundary. It imports three, including when using its software renderer. Use the project's package manager to provide three and matching TypeScript declarations if needed.",
       "Mount the globe in a responsive square. Preserve the built-in geographic mask, reduced-motion still, offscreen pause, and cleanup. Leave phase unset for animation; choose a fixed phase in [0,1) only for a still. Use a descriptive label for meaningful content or decorative for a purely decorative placement.",
       'Example usage:\n```tsx\nimport { MotifGlobe } from "./MotifGlobe";\n\nexport function Preview() {\n  return <MotifGlobe aspectRatio={1} period={5} renderer="software" background="#0B1011" colors={["#5EA79D", "#EFD38E", "#FFB49F"]} outline="#75928A" idleColor="#1E302F" label="Rotating motif globe" />;\n}\n```',
@@ -103,8 +113,11 @@ function Detail({ index, source, lines, composition }: { composition: string; in
       {(["disc", "frame"] as const).map(value => <MotionButton {...buttonGestures} variant="outline" key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>{value === "disc" ? "Disc ripple" : "Full-frame sweep"}</MotionButton>)}
     </div>}
     <section data-mode={isRipple ? mode : undefined} className={'stage art-' + item.slug} aria-label={item.title + " preview"}>
-      {isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
+      {isVoxel ? <VoxelSticker name={sticker} size="min(80%, 340px)"/> : isKawaii ? <KawaiiFace expression={face.expression} eyes={face.eyes || undefined} mouth={face.mouth || undefined} blush={face.blush} size="min(78%, 320px)"/> : isPixel ? <PixelCharacter {...pixel} size="min(75%, 336px)"/> : isRipple ? <RippleDemo mode={mode} fullSize/> : <Preview fullSize/>}
     </section>
+    {isVoxel && <div className="face-sheet" role="group" aria-label="Sticker designs">{stickerNames.map(name =>
+      <button key={name} aria-label={name} aria-pressed={name===sticker} onClick={()=>setSticker(name)}><span aria-hidden="true"><VoxelSticker name={name} size={56}/></span>{name}</button>
+    )}</div>}
     {isKawaii && <KawaiiControls value={face} change={setFace}/>}
     {isPixel && <PixelControls value={pixel} change={setPixel}/>}
     <section className="editor" aria-label="Component source">
