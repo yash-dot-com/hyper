@@ -473,7 +473,9 @@ function Detail({ index, source, lines, composition }: { composition: string; in
         <h2 id="source-title">{isSkill?"Skill":"Code"}</h2>
         <CopyAction label={isSkill?"Copy skill":"Copy code"} copied={feedback==="code"} onCopy={()=>copy("code")}/>
       </div>
-      <pre className="editor" tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
+      <div className="editor-frame">
+        <pre className="editor" tabIndex={0} aria-label="Scrollable source code"><code>{lines.map((tokens, i) => <span className="line" key={i}><i aria-hidden="true">{i + 1}</i><span>{tokens.map((token, j) => <span key={j} className={'tok-' + token.kind}>{token.text}</span>)}{'\n'}</span></span>)}</code></pre>
+      </div>
     </section>
     {manual && <label className="manual">Select and copy the text<textarea autoFocus readOnly value={manual} onFocus={e => e.target.select()}/></label>}
     <span className="sr-only" role="status">{feedback && feedback + " copied"}</span>

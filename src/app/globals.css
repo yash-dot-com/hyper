@@ -143,7 +143,7 @@ button,a {cursor:pointer} :focus-visible {outline:2px solid #e4cb94;outline-offs
 .rail h2 {color:#90908a;font-size:12px;font-weight:500;margin:34px 12px 9px}
 .canvas {width:100%;max-width:1300px;margin-inline:auto;padding:clamp(40px,6vw,92px) clamp(24px,5vw,80px);min-width:0}
 h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-height:1.05}
-.gallery,.stage,.editor {border:1px solid var(--edge);border-radius:18px;overflow:hidden}
+.gallery,.stage,.editor-frame {border:1px solid var(--edge);border-radius:18px;overflow:hidden}
 .gallery {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:42px}
 .tile {position:relative;min-width:0;background:#1d1d1c}
 .tile+.tile {border-left:1px solid var(--edge)}
@@ -164,7 +164,17 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .prompt-action {font-size:13px;line-height:20px}
 
 .stage {position:relative;height:clamp(310px,40vw,465px);background:#20201f}
-.editor {margin:0;background:#151515;font:13px/1.65 var(--font-geist-mono),monospace;letter-spacing:0}
+@font-face {font-family:"JetBrains Mono";src:url("/fonts/jetbrains-mono/regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
+.editor-frame {position:relative;isolation:isolate;background:#151515}
+.editor-frame::after {
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  mask-image:linear-gradient(to bottom,#000,transparent 28px,transparent calc(100% - 28px),#000),
+    linear-gradient(to right,#000,transparent 18px,transparent calc(100% - 18px),#000);
+}
+.editor-frame:focus-within::after {opacity:0}
+.editor code {font-family:inherit}
+.editor {margin:0;background:#151515;font:13px/1.65 "JetBrains Mono",monospace;letter-spacing:0}
 .source-section {display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-block-start:clamp(24px,3vw,36px)}
 .source-heading {justify-content:space-between;gap:16px}
 .source-heading h2 {margin:0;font-size:20px;font-weight:600;letter-spacing:-.035em}
