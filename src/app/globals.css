@@ -308,3 +308,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
     overscroll-behavior:contain;
   }
 }
+.art-chroma-tiles .mini,.stage.art-chroma-tiles{background:#181422;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.chroma-sheet{width:min(92%,560px);height:min(80%,300px);display:grid;grid-template:repeat(2,minmax(0,1fr))/1.1fr 1fr;gap:9px}
+.chroma-sheet strong{font-size:clamp(14px,2vw,26px);letter-spacing:-.04em;line-height:1.1}
+.art-chroma-tiles .mini .chroma-sheet{max-width:340px}.art-chroma-tiles .mini strong{font-size:15px}
