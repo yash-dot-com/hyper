@@ -168,7 +168,7 @@ h1 {font-weight:500;font-size:clamp(40px,5vw,72px);letter-spacing:-.065em;line-h
 .editor-frame {position:relative;isolation:isolate;background:#151515}
 .editor-frame::after {
   content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
   mask-image:linear-gradient(to bottom,#000,transparent 48px,transparent calc(100% - 48px),#000),
     linear-gradient(to right,#000,transparent 32px,transparent calc(100% - 32px),#000);
 }
