@@ -139,6 +139,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
   const [folderColor,setFolderColor] = useState<FolderColor>("persimmon");
   const isTree = item.slug === "procedural-tree";
   const [tree,setTree] = useState<TreeSettings>({width:460,height:380,depth:3,seed:19});
+  useEffect(()=>{if(isTree)setTree(t=>({...t,seed:Math.floor(Math.random()*1000)}));},[isTree]);
   const [growth,regrow] = useState(0);
   const isLight = item.slug === "luminous-surfaces";
   const [light,setLight] = useState<LightFinish>("bloom");
@@ -230,6 +231,7 @@ function Detail({ index, source, lines, composition }: { composition: string; in
     </section>
     {isTree && <div className="pixel-controls">
       {(["width","height","depth","seed"] as const).map(k=><label key={k}>{k[0].toUpperCase()+k.slice(1)} · {tree[k]}<input type="range" min={k==="seed"?0:k==="depth"?1:160} max={k==="depth"?5:k==="seed"?999:800} step={k==="width"||k==="height"?10:1} value={tree[k]} onChange={e=>setTree({...tree,[k]:Number(e.target.value)})}/></label>)}
+      <Button variant="outline" onClick={()=>setTree(t=>({...t,seed:(t.seed+1+Math.floor(Math.random()*999))%1000}))}>New tree</Button>
       <Button variant="outline" onClick={()=>regrow(n=>n+1)}>Replay growth</Button>
     </div>}
     {isLight && <p role="status" style={{marginTop:12}}>Selected finish: {light}</p>}

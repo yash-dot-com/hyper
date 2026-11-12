@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 
 type Point = [number,number];
 type Stem = {d:string; color:string; start:number; duration:number; tip:Point; flower:number; weight:number};
@@ -25,6 +27,24 @@ function grow({width:w,height:h,depth,seed}:TreeSettings) {
     stems.push({d:`M${root}V${y+diagonal}l${sign*diagonal},${-diagonal}H${x}`,tip,
       color:pigments[color],start,duration,weight:unit*(1.05-level*.095),flower:leaf?Math.floor(rand()*4):-1});
     if(leaf)return;
+    // Sample distance along the actual parent polyline so each sprig stays attached.
+    const vertical=root[1]-y-diagonal, slant=diagonal*Math.SQRT2;
+    const total=vertical+slant+Math.abs(x-root[0])-diagonal;
+    const count=level===0?2:level<=2?1:Number(rand()<.35);
+    const firstSide=rand()<.5?-1:1;
+    for(let j=0;j<count;j++){
+      const fraction=(j+.35+rand()*.35)/count, along=total*fraction;
+      const onSlope=Math.min(diagonal,Math.max(0,along-vertical)/Math.SQRT2);
+      const ax=root[0]+sign*(onSlope+Math.max(0,along-vertical-slant));
+      const ay=root[1]-Math.min(vertical,along)-onSlope;
+      let side=j%2?-firstSide:firstSide;
+      const reach=Math.min((right-left)*.27,unit*(3+rand()*3));
+      if(ax+side*reach<unit*4 || ax+side*reach>w-unit*4)side=-side;
+      const end:Point=[ax+side*reach,ay-reach*.35];
+      stems.push({d:`M${ax},${ay}l${side*reach*.35},${-reach*.35}H${end[0]}`,
+        tip:end,color:pigments[color],start:start+duration*fraction,duration:.22,
+        weight:unit*.65,flower:Math.floor(rand()*4)});
+    }
     const split=left+(right-left)*(.42+rand()*.16);
     branch(tip,left,split,level+1,start+duration,color);
     branch(tip,split,right,level+1,start+duration,(color+1+Math.floor(rand()*2))%4);
@@ -38,15 +58,18 @@ function Bloom({kind}: {kind:number}) {
   if(kind===2)return <><path fill="#ff9558" d="m0 0-3-1-1-2 2-1 2 2-1-3 1-1 2 1-1 3 2-2 2 1-1 2z"/><circle r=".8" fill="#ffe4a1"/></>;
   return <><path fill="#72c76d" d="M0 1v-2q-3-1-2-4h4q1 3-1 4v2z"/><path stroke="#9ce18d" strokeWidth=".7" d="M0 0v-3"/></>;
 }
-export function ProceduralTree({width=460,height=380,depth=3,seed=19,animated=true}: Partial<TreeSettings>&{animated?:boolean}) {
+export function ProceduralTree({width=460,height=380,depth=3,seed,animated=true}: Partial<TreeSettings>&{animated?:boolean}) {
   const w=limit(width,160,1200,460),h=limit(height,160,1200,380);
   const levels=Math.round(limit(depth,1,5,3));
-  const {stems,unit}=useMemo(()=>grow({width:w,height:h,depth:levels,seed}),[w,h,levels,seed]);
+  const [randomSeed,setRandomSeed]=useState(19);
+  useEffect(()=>{if(seed===undefined)setRandomSeed(Math.floor(Math.random()*0xffffffff));},[seed]);
+  const actualSeed=seed??randomSeed;
+  const {stems,unit}=useMemo(()=>grow({width:w,height:h,depth:levels,seed:actualSeed}),[w,h,levels,actualSeed]);
   const flowerScale=Math.min(unit*.8,w/(2**levels*11));
   return <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} role="img" aria-label="Procedurally grown flowering tree"
     style={{display:"block",maxWidth:"100%",maxHeight:"100%",background:"#101311"}}>
     <style>{`@keyframes tree-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}@keyframes tree-bloom{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:scale(1)}}@media(prefers-reduced-motion:reduce){.tree-stem,.tree-bloom{animation:none!important}}`}</style>
-    <g key={`${w}-${h}-${levels}-${seed}`}>{stems.map(({d,color,start,duration,tip,weight,flower},i)=><g key={i}>
+    <g key={`${w}-${h}-${levels}-${actualSeed}`}>{stems.map(({d,color,start,duration,tip,weight,flower},i)=><g key={i}>
       <path className="tree-stem" d={d} stroke={color} strokeWidth={weight} strokeLinecap="round" strokeLinejoin="round" fill="none" pathLength="1" strokeDasharray="1 1"
         style={{animation:animated?`tree-draw ${duration}s linear ${start}s both`:undefined}}/>
       {flower>=0 && <g transform={`translate(${tip}) scale(${flowerScale})`}><g className="tree-bloom" style={{animation:animated?`tree-bloom .32s ease-out ${start+duration}s both`:undefined}}><Bloom kind={flower}/></g></g>}
