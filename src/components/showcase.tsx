@@ -85,9 +85,12 @@ function EmbossedSheet({choose}:{choose?:(finish:BadgeFinish)=>void}) {
 }
 function JellyThumbnail() { return <JellyAvatar size={176}/>; }
 function GlassConversation({compact=false}:{compact?:boolean}) {
+  const [largeIndex,setLargeIndex] = useState(1);
+  useEffect(() => { setLargeIndex(Math.floor(Math.random() * (compact ? 2 : 3))); }, [compact]);
   return <div style={{width:"86%",maxWidth:compact?290:440,display:"flex",flexDirection:"column",gap:compact?9:14,fontSize:compact?14:18}}>
-    <GlassBubble side="incoming">What are we making?</GlassBubble>
-    <GlassBubble>A little light in glass.</GlassBubble>
+    {(compact ? ["What are we making?", "A little light in glass."] : ["What are we making?", "A little light in glass.", "Let’s try it."]).map((message,i) =>
+      <GlassBubble key={message} side={i%2 ? "outgoing" : "incoming"} size={i===largeIndex ? "large" : "regular"}>{message}</GlassBubble>
+    )}
   </div>;
 }
 function GlassThumbnail() { return <GlassConversation compact/>; }
